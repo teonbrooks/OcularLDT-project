@@ -8,10 +8,10 @@ http://w3.usf.edu/FreeAssociation/
 '''
 
 
-
 import os
+import os.path as op
+import inspect
 
-free_dir = os.path.expanduser('~/Dropbox/academic/Experiments/E-MEG/stim')
 
 fields = {
     
@@ -26,7 +26,7 @@ fields = {
     'OSG':	'Overlapping Associate Strength',
     '#M':	'Number of Mediators',
     'MMIA':	'Number of Non-Normed Potential Mediating Associates',
-    '#O':	'Number of Overlaping Associates',
+    '#O':	'Number of Overlapping Associates',
     'OMIA':	'Number of Non-Normed Overlapping Associates',
     'QSS':	'Cue: Set Size',
     'QFR':	'Cue: Frequency',
@@ -49,27 +49,25 @@ fields = {
 }
 
 
-class Free(object):
+class Free(dict):
 
     def __init__(self):
-        self.free = self._read_free()
-        self.cues = [x['CUE'] for x in self.free]
-        self.lemma_heads = {}
-
-    def field_lookup(self, field):
-        return fields[field]
-    
-    def info(self, word):
-        if word in self.cues:
-            idx = self.cues.index(word.upper())
-        else:
-            raise ValueError("'%s' not found. :( " %word)
-        return self.free[idx]
-
-    def _read_free(self):
-        fname = os.path.join(free_dir, 'free_association.txt')
-        with open(fname) as f:
+        with open('free_association.txt') as f:
             self.fields = [x.strip() for x in f.readline().split(',')]
             db = [dict(zip(self.fields, [y.strip() for y in x.split(',')]))
                   for x in f.readlines()]
-        return db
+        self._free = db
+        self.cues = set([x['CUE'].lower() for x in db])
+
+    def __getitem__(self, word):
+        return [x for x in self._free if x['CUE'] == word.upper()]
+        
+    def field_lookup(self, field):
+        return fields[field]
+    
+    # def info(self, word):
+    #     if word in self.cues:
+    #         idx = self.cues.index(word.upper())
+    #     else:
+    #         raise ValueError("'%s' not found. :( " %word)
+    #     return self._free[idx]
