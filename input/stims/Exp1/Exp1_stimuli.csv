@@ -1,0 +1,501 @@
+item,,block,scenario,relatedness,nonword,identifier,trigger_fix,prime,trigger_prime,target,trigger_target,post,trigger_post,probe,nonword
+000, ,0,000,0,0,000 000000,0,ANIMAL,1,RED,2,MAID,3,Correct! Press button to move to the next trial,0
+000, ,0,000,0,0,000 000000,0,ANIMAL,1,RED,2,MAID,3,Correct! Press button to move to the next trial,0
+000, ,0,000,0,1,000 000001,4,dass,5,Incorrect,6,Incorrect,7,Incorrect,1
+000, ,0,000,0,1,000 000001,4,dass,5,Incorrect,6,Incorrect,7,Incorrect,1
+000, ,0,000,0,2,000 000002,8,SPIDER,9,lomb,10,Incorrect,11,Incorrect,2
+000, ,0,000,0,2,000 000002,8,SPIDER,9,lomb,10,Incorrect,11,Incorrect,2
+000, ,0,000,0,3,000 000003,12,BABY,13,COB,14,drate,15,Incorrect,3
+000, ,0,000,0,3,000 000003,12,BABY,13,COB,14,drate,15,Incorrect,3
+000, ,0,000,0,0,000 000000,0,YEAR,1,TWELVE,2,ENEMY,3,Correct! Press button to move to the next trial,0
+000, ,0,000,0,0,000 000000,0,YEAR,1,TWELVE,2,ENEMY,3,Correct! Press button to move to the next trial,0
+000, ,0,000,0,1,000 000001,4,fowns,5,Incorrect,6,Incorrect,7,Incorrect,1
+000, ,0,000,0,1,000 000001,4,fowns,5,Incorrect,6,Incorrect,7,Incorrect,1
+000, ,0,000,0,2,000 000002,8,LOVE,9,jurp,10,Incorrect,11,Incorrect,2
+000, ,0,000,0,2,000 000002,8,LOVE,9,jurp,10,Incorrect,11,Incorrect,2
+000, ,0,000,0,3,000 000003,12,GLOVE,13,LAVA,14,degent,15,Incorrect,3
+000, ,0,000,0,3,000 000003,12,GLOVE,13,LAVA,14,degent,15,Incorrect,3
+000, ,0,000,0,0,000 000000,0,PIE,1,SWORD,2,ART,3,Correct! Press button to move to the next trial,0
+000, ,0,000,0,0,000 000000,0,PIE,1,SWORD,2,ART,3,Correct! Press button to move to the next trial,0
+000, ,0,000,0,1,000 000001,4,smout,5,Incorrect,6,Incorrect,7,Incorrect,1
+000, ,0,000,0,1,000 000001,4,smout,5,Incorrect,6,Incorrect,7,Incorrect,1
+801, ,1,001,1,3,801 100113,60,TOGETHER,61,APART,62,sorthe,63,Incorrect,3
+802, ,1,001,0,3,802 100103,44,HAMMER,45,APART,46,sorthe,47,Incorrect,4
+803, ,1,002,1,3,803 100213,60,ASLEEP,61,AWAKE,62,dyct,63,Incorrect,3
+804, ,1,002,0,3,804 100203,44,HEAVEN,45,AWAKE,46,dyct,47,Incorrect,3
+805, ,1,003,1,0,805 100310,48,BAT,49,BALL,50,WINDOW,51,Correct! Press button to move to the next trial,0
+806, ,1,003,0,0,806 100300,32,KEG,33,BALL,34,WINDOW,35,Correct! Press button to move to the next trial,0
+807, ,1,004,1,0,807 100410,48,KEG,49,BEER,50,BUYER,51,Correct! Press button to move to the next trial,1
+808, ,1,004,0,0,808 100400,32,LOW,33,BEER,34,BUYER,35,Correct! Press button to move to the next trial,2
+809, ,1,005,1,3,809 100513,60,TEXT,61,BOOK,62,dags          ,63,Incorrect,3
+810, ,1,005,0,3,810 100503,44,FORK,45,BOOK,46,dags          ,47,Incorrect,3
+811, ,1,006,1,0,811 100610,48,RYE,49,BREAD,50,FOOT,51,Correct! Press button to move to the next trial,0
+812, ,1,006,0,0,812 100600,32,BAT,33,BREAD,34,FOOT,35,Correct! Press button to move to the next trial,0
+813, ,1,007,1,3,813 100713,60,PRIEST,61,CHURCH,62,flokes,63,Incorrect,3
+814, ,1,007,0,3,814 100703,44,NICKEL,45,CHURCH,46,flokes,47,Incorrect,3
+815, ,1,008,1,3,815 100813,60,DOE,61,DEER,62,lale ,63,Incorrect,3
+816, ,1,008,0,3,816 100803,44,BOY,45,DEER,46,lale ,47,Incorrect,3
+817, ,1,009,1,0,817 100910,48,NICKEL,49,DIME,50,WALL,51,Correct! Press button to move to the next trial,0
+818, ,1,009,0,0,818 100900,32,TOGETHER,33,DIME,34,WALL,35,Correct! Press button to move to the next trial,0
+819, ,1,010,1,3,819 101013,60,SKETCH,61,DRAW,62,yoam,63,Incorrect,3
+820, ,1,010,0,3,820 101003,44,ASLEEP,45,DRAW,46,yoam,47,Incorrect,3
+821, ,1,011,1,0,821 101110,48,QUACK,49,DUCK,50,HUMAN,51,Correct! Press button to move to the next trial,0
+822, ,1,011,0,0,822 101100,32,FOUND,33,DUCK,34,HUMAN,35,Correct! Press button to move to the next trial,0
+823, ,1,012,1,3,823 101213,60,THUMB,61,FINGER,62,zore,63,Incorrect,3
+824, ,1,012,0,3,824 101203,44,BLAZE,45,FINGER,46,zore,47,Incorrect,3
+825, ,1,013,1,0,825 101310,48,BLAZE,49,FIRE,50,GLASS,51,Correct! Press button to move to the next trial,0
+826, ,1,013,0,0,826 101300,32,QUACK,33,FIRE,34,GLASS,35,Correct! Press button to move to the next trial,0
+827, ,1,014,1,3,827 101413,60,TROUT,61,FISH,62,fars            ,63,Incorrect,3
+828, ,1,014,0,3,828 101403,44,THUMB,45,FISH,46,fars            ,47,Incorrect,3
+829, ,1,015,1,0,829 101510,48,BOY,49,GIRL,50,WATER,51,Correct! Press button to move to the next trial,0
+830, ,1,015,0,0,830 101500,32,KEY,33,GIRL,34,WATER,35,Correct! Press button to move to the next trial,0
+831, ,1,016,1,3,831 101613,60,SILVER,61,GOLD,62,norg,63,Incorrect,3
+832, ,1,016,0,3,832 101603,44,PRIEST,45,GOLD,46,norg,47,Incorrect,3
+833, ,1,017,1,0,833 101710,48,HEAVEN,49,HELL,50,GUM,51,Correct! Press button to move to the next trial,0
+834, ,1,017,0,0,834 101700,32,SILVER,33,HELL,34,GUM,35,Correct! Press button to move to the next trial,0
+835, ,1,018,1,3,835 101813,60,LOW,61,HIGH,62,dure ,63,Incorrect,3
+836, ,1,018,0,3,836 101803,44,RYE,45,HIGH,46,dure ,47,Incorrect,3
+837, ,1,019,1,0,837 101910,48,FORK,49,KNIFE,50,FAT,51,Correct! Press button to move to the next trial,0
+838, ,1,019,0,0,838 101900,32,MORE,33,KNIFE,34,FAT,35,Correct! Press button to move to the next trial,0
+839, ,1,020,1,3,839 102013,60,MORE,61,LESS,62,tomp         ,63,Incorrect,3
+840, ,1,020,0,3,840 102003,44,BANK,45,LESS,46,tomp         ,47,Incorrect,3
+841, ,1,021,1,0,841 102110,48,KEY,49,LOCK,50,SCHOOL,51,Correct! Press button to move to the next trial,0
+842, ,1,021,0,0,842 102100,32,DOE,33,LOCK,34,SCHOOL,35,Correct! Press button to move to the next trial,0
+843, ,1,022,1,3,843 102213,60,FOUND,61,LOST,62,dup,63,Incorrect,3
+844, ,1,022,0,3,844 102203,44,TROUT,45,LOST,46,dup,47,Incorrect,3
+845, ,1,023,1,0,845 102310,48,BANK,49,MONEY,50,CLAM,51,Correct! Press button to move to the next trial,0
+846, ,1,023,0,0,846 102300,32,TEXT,33,MONEY,34,CLAM,35,Correct! Press button to move to the next trial,0
+847, ,1,024,1,3,847 102413,60,HAMMER,61,NAIL,62,jafts,63,Incorrect,3
+848, ,1,024,0,3,848 102403,44,SKETCH,45,NAIL,46,jafts,47,Incorrect,3
+849, ,1,025,1,0,849 102510,48,JET,49,PLANE,50,ARMY,51,Correct! Press button to move to the next trial,0
+850, ,1,025,0,0,850 102500,32,NAP,33,PLANE,34,ARMY,35,Correct! Press button to move to the next trial,0
+851, ,1,026,1,3,851 102613,60,RICH,61,POOR,62,marn,63,Incorrect,3
+852, ,1,026,0,3,852 102603,44,EAST,45,POOR,46,marn,47,Incorrect,3
+853, ,1,027,1,0,853 102710,48,SHOVE,49,PUSH,50,RECIPE,51,Correct! Press button to move to the next trial,0
+854, ,1,027,0,0,854 102700,32,FALSE,33,PUSH,34,RECIPE,35,Correct! Press button to move to the next trial,0
+855, ,1,028,1,3,855 102813,60,KING,61,QUEEN,62,nild,63,Incorrect,3
+856, ,1,028,0,3,856 102803,44,HALT,45,QUEEN,46,nild,47,Incorrect,3
+857, ,1,029,1,0,857 102910,48,LEFT,49,RIGHT,50,NUMBER,51,Correct! Press button to move to the next trial,0
+858, ,1,029,0,0,858 102900,32,HERB,33,RIGHT,34,NUMBER,35,Correct! Press button to move to the next trial,0
+859, ,1,030,1,3,859 103013,60,PEPPER,61,SALT,62,hine,63,Incorrect,3
+860, ,1,030,0,3,860 103003,44,HEIGHT,45,SALT,46,hine,47,Incorrect,3
+861, ,1,031,1,0,861 103110,48,TALL,49,SHORT,50,COLOR,51,Correct! Press button to move to the next trial,0
+862, ,1,031,0,0,862 103100,32,KING,33,SHORT,34,COLOR,35,Correct! Press button to move to the next trial,0
+863, ,1,032,1,3,863 103213,60,NAP,61,SLEEP,62,skake,63,Incorrect,3
+864, ,1,032,0,3,864 103203,44,JET,45,SLEEP,46,skake,47,Incorrect,3
+865, ,1,033,1,0,865 103310,48,NORTH,49,SOUTH,50,ICE,51,Correct! Press button to move to the next trial,0
+866, ,1,033,0,0,866 103300,32,DRYER,33,SOUTH,34,ICE,35,Correct! Press button to move to the next trial,0
+867, ,1,034,1,3,867 103413,60,HERB,61,SPICE,62,fent   ,63,Incorrect,3
+868, ,1,034,0,3,868 103403,44,LEFT,45,SPICE,46,fent   ,47,Incorrect,3
+869, ,1,035,1,0,869 103510,48,ROB,49,STEAL,50,SHOVEL,51,Correct! Press button to move to the next trial,0
+870, ,1,035,0,0,870 103500,32,NEW,33,STEAL,34,SHOVEL,35,Correct! Press button to move to the next trial,0
+871, ,1,036,1,3,871 103613,60,WEAK,61,STRONG,62,whep             ,63,Incorrect,3
+872, ,1,036,0,3,872 103603,44,LION,45,STRONG,46,whep             ,47,Incorrect,3
+873, ,1,037,1,0,873 103710,48,HALT,49,STOP,50,FUN,51,Correct! Press button to move to the next trial,0
+874, ,1,037,0,0,874 103700,32,TALL,33,STOP,34,FUN,35,Correct! Press button to move to the next trial,0
+875, ,1,038,1,3,875 103813,60,ROAD,61,STREET,62,sprefs,63,Incorrect,3
+876, ,1,038,0,3,876 103803,44,RICH,45,STREET,46,sprefs,47,Incorrect,3
+877, ,1,039,1,0,877 103910,48,QUIZ,49,TEST,50,TALE,51,Correct! Press button to move to the next trial,0
+878, ,1,039,0,0,878 103900,32,WEAK,33,TEST,34,TALE,35,Correct! Press button to move to the next trial,0
+879, ,1,040,1,3,879 104013,60,LION,61,TIGER,62,grerns,63,Incorrect,3
+880, ,1,040,0,3,880 104003,44,QUIZ,45,TIGER,46,grerns,47,Incorrect,3
+881, ,1,041,1,0,881 104110,48,FLUSH,49,TOILET,50,TOE,51,Correct! Press button to move to the next trial,0
+882, ,1,041,0,0,882 104100,32,SHOVE,33,TOILET,34,TOE,35,Correct! Press button to move to the next trial,0
+883, ,1,042,1,3,883 104213,60,OAK,61,TREE,62,murf,63,Incorrect,3
+884, ,1,042,0,3,884 104203,44,RIP,45,TREE,46,murf,47,Incorrect,3
+885, ,1,043,1,0,885 104310,48,FALSE,49,TRUE,50,STREAM,51,Correct! Press button to move to the next trial,0
+886, ,1,043,0,0,886 104300,32,NORTH,33,TRUE,34,STREAM,35,Correct! Press button to move to the next trial,0
+887, ,1,044,1,3,887 104413,60,DRYER,61,WASHER,62,brotch,63,Incorrect,3
+888, ,1,044,0,3,888 104403,44,FLUSH,45,WASHER,46,brotch,47,Incorrect,3
+889, ,1,045,1,0,889 104510,48,HEIGHT,49,WEIGHT,50,FACE,51,Correct! Press button to move to the next trial,0
+890, ,1,045,0,0,890 104500,32,PEPPER,33,WEIGHT,34,FACE,35,Correct! Press button to move to the next trial,0
+891, ,1,046,1,3,891 104613,60,EAST,61,WEST,62,stoins,63,Incorrect,3
+892, ,1,046,0,3,892 104603,44,ROAD,45,WEST,46,stoins,47,Incorrect,3
+893, ,1,047,1,0,893 104710,48,RIP,49,TEAR,50,SMILE,51,Correct! Press button to move to the next trial,0
+894, ,1,047,0,0,894 104700,32,OAK,33,TEAR,34,SMILE,35,Correct! Press button to move to the next trial,0
+895, ,1,048,1,3,895 104813,60,NEW,61,OLD,62,staw,63,Incorrect,3
+896, ,1,048,0,3,896 104803,44,ROB,45,OLD,46,staw,47,Incorrect,3
+897, ,1,049,1,0,897 104910,48,BELOW,49,ABOVE,50,SEA,51,Correct! Press button to move to the next trial,0
+898, ,1,049,0,0,898 104900,32,TABLE,33,ABOVE,34,SEA,35,Correct! Press button to move to the next trial,0
+899, ,1,050,1,0,899 105010,48,FRONT,49,BACK,50,ACTOR,51,Correct! Press button to move to the next trial,0
+900, ,1,050,0,0,900 105000,32,THERE,33,BACK,34,ACTOR,35,Correct! Press button to move to the next trial,0
+901, ,1,051,1,3,901 105113,60,SAND,61,BEACH,62,thand,63,Incorrect,3
+902, ,1,051,0,3,902 105103,44,SOFT,45,BEACH,46,thand,47,Incorrect,3
+903, ,1,052,1,0,903 105210,48,RAZOR,49,BLADE,50,BEE,51,Correct! Press button to move to the next trial,0
+904, ,1,052,0,0,904 105200,32,FRONT,33,BLADE,34,BEE,35,Correct! Press button to move to the next trial,0
+905, ,1,053,1,0,905 105310,48,TABLE,49,CHAIR,50,COPY,51,Correct! Press button to move to the next trial,0
+906, ,1,053,0,0,906 105300,32,BRIDE,33,CHAIR,34,COPY,35,Correct! Press button to move to the next trial,0
+907, ,1,054,1,0,907 105410,48,SWISS,49,CHEESE,50,VEIN,51,Correct! Press button to move to the next trial,0
+908, ,1,054,0,0,908 105400,32,BRAWL,33,CHEESE,34,VEIN,35,Correct! Press button to move to the next trial,0
+909, ,1,055,1,3,909 105513,60,TIME,61,CLOCK,62,hus,63,Incorrect,3
+910, ,1,055,0,3,910 105503,44,LEAP,45,CLOCK,46,hus,47,Incorrect,3
+911, ,1,056,1,0,911 105610,48,OPEN,49,CLOSE,50,BOAT,51,Correct! Press button to move to the next trial,0
+912, ,1,056,0,0,912 105600,32,LATE,33,CLOSE,34,BOAT,35,Correct! Press button to move to the next trial,0
+913, ,1,057,1,3,913 105713,60,HOT,61,COLD,62,mank ,63,Incorrect,3
+914, ,1,057,0,3,914 105703,44,UP,45,COLD,46,mank ,47,Incorrect,3
+915, ,1,058,1,0,915 105810,48,SOFA,49,COUCH,50,JELLY,51,Correct! Press button to move to the next trial,0
+916, ,1,058,0,0,916 105800,32,SOIL,33,COUCH,34,JELLY,35,Correct! Press button to move to the next trial,0
+917, ,1,059,1,0,917 105910,48,INSANE,49,CRAZY,50,PANTS,51,Correct! Press button to move to the next trial,0
+918, ,1,059,0,0,918 105900,32,SUPPER,33,CRAZY,34,PANTS,35,Correct! Press button to move to the next trial,0
+919, ,1,060,1,3,919 106013,60,SUPPER,61,DINNER,62,trulps,63,Incorrect,3
+920, ,1,060,0,3,920 106003,44,MURDER,45,DINNER,46,trulps,47,Incorrect,3
+921, ,1,061,1,0,921 106110,48,SOIL,49,DIRT,50,WORK,51,Correct! Press button to move to the next trial,0
+922, ,1,061,0,0,922 106100,32,OPEN,33,DIRT,34,WORK,35,Correct! Press button to move to the next trial,0
+923, ,1,062,1,3,923 106213,60,UP,61,DOWN,62,rilds,63,Incorrect,3
+924, ,1,062,0,3,924 106203,44,BAD,45,DOWN,46,rilds,47,Incorrect,3
+925, ,1,063,1,0,925 106310,48,LATE,49,EARLY,50,RULE,51,Correct! Press button to move to the next trial,0
+926, ,1,063,0,0,926 106300,32,SOFA,33,EARLY,34,RULE,35,Correct! Press button to move to the next trial,0
+927, ,1,064,1,3,927 106413,60,BRAWL,61,FIGHT,62,cile            ,63,Incorrect,3
+928, ,1,064,0,3,928 106403,44,EMPTY,45,FIGHT,46,cile            ,47,Incorrect,3
+929, ,1,065,1,0,929 106510,48,TOAD,49,FROG,50,PLACE,51,Correct! Press button to move to the next trial,0
+930, ,1,065,0,0,930 106500,32,TIME,33,FROG,34,PLACE,35,Correct! Press button to move to the next trial,0
+931, ,1,066,1,3,931 106613,60,EMPTY,61,FULL,62,prot           ,63,Incorrect,3
+932, ,1,066,0,3,932 106603,44,RAZOR,45,FULL,46,prot           ,47,Incorrect,3
+933, ,1,067,1,0,933 106710,48,BAD,49,GOOD,50,SYRUP,51,Correct! Press button to move to the next trial,0
+934, ,1,067,0,0,934 106700,32,HOT,33,GOOD,34,SYRUP,35,Correct! Press button to move to the next trial,0
+935, ,1,068,1,3,935 106813,60,BRIDE,61,GROOM,62,soag            ,63,Incorrect,3
+936, ,1,068,0,3,936 106803,44,BELOW,45,GROOM,46,soag            ,47,Incorrect,3
+937, ,1,069,1,0,937 106910,48,SOFT,49,HARD,50,SPEED,51,Correct! Press button to move to the next trial,0
+938, ,1,069,0,0,938 106900,32,TOAD,33,HARD,34,SPEED,35,Correct! Press button to move to the next trial,0
+939, ,1,070,1,3,939 107013,60,THERE,61,HERE,62,dape,63,Incorrect,3
+940, ,1,070,0,3,940 107003,44,SWISS,45,HERE,46,dape,47,Incorrect,3
+941, ,1,071,1,0,941 107110,48,LEAP,49,JUMP,50,COAL,51,Correct! Press button to move to the next trial,0
+942, ,1,071,0,0,942 107100,32,SAND,33,JUMP,34,COAL,35,Correct! Press button to move to the next trial,0
+943, ,1,072,1,3,943 107213,60,MURDER,61,KILL,62,swip            ,63,Incorrect,3
+944, ,1,072,0,3,944 107203,44,INSANE,45,KILL,46,swip            ,47,Incorrect,3
+945, ,1,073,1,0,945 107310,48,LEMON,49,LIME,50,CANDY,51,Correct! Press button to move to the next trial,0
+946, ,1,073,0,0,946 107300,32,BLACK,33,LIME,34,CANDY,35,Correct! Press button to move to the next trial,0
+947, ,1,074,1,3,947 107413,60,WIN,61,LOSE,62,hule,63,Incorrect,3
+948, ,1,074,0,3,948 107403,44,BOW,45,LOSE,46,hule,47,Incorrect,3
+949, ,1,075,1,0,949 107510,48,NOISE,49,LOUD,50,BORING,51,Correct! Press button to move to the next trial,0
+950, ,1,075,0,0,950 107500,32,THICK,33,LOUD,34,BORING,35,Correct! Press button to move to the next trial,0
+951, ,1,076,1,3,951 107613,60,FILM,61,MOVIE,62,domp,63,Incorrect,3
+952, ,1,076,0,3,952 107603,44,AUNT,45,MOVIE,46,domp,47,Incorrect,3
+953, ,1,077,1,0,953 107710,48,NIECE,49,NEPHEW,50,MUSIC,51,Correct! Press button to move to the next trial,0
+954, ,1,077,0,0,954 107700,32,SATIN,33,NEPHEW,34,MUSIC,35,Correct! Press button to move to the next trial,0
+955, ,1,078,1,3,955 107813,60,DAY,61,NIGHT,62,skoon,63,Incorrect,3
+956, ,1,078,0,3,956 107803,44,ILL,45,NIGHT,46,skoon,47,Incorrect,3
+957, ,1,079,1,0,957 107910,48,UNDER,49,OVER,50,COW,51,Correct! Press button to move to the next trial,0
+958, ,1,079,0,0,958 107900,32,NOISE,33,OVER,34,COW,35,Correct! Press button to move to the next trial,0
+959, ,1,080,1,3,959 108013,60,POLISH,61,SHINE,62,tief,63,Incorrect,3
+960, ,1,080,0,3,960 108003,44,QUENCH,45,SHINE,46,tief,47,Incorrect,3
+961, ,1,081,1,0,961 108110,48,SOCK,49,SHOE,50,STONE,51,Correct! Press button to move to the next trial,0
+962, ,1,081,0,0,962 108100,32,FILM,33,SHOE,34,STONE,35,Correct! Press button to move to the next trial,0
+963, ,1,082,1,3,963 108213,60,ILL,61,SICK,62,zepth,63,Incorrect,3
+964, ,1,082,0,3,964 108203,44,DAY,45,SICK,46,zepth,47,Incorrect,3
+965, ,1,083,1,0,965 108310,48,SATIN,49,SILK,50,BIRD,51,Correct! Press button to move to the next trial,0
+966, ,1,083,0,0,966 108300,32,NIECE,33,SILK,34,BIRD,35,Correct! Press button to move to the next trial,0
+967, ,1,084,1,3,967 108413,60,IRON,61,STEEL,62,delche,63,Incorrect,3
+968, ,1,084,0,3,968 108403,44,TAME,45,STEEL,46,delche,47,Incorrect,3
+969, ,1,085,1,0,969 108510,48,WAG,49,TAIL,50,JAIL,51,Correct! Press button to move to the next trial,0
+970, ,1,085,0,0,970 108500,32,WIN,33,TAIL,34,JAIL,35,Correct! Press button to move to the next trial,0
+971, ,1,086,1,3,971 108613,60,THICK,61,THIN,62,spress,63,Incorrect,3
+972, ,1,086,0,3,972 108603,44,SPOOL,45,THIN,46,spress,47,Incorrect,3
+973, ,1,087,1,0,973 108710,48,QUENCH,49,THIRST,50,EAR,51,Correct! Press button to move to the next trial,0
+974, ,1,087,0,0,974 108700,32,POLISH,33,THIRST,34,EAR,35,Correct! Press button to move to the next trial,0
+975, ,1,088,1,3,975 108813,60,SPOOL,61,THREAD,62,rooc,63,Incorrect,3
+976, ,1,088,0,3,976 108803,44,UNDER,45,THREAD,46,rooc,47,Incorrect,3
+977, ,1,089,1,0,977 108910,48,ONCE,49,TWICE,50,MILK,51,Correct! Press button to move to the next trial,0
+978, ,1,089,0,0,978 108900,32,SOCK,33,TWICE,34,MILK,35,Correct! Press button to move to the next trial,0
+979, ,1,090,1,3,979 109013,60,AUNT,61,UNCLE,62,soit          ,63,Incorrect,3
+980, ,1,090,0,3,980 109003,44,ONCE,45,UNCLE,46,soit          ,47,Incorrect,3
+981, ,1,091,1,0,981 109110,48,NOUN,49,VERB,50,HORSE,51,Correct! Press button to move to the next trial,0
+982, ,1,091,0,0,982 109100,32,IRON,33,VERB,34,HORSE,35,Correct! Press button to move to the next trial,0
+983, ,1,092,1,3,983 109213,60,RUN,61,WALK,62,helf           ,63,Incorrect,3
+984, ,1,092,0,3,984 109203,44,INK,45,WALK,46,helf           ,47,Incorrect,3
+985, ,1,093,1,0,985 109310,48,BLACK,49,WHITE,50,SQUARE,51,Correct! Press button to move to the next trial,0
+986, ,1,093,0,0,986 109300,32,LEMON,33,WHITE,34,SQUARE,35,Correct! Press button to move to the next trial,0
+987, ,1,094,1,3,987 109413,60,TAME,61,WILD,62,drung,63,Incorrect,3
+988, ,1,094,0,3,988 109403,44,NOUN,45,WILD,46,drung,47,Incorrect,3
+989, ,1,095,1,3,989 109513,60,BOW,61,ARROW,62,yiss,63,Incorrect,3
+990, ,1,095,0,3,990 109503,44,RUN,45,ARROW,46,yiss,47,Incorrect,3
+991, ,1,096,1,3,991 109613,60,INK,61,PEN,62,zans,63,Incorrect,3
+992, ,1,096,0,3,992 109603,44,WAG,45,PEN,46,zans,47,Incorrect,3
+401, ,1,097,0,1,401 109701,36,pels           ,37,Incorrect,38,Incorrect,39,Incorrect,1
+402, ,1,097,0,1,402 109701,36,pels           ,37,Incorrect,38,Incorrect,39,Incorrect,1
+403, ,1,098,0,1,403 109801,36,nurche,37,Incorrect,38,Incorrect,39,Incorrect,1
+404, ,1,098,0,1,404 109801,36,nurche,37,Incorrect,38,Incorrect,39,Incorrect,1
+405, ,1,099,0,1,405 109901,36,kib  ,37,Incorrect,38,Incorrect,39,Incorrect,1
+406, ,1,099,0,1,406 109901,36,kib  ,37,Incorrect,38,Incorrect,39,Incorrect,1
+407, ,1,100,0,1,407 110001,36,fusk           ,37,Incorrect,38,Incorrect,39,Incorrect,1
+408, ,1,100,0,1,408 110001,36,fusk           ,37,Incorrect,38,Incorrect,39,Incorrect,1
+409, ,1,101,0,1,409 110101,36,doss ,37,Incorrect,38,Incorrect,39,Incorrect,1
+410, ,1,101,0,1,410 110101,36,doss ,37,Incorrect,38,Incorrect,39,Incorrect,1
+411, ,1,102,0,1,411 110201,36,palb,37,Incorrect,38,Incorrect,39,Incorrect,1
+412, ,1,102,0,1,412 110201,36,palb,37,Incorrect,38,Incorrect,39,Incorrect,1
+413, ,1,103,0,1,413 110301,36,brare,37,Incorrect,38,Incorrect,39,Incorrect,1
+414, ,1,103,0,1,414 110301,36,brare,37,Incorrect,38,Incorrect,39,Incorrect,1
+415, ,1,104,0,1,415 110401,36,chents,37,Incorrect,38,Incorrect,39,Incorrect,1
+416, ,1,104,0,1,416 110401,36,chents,37,Incorrect,38,Incorrect,39,Incorrect,1
+417, ,1,105,0,1,417 110501,36,yade          ,37,Incorrect,38,Incorrect,39,Incorrect,1
+418, ,1,105,0,1,418 110501,36,yade          ,37,Incorrect,38,Incorrect,39,Incorrect,1
+419, ,1,106,0,1,419 110601,36,crench,37,Incorrect,38,Incorrect,39,Incorrect,1
+420, ,1,106,0,1,420 110601,36,crench,37,Incorrect,38,Incorrect,39,Incorrect,1
+421, ,1,107,0,1,421 110701,36,fum             ,37,Incorrect,38,Incorrect,39,Incorrect,1
+422, ,1,107,0,1,422 110701,36,fum             ,37,Incorrect,38,Incorrect,39,Incorrect,1
+423, ,1,108,0,1,423 110801,36,skurk,37,Incorrect,38,Incorrect,39,Incorrect,1
+424, ,1,108,0,1,424 110801,36,skurk,37,Incorrect,38,Incorrect,39,Incorrect,1
+425, ,1,109,0,1,425 110901,36,slagn,37,Incorrect,38,Incorrect,39,Incorrect,1
+426, ,1,109,0,1,426 110901,36,slagn,37,Incorrect,38,Incorrect,39,Incorrect,1
+427, ,1,110,0,1,427 111001,36,zear ,37,Incorrect,38,Incorrect,39,Incorrect,1
+428, ,1,110,0,1,428 111001,36,zear ,37,Incorrect,38,Incorrect,39,Incorrect,1
+429, ,1,111,0,1,429 111101,36,ouce,37,Incorrect,38,Incorrect,39,Incorrect,1
+430, ,1,111,0,1,430 111101,36,ouce,37,Incorrect,38,Incorrect,39,Incorrect,1
+431, ,1,112,0,1,431 111201,36,pank         ,37,Incorrect,38,Incorrect,39,Incorrect,1
+432, ,1,112,0,1,432 111201,36,pank         ,37,Incorrect,38,Incorrect,39,Incorrect,1
+433, ,1,113,0,1,433 111301,36,nur           ,37,Incorrect,38,Incorrect,39,Incorrect,1
+434, ,1,113,0,1,434 111301,36,nur           ,37,Incorrect,38,Incorrect,39,Incorrect,1
+435, ,1,114,0,1,435 111401,36,yalt,37,Incorrect,38,Incorrect,39,Incorrect,1
+436, ,1,114,0,1,436 111401,36,yalt,37,Incorrect,38,Incorrect,39,Incorrect,1
+437, ,1,115,0,1,437 111501,36,pone,37,Incorrect,38,Incorrect,39,Incorrect,1
+438, ,1,115,0,1,438 111501,36,pone,37,Incorrect,38,Incorrect,39,Incorrect,1
+439, ,1,116,0,1,439 111601,36,chulke,37,Incorrect,38,Incorrect,39,Incorrect,1
+440, ,1,116,0,1,440 111601,36,chulke,37,Incorrect,38,Incorrect,39,Incorrect,1
+441, ,1,117,0,1,441 111701,36,tarb           ,37,Incorrect,38,Incorrect,39,Incorrect,1
+442, ,1,117,0,1,442 111701,36,tarb           ,37,Incorrect,38,Incorrect,39,Incorrect,1
+443, ,1,118,0,1,443 111801,36,rurd,37,Incorrect,38,Incorrect,39,Incorrect,1
+444, ,1,118,0,1,444 111801,36,rurd,37,Incorrect,38,Incorrect,39,Incorrect,1
+445, ,1,119,0,1,445 111901,36,vounce,37,Incorrect,38,Incorrect,39,Incorrect,1
+446, ,1,119,0,1,446 111901,36,vounce,37,Incorrect,38,Incorrect,39,Incorrect,1
+447, ,1,120,0,1,447 112001,36,mume             ,37,Incorrect,38,Incorrect,39,Incorrect,1
+448, ,1,120,0,1,448 112001,36,mume             ,37,Incorrect,38,Incorrect,39,Incorrect,1
+449, ,1,121,0,1,449 112101,36,heasts,37,Incorrect,38,Incorrect,39,Incorrect,1
+450, ,1,121,0,1,450 112101,36,heasts,37,Incorrect,38,Incorrect,39,Incorrect,1
+451, ,1,122,0,1,451 112201,36,rond,37,Incorrect,38,Incorrect,39,Incorrect,1
+452, ,1,122,0,1,452 112201,36,rond,37,Incorrect,38,Incorrect,39,Incorrect,1
+453, ,1,123,0,1,453 112301,36,yarm,37,Incorrect,38,Incorrect,39,Incorrect,1
+454, ,1,123,0,1,454 112301,36,yarm,37,Incorrect,38,Incorrect,39,Incorrect,1
+455, ,1,124,0,1,455 112401,36,margs,37,Incorrect,38,Incorrect,39,Incorrect,1
+456, ,1,124,0,1,456 112401,36,margs,37,Incorrect,38,Incorrect,39,Incorrect,1
+457, ,1,125,0,1,457 112501,36,snigs,37,Incorrect,38,Incorrect,39,Incorrect,1
+458, ,1,125,0,1,458 112501,36,snigs,37,Incorrect,38,Incorrect,39,Incorrect,1
+459, ,1,126,0,1,459 112601,36,foafs,37,Incorrect,38,Incorrect,39,Incorrect,1
+460, ,1,126,0,1,460 112601,36,foafs,37,Incorrect,38,Incorrect,39,Incorrect,1
+461, ,1,127,0,1,461 112701,36,dryss,37,Incorrect,38,Incorrect,39,Incorrect,1
+462, ,1,127,0,1,462 112701,36,dryss,37,Incorrect,38,Incorrect,39,Incorrect,1
+463, ,1,128,0,1,463 112801,36,dofe,37,Incorrect,38,Incorrect,39,Incorrect,1
+464, ,1,128,0,1,464 112801,36,dofe,37,Incorrect,38,Incorrect,39,Incorrect,1
+465, ,1,129,0,1,465 112901,36,trich,37,Incorrect,38,Incorrect,39,Incorrect,1
+466, ,1,129,0,1,466 112901,36,trich,37,Incorrect,38,Incorrect,39,Incorrect,1
+467, ,1,130,0,1,467 113001,36,jav             ,37,Incorrect,38,Incorrect,39,Incorrect,1
+468, ,1,130,0,1,468 113001,36,jav             ,37,Incorrect,38,Incorrect,39,Incorrect,1
+469, ,1,131,0,1,469 113101,36,stib,37,Incorrect,38,Incorrect,39,Incorrect,1
+470, ,1,131,0,1,470 113101,36,stib,37,Incorrect,38,Incorrect,39,Incorrect,1
+471, ,1,132,0,1,471 113201,36,fraine,37,Incorrect,38,Incorrect,39,Incorrect,1
+472, ,1,132,0,1,472 113201,36,fraine,37,Incorrect,38,Incorrect,39,Incorrect,1
+473, ,1,133,0,1,473 113301,36,sweeve,37,Incorrect,38,Incorrect,39,Incorrect,1
+474, ,1,133,0,1,474 113301,36,sweeve,37,Incorrect,38,Incorrect,39,Incorrect,1
+475, ,1,134,0,1,475 113401,36,hace,37,Incorrect,38,Incorrect,39,Incorrect,1
+476, ,1,134,0,1,476 113401,36,hace,37,Incorrect,38,Incorrect,39,Incorrect,1
+477, ,1,135,0,1,477 113501,36,sirth,37,Incorrect,38,Incorrect,39,Incorrect,1
+478, ,1,135,0,1,478 113501,36,sirth,37,Incorrect,38,Incorrect,39,Incorrect,1
+479, ,1,136,0,1,479 113601,36,luts ,37,Incorrect,38,Incorrect,39,Incorrect,1
+480, ,1,136,0,1,480 113601,36,luts ,37,Incorrect,38,Incorrect,39,Incorrect,1
+481, ,1,137,0,1,481 113701,36,keer,37,Incorrect,38,Incorrect,39,Incorrect,1
+482, ,1,137,0,1,482 113701,36,keer,37,Incorrect,38,Incorrect,39,Incorrect,1
+483, ,1,138,0,1,483 113801,36,nang           ,37,Incorrect,38,Incorrect,39,Incorrect,1
+484, ,1,138,0,1,484 113801,36,nang           ,37,Incorrect,38,Incorrect,39,Incorrect,1
+485, ,1,139,0,1,485 113901,36,lafe            ,37,Incorrect,38,Incorrect,39,Incorrect,1
+486, ,1,139,0,1,486 113901,36,lafe            ,37,Incorrect,38,Incorrect,39,Incorrect,1
+487, ,1,140,0,1,487 114001,36,clibs,37,Incorrect,38,Incorrect,39,Incorrect,1
+488, ,1,140,0,1,488 114001,36,clibs,37,Incorrect,38,Incorrect,39,Incorrect,1
+489, ,1,141,0,1,489 114101,36,tovs            ,37,Incorrect,38,Incorrect,39,Incorrect,1
+490, ,1,141,0,1,490 114101,36,tovs            ,37,Incorrect,38,Incorrect,39,Incorrect,1
+491, ,1,142,0,1,491 114201,36,briep,37,Incorrect,38,Incorrect,39,Incorrect,1
+492, ,1,142,0,1,492 114201,36,briep,37,Incorrect,38,Incorrect,39,Incorrect,1
+493, ,1,143,0,1,493 114301,36,chutch,37,Incorrect,38,Incorrect,39,Incorrect,1
+494, ,1,143,0,1,494 114301,36,chutch,37,Incorrect,38,Incorrect,39,Incorrect,1
+495, ,1,144,0,1,495 114401,36,guve,37,Incorrect,38,Incorrect,39,Incorrect,1
+496, ,1,144,0,1,496 114401,36,guve,37,Incorrect,38,Incorrect,39,Incorrect,1
+501, ,1,145,0,2,501 114502,40,NEVER,41,BIRF,42,Incorrect,43,Incorrect,2
+502, ,1,145,0,2,502 114502,40,NEVER,41,BIRF,42,Incorrect,43,Incorrect,2
+503, ,1,146,0,2,503 114602,40,SWEET,41,BOIT,42,Incorrect,43,Incorrect,2
+504, ,1,146,0,2,504 114602,40,SWEET,41,BOIT,42,Incorrect,43,Incorrect,2
+505, ,1,147,0,2,505 114702,40,FLOWER,41,BLOME,42,Incorrect,43,Incorrect,2
+506, ,1,147,0,2,506 114702,40,FLOWER,41,BLOME,42,Incorrect,43,Incorrect,2
+507, ,1,148,0,2,507 114802,40,SISTER,41,BLIK,42,Incorrect,43,Incorrect,2
+508, ,1,148,0,2,508 114802,40,SISTER,41,BLIK,42,Incorrect,43,Incorrect,2
+509, ,1,149,0,2,509 114902,40,MONKEY,41,DEAB,42,Incorrect,43,Incorrect,2
+510, ,1,149,0,2,510 114902,40,MONKEY,41,DEAB,42,Incorrect,43,Incorrect,2
+511, ,1,150,0,2,511 115002,40,RUG,41,FEAP,42,Incorrect,43,Incorrect,2
+512, ,1,150,0,2,512 115002,40,RUG,41,FEAP,42,Incorrect,43,Incorrect,2
+513, ,1,151,0,2,513 115102,40,ORDER,41,GLOKE,42,Incorrect,43,Incorrect,2
+514, ,1,151,0,2,514 115102,40,ORDER,41,GLOKE,42,Incorrect,43,Incorrect,2
+515, ,1,152,0,2,515 115202,40,TAKE,41,GLIEF,42,Incorrect,43,Incorrect,2
+516, ,1,152,0,2,516 115202,40,TAKE,41,GLIEF,42,Incorrect,43,Incorrect,2
+517, ,1,153,0,2,517 115302,40,HEAD,41,HOCH,42,Incorrect,43,Incorrect,2
+518, ,1,153,0,2,518 115302,40,HEAD,41,HOCH,42,Incorrect,43,Incorrect,2
+519, ,1,154,0,2,519 115402,40,HAIR,41,HOBE,42,Incorrect,43,Incorrect,2
+520, ,1,154,0,2,520 115402,40,HAIR,41,HOBE,42,Incorrect,43,Incorrect,2
+521, ,1,155,0,2,521 115502,40,TRUTH,41,HOCE,42,Incorrect,43,Incorrect,2
+522, ,1,155,0,2,522 115502,40,TRUTH,41,HOCE,42,Incorrect,43,Incorrect,2
+523, ,1,156,0,2,523 115602,40,FOOD,41,CUMP,42,Incorrect,43,Incorrect,2
+524, ,1,156,0,2,524 115602,40,FOOD,41,CUMP,42,Incorrect,43,Incorrect,2
+525, ,1,157,0,2,525 115702,40,DREAM,41,GECH,42,Incorrect,43,Incorrect,2
+526, ,1,157,0,2,526 115702,40,DREAM,41,GECH,42,Incorrect,43,Incorrect,2
+527, ,1,158,0,2,527 115802,40,BUG,41,SCOGE,42,Incorrect,43,Incorrect,2
+528, ,1,158,0,2,528 115802,40,BUG,41,SCOGE,42,Incorrect,43,Incorrect,2
+529, ,1,159,0,2,529 115902,40,SALAD,41,SEWK,42,Incorrect,43,Incorrect,2
+530, ,1,159,0,2,530 115902,40,SALAD,41,SEWK,42,Incorrect,43,Incorrect,2
+531, ,1,160,0,2,531 116002,40,MOUTH,41,SOIRCE,42,Incorrect,43,Incorrect,2
+532, ,1,160,0,2,532 116002,40,MOUTH,41,SOIRCE,42,Incorrect,43,Incorrect,2
+533, ,1,161,0,2,533 116102,40,DIE,41,SPO,42,Incorrect,43,Incorrect,2
+534, ,1,161,0,2,534 116102,40,DIE,41,SPO,42,Incorrect,43,Incorrect,2
+535, ,1,162,0,2,535 116202,40,YOURS,41,TOACH,42,Incorrect,43,Incorrect,2
+536, ,1,162,0,2,536 116202,40,YOURS,41,TOACH,42,Incorrect,43,Incorrect,2
+537, ,1,163,0,2,537 116302,40,STAR,41,TRAUSE,42,Incorrect,43,Incorrect,2
+538, ,1,163,0,2,538 116302,40,STAR,41,TRAUSE,42,Incorrect,43,Incorrect,2
+539, ,1,164,0,2,539 116402,40,KETCHUP,41,WHIAT,42,Incorrect,43,Incorrect,2
+540, ,1,164,0,2,540 116402,40,KETCHUP,41,WHIAT,42,Incorrect,43,Incorrect,2
+541, ,1,165,0,2,541 116502,40,LETTER,41,MUTH,42,Incorrect,43,Incorrect,2
+542, ,1,165,0,2,542 116502,40,LETTER,41,MUTH,42,Incorrect,43,Incorrect,2
+543, ,1,166,0,2,543 116602,40,BUY,41,WARTH,42,Incorrect,43,Incorrect,2
+544, ,1,166,0,2,544 116602,40,BUY,41,WARTH,42,Incorrect,43,Incorrect,2
+545, ,1,167,0,2,545 116702,40,FAST,41,WOAND,42,Incorrect,43,Incorrect,2
+546, ,1,167,0,2,546 116702,40,FAST,41,WOAND,42,Incorrect,43,Incorrect,2
+547, ,1,168,0,2,547 116802,40,TUNE,41,WAPE,42,Incorrect,43,Incorrect,2
+548, ,1,168,0,2,548 116802,40,TUNE,41,WAPE,42,Incorrect,43,Incorrect,2
+549, ,1,169,0,2,549 116902,40,ROUND,41,BLOS,42,Incorrect,43,Incorrect,2
+550, ,1,169,0,2,550 116902,40,ROUND,41,BLOS,42,Incorrect,43,Incorrect,2
+551, ,1,170,0,2,551 117002,40,ADD,41,BOWB,42,Incorrect,43,Incorrect,2
+552, ,1,170,0,2,552 117002,40,ADD,41,BOWB,42,Incorrect,43,Incorrect,2
+553, ,1,171,0,2,553 117102,40,MEAT,41,COFE,42,Incorrect,43,Incorrect,2
+554, ,1,171,0,2,554 117102,40,MEAT,41,COFE,42,Incorrect,43,Incorrect,2
+555, ,1,172,0,2,555 117202,40,GRASS,41,DOYT,42,Incorrect,43,Incorrect,2
+556, ,1,172,0,2,556 117202,40,GRASS,41,DOYT,42,Incorrect,43,Incorrect,2
+557, ,1,173,0,2,557 117302,40,SMELL,41,FIPE,42,Incorrect,43,Incorrect,2
+558, ,1,173,0,2,558 117302,40,SMELL,41,FIPE,42,Incorrect,43,Incorrect,2
+559, ,1,174,0,2,559 117402,40,GUMS,41,GLIE,42,Incorrect,43,Incorrect,2
+560, ,1,174,0,2,560 117402,40,GUMS,41,GLIE,42,Incorrect,43,Incorrect,2
+561, ,1,175,0,2,561 117502,40,SKULL,41,KEET,42,Incorrect,43,Incorrect,2
+562, ,1,175,0,2,562 117502,40,SKULL,41,KEET,42,Incorrect,43,Incorrect,2
+563, ,1,176,0,2,563 117602,40,CAR,41,CABE,42,Incorrect,43,Incorrect,2
+564, ,1,176,0,2,564 117602,40,CAR,41,CABE,42,Incorrect,43,Incorrect,2
+565, ,1,177,0,2,565 117702,40,DRINK,41,RAFE,42,Incorrect,43,Incorrect,2
+566, ,1,177,0,2,566 117702,40,DRINK,41,RAFE,42,Incorrect,43,Incorrect,2
+567, ,1,178,0,2,567 117802,40,ARM,41,SULE,42,Incorrect,43,Incorrect,2
+568, ,1,178,0,2,568 117802,40,ARM,41,SULE,42,Incorrect,43,Incorrect,2
+569, ,1,179,0,2,569 117902,40,KNIT,41,TUPE,42,Incorrect,43,Incorrect,2
+570, ,1,179,0,2,570 117902,40,KNIT,41,TUPE,42,Incorrect,43,Incorrect,2
+571, ,1,180,0,2,571 118002,40,BOX,41,GARL,42,Incorrect,43,Incorrect,2
+572, ,1,180,0,2,572 118002,40,BOX,41,GARL,42,Incorrect,43,Incorrect,2
+573, ,1,181,0,2,573 118102,40,HILL,41,BORCH,42,Incorrect,43,Incorrect,2
+574, ,1,181,0,2,574 118102,40,HILL,41,BORCH,42,Incorrect,43,Incorrect,2
+575, ,1,182,0,2,575 118202,40,UGLY,41,CAZE,42,Incorrect,43,Incorrect,2
+576, ,1,182,0,2,576 118202,40,UGLY,41,CAZE,42,Incorrect,43,Incorrect,2
+577, ,1,183,0,2,577 118302,40,MOTH,41,LERT,42,Incorrect,43,Incorrect,2
+578, ,1,183,0,2,578 118302,40,MOTH,41,LERT,42,Incorrect,43,Incorrect,2
+579, ,1,184,0,2,579 118402,40,LOOK,41,MAVIC,42,Incorrect,43,Incorrect,2
+580, ,1,184,0,2,580 118402,40,LOOK,41,MAVIC,42,Incorrect,43,Incorrect,2
+581, ,1,185,0,2,581 118502,40,STAND,41,BROIN,42,Incorrect,43,Incorrect,2
+582, ,1,185,0,2,582 118502,40,STAND,41,BROIN,42,Incorrect,43,Incorrect,2
+583, ,1,186,0,2,583 118602,40,TAXI,41,CLEUN,42,Incorrect,43,Incorrect,2
+584, ,1,186,0,2,584 118602,40,TAXI,41,CLEUN,42,Incorrect,43,Incorrect,2
+585, ,1,187,0,2,585 118702,40,BULL,41,BEEG,42,Incorrect,43,Incorrect,2
+586, ,1,187,0,2,586 118702,40,BULL,41,BEEG,42,Incorrect,43,Incorrect,2
+587, ,1,188,0,2,587 118802,40,WOMAN,41,CITTON,42,Incorrect,43,Incorrect,2
+588, ,1,188,0,2,588 118802,40,WOMAN,41,CITTON,42,Incorrect,43,Incorrect,2
+589, ,1,189,0,2,589 118902,40,FUEL,41,HEAK,42,Incorrect,43,Incorrect,2
+590, ,1,189,0,2,590 118902,40,FUEL,41,HEAK,42,Incorrect,43,Incorrect,2
+591, ,1,190,0,2,591 119002,40,PISTOL,41,HOURLE,42,Incorrect,43,Incorrect,2
+592, ,1,190,0,2,592 119002,40,PISTOL,41,HOURLE,42,Incorrect,43,Incorrect,2
+593, ,1,191,0,2,593 119102,40,CAT,41,NEP,42,Incorrect,43,Incorrect,2
+594, ,1,191,0,2,594 119102,40,CAT,41,NEP,42,Incorrect,43,Incorrect,2
+595, ,1,192,0,2,595 119202,40,ONE,41,AIF,42,Incorrect,43,Incorrect,2
+596, ,1,192,0,2,596 119202,40,ONE,41,AIF,42,Incorrect,43,Incorrect,2
+597, ,1,193,0,2,597 119302,40,MAD,41,trape,42,Incorrect,43,Incorrect,2
+598, ,1,193,0,2,598 119302,40,MAD,41,trape,42,Incorrect,43,Incorrect,2
+599, ,1,194,0,2,599 119402,40,CHILD,41,dweln,42,Incorrect,43,Incorrect,2
+600, ,1,194,0,2,600 119402,40,CHILD,41,dweln,42,Incorrect,43,Incorrect,2
+601, ,1,195,0,2,601 119502,40,GOD,41,snuth,42,Incorrect,43,Incorrect,2
+602, ,1,195,0,2,602 119502,40,GOD,41,snuth,42,Incorrect,43,Incorrect,2
+603, ,1,196,0,2,603 119602,40,TOWN,41,zash,42,Incorrect,43,Incorrect,2
+604, ,1,196,0,2,604 119602,40,TOWN,41,zash,42,Incorrect,43,Incorrect,2
+605, ,1,197,0,2,605 119702,40,KITCHEN,41,churbe,42,Incorrect,43,Incorrect,2
+606, ,1,197,0,2,606 119702,40,KITCHEN,41,churbe,42,Incorrect,43,Incorrect,2
+607, ,1,198,0,2,607 119802,40,LIGHT,41,hulm,42,Incorrect,43,Incorrect,2
+608, ,1,198,0,2,608 119802,40,LIGHT,41,hulm,42,Incorrect,43,Incorrect,2
+609, ,1,199,0,2,609 119902,40,PLATE,41,smoof,42,Incorrect,43,Incorrect,2
+610, ,1,199,0,2,610 119902,40,PLATE,41,smoof,42,Incorrect,43,Incorrect,2
+611, ,1,200,0,2,611 120002,40,GROUND,41,bap,42,Incorrect,43,Incorrect,2
+612, ,1,200,0,2,612 120002,40,GROUND,41,bap,42,Incorrect,43,Incorrect,2
+613, ,1,201,0,2,613 120102,40,END,41,blels,42,Incorrect,43,Incorrect,2
+614, ,1,201,0,2,614 120102,40,END,41,blels,42,Incorrect,43,Incorrect,2
+615, ,1,202,0,2,615 120202,40,VOTE,41,lind             ,42,Incorrect,43,Incorrect,2
+616, ,1,202,0,2,616 120202,40,VOTE,41,lind             ,42,Incorrect,43,Incorrect,2
+617, ,1,203,0,2,617 120302,40,SPRING,41,founge,42,Incorrect,43,Incorrect,2
+618, ,1,203,0,2,618 120302,40,SPRING,41,founge,42,Incorrect,43,Incorrect,2
+619, ,1,204,0,2,619 120402,40,POLE,41,zun,42,Incorrect,43,Incorrect,2
+620, ,1,204,0,2,620 120402,40,POLE,41,zun,42,Incorrect,43,Incorrect,2
+621, ,1,205,0,2,621 120502,40,HAND,41,sarp,42,Incorrect,43,Incorrect,2
+622, ,1,205,0,2,622 120502,40,HAND,41,sarp,42,Incorrect,43,Incorrect,2
+623, ,1,206,0,2,623 120602,40,GREEN,41,shreb,42,Incorrect,43,Incorrect,2
+624, ,1,206,0,2,624 120602,40,GREEN,41,shreb,42,Incorrect,43,Incorrect,2
+625, ,1,207,0,2,625 120702,40,JOY,41,julpe,42,Incorrect,43,Incorrect,2
+626, ,1,207,0,2,626 120702,40,JOY,41,julpe,42,Incorrect,43,Incorrect,2
+627, ,1,208,0,2,627 120802,40,MIGHT,41,cype,42,Incorrect,43,Incorrect,2
+628, ,1,208,0,2,628 120802,40,MIGHT,41,cype,42,Incorrect,43,Incorrect,2
+629, ,1,209,0,2,629 120902,40,BIZARRE,41,nount,42,Incorrect,43,Incorrect,2
+630, ,1,209,0,2,630 120902,40,BIZARRE,41,nount,42,Incorrect,43,Incorrect,2
+631, ,1,210,0,2,631 121002,40,DOCTOR,41,kemn,42,Incorrect,43,Incorrect,2
+632, ,1,210,0,2,632 121002,40,DOCTOR,41,kemn,42,Incorrect,43,Incorrect,2
+633, ,1,211,0,2,633 121102,40,APPLE,41,vuff,42,Incorrect,43,Incorrect,2
+634, ,1,211,0,2,634 121102,40,APPLE,41,vuff,42,Incorrect,43,Incorrect,2
+635, ,1,212,0,2,635 121202,40,SHIRT,41,stous,42,Incorrect,43,Incorrect,2
+636, ,1,212,0,2,636 121202,40,SHIRT,41,stous,42,Incorrect,43,Incorrect,2
+637, ,1,213,0,2,637 121302,40,PAPER,41,obbs,42,Incorrect,43,Incorrect,2
+638, ,1,213,0,2,638 121302,40,PAPER,41,obbs,42,Incorrect,43,Incorrect,2
+639, ,1,214,0,2,639 121402,40,CROWD,41,mep            ,42,Incorrect,43,Incorrect,2
+640, ,1,214,0,2,640 121402,40,CROWD,41,mep            ,42,Incorrect,43,Incorrect,2
+641, ,1,215,0,2,641 121502,40,CAKE,41,zole,42,Incorrect,43,Incorrect,2
+642, ,1,215,0,2,642 121502,40,CAKE,41,zole,42,Incorrect,43,Incorrect,2
+643, ,1,216,0,2,643 121602,40,FRIEND,41,brugue,42,Incorrect,43,Incorrect,2
+644, ,1,216,0,2,644 121602,40,FRIEND,41,brugue,42,Incorrect,43,Incorrect,2
+645, ,1,217,0,2,645 121702,40,DRESS,41,kark           ,42,Incorrect,43,Incorrect,2
+646, ,1,217,0,2,646 121702,40,DRESS,41,kark           ,42,Incorrect,43,Incorrect,2
+647, ,1,218,0,2,647 121802,40,WAGE,41,kep  ,42,Incorrect,43,Incorrect,2
+648, ,1,218,0,2,648 121802,40,WAGE,41,kep  ,42,Incorrect,43,Incorrect,2
+649, ,1,219,0,2,649 121902,40,AFRAID,41,jull,42,Incorrect,43,Incorrect,2
+650, ,1,219,0,2,650 121902,40,AFRAID,41,jull,42,Incorrect,43,Incorrect,2
+651, ,1,220,0,2,651 122002,40,ITCH,41,mab           ,42,Incorrect,43,Incorrect,2
+652, ,1,220,0,2,652 122002,40,ITCH,41,mab           ,42,Incorrect,43,Incorrect,2
+653, ,1,221,0,2,653 122102,40,DEEP,41,tweeps,42,Incorrect,43,Incorrect,2
+654, ,1,221,0,2,654 122102,40,DEEP,41,tweeps,42,Incorrect,43,Incorrect,2
+655, ,1,222,0,2,655 122202,40,HEALTH,41,furte,42,Incorrect,43,Incorrect,2
+656, ,1,222,0,2,656 122202,40,HEALTH,41,furte,42,Incorrect,43,Incorrect,2
+657, ,1,223,0,2,657 122302,40,ROUGH,41,jark,42,Incorrect,43,Incorrect,2
+658, ,1,223,0,2,658 122302,40,ROUGH,41,jark,42,Incorrect,43,Incorrect,2
+659, ,1,224,0,2,659 122402,40,TALK,41,len    ,42,Incorrect,43,Incorrect,2
+660, ,1,224,0,2,660 122402,40,TALK,41,len    ,42,Incorrect,43,Incorrect,2
+661, ,1,225,0,2,661 122502,40,SMOKE,41,soarl,42,Incorrect,43,Incorrect,2
+662, ,1,225,0,2,662 122502,40,SMOKE,41,soarl,42,Incorrect,43,Incorrect,2
+663, ,1,226,0,2,663 122602,40,DRUG,41,dold,42,Incorrect,43,Incorrect,2
+664, ,1,226,0,2,664 122602,40,DRUG,41,dold,42,Incorrect,43,Incorrect,2
+665, ,1,227,0,2,665 122702,40,DOOR,41,sile ,42,Incorrect,43,Incorrect,2
+666, ,1,227,0,2,666 122702,40,DOOR,41,sile ,42,Incorrect,43,Incorrect,2
+667, ,1,228,0,2,667 122802,40,LITTLE,41,gens ,42,Incorrect,43,Incorrect,2
+668, ,1,228,0,2,668 122802,40,LITTLE,41,gens ,42,Incorrect,43,Incorrect,2
+669, ,1,229,0,2,669 122902,40,PEACE,41,speigs,42,Incorrect,43,Incorrect,2
+670, ,1,229,0,2,670 122902,40,PEACE,41,speigs,42,Incorrect,43,Incorrect,2
+671, ,1,230,0,2,671 123002,40,COFFEE,41,pome,42,Incorrect,43,Incorrect,2
+672, ,1,230,0,2,672 123002,40,COFFEE,41,pome,42,Incorrect,43,Incorrect,2
+673, ,1,231,0,2,673 123102,40,PLEAD,41,skulb,42,Incorrect,43,Incorrect,2
+674, ,1,231,0,2,674 123102,40,PLEAD,41,skulb,42,Incorrect,43,Incorrect,2
+675, ,1,232,0,2,675 123202,40,THEN,41,mape,42,Incorrect,43,Incorrect,2
+676, ,1,232,0,2,676 123202,40,THEN,41,mape,42,Incorrect,43,Incorrect,2
+677, ,1,233,0,2,677 123302,40,BLUE,41,melp,42,Incorrect,43,Incorrect,2
+678, ,1,233,0,2,678 123302,40,BLUE,41,melp,42,Incorrect,43,Incorrect,2
+679, ,1,234,0,2,679 123402,40,CUT,41,meve,42,Incorrect,43,Incorrect,2
+680, ,1,234,0,2,680 123402,40,CUT,41,meve,42,Incorrect,43,Incorrect,2
+681, ,1,235,0,2,681 123502,40,LOBE,41,zist            ,42,Incorrect,43,Incorrect,2
+682, ,1,235,0,2,682 123502,40,LOBE,41,zist            ,42,Incorrect,43,Incorrect,2
+683, ,1,236,0,2,683 123602,40,YOLK,41,crine,42,Incorrect,43,Incorrect,2
+684, ,1,236,0,2,684 123602,40,YOLK,41,crine,42,Incorrect,43,Incorrect,2
+685, ,1,237,0,2,685 123702,40,WEEP,41,yurk,42,Incorrect,43,Incorrect,2
+686, ,1,237,0,2,686 123702,40,WEEP,41,yurk,42,Incorrect,43,Incorrect,2
+687, ,1,238,0,2,687 123802,40,HIVE,41,dink  ,42,Incorrect,43,Incorrect,2
+688, ,1,238,0,2,688 123802,40,HIVE,41,dink  ,42,Incorrect,43,Incorrect,2
+689, ,1,239,0,2,689 123902,40,POT,41,sace             ,42,Incorrect,43,Incorrect,2
+690, ,1,239,0,2,690 123902,40,POT,41,sace             ,42,Incorrect,43,Incorrect,2
+691, ,1,240,0,2,691 124002,40,DAD,41,swirs,42,Incorrect,43,Incorrect,2
+692, ,1,240,0,2,692 124002,40,DAD,41,swirs,42,Incorrect,43,Incorrect,2
