@@ -21,6 +21,11 @@ trials[idx] = [word.lower() if word != 'Incorrect' else word.upper()
 idx = header.index('post')
 trials[idx] = [word.lower() if word != 'Incorrect' else word.upper()
                for word in trials[idx] ]
+# remove blank
+idx = header.index('blank')
+header.pop(idx)
+trials.pop(idx)
+
 list1 = [header]
 list1.extend(zip(*trials)[::4])
 list1.extend(zip(*trials)[3::4])
