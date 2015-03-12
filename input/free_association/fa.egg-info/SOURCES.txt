@@ -1,7 +1,0 @@
-setup.py
-fa/__init__.py
-fa/free_association.py
-fa.egg-info/PKG-INFO
-fa.egg-info/SOURCES.txt
-fa.egg-info/dependency_links.txt
-fa.egg-info/top_level.txt

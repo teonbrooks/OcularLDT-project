@@ -1,93 +1,93 @@
-block	bin_strength	trigger_fix	prime	trigger_prime	aux	trigger_aux	target	trigger_target	post	trigger_post	strength
-0	0	0	This	1	is	2	a	3	sentence.	4	0
-0	0	0	Practice	1	is	2	very	3	important.	4	0
-1	0	16	Acrobats	17	can	18	fly	19	high.	20	0.019
-1	0	16	Alarms	17	can	18	scare	19	people.	20	0.048
-1	0	16	Ants	17	can	18	sting	19	people.	20	0.017
-1	0	16	Artists	17	can	18	draw	19	everything.	20	0.015
-1	0	16	Balloons	17	can	18	float	19	abruptly.	20	0.054
-1	0	16	Bats	17	can	18	bite	19	blindly.	20	0.016
-1	0	16	Birds	17	can	18	chirp	19	sweetly.	20	0.013
-1	0	16	Boxers	17	can	18	hit	19	hard.	20	0.026
-1	0	16	Bugs	17	can	18	annoy	19	easily.	20	0.013
-1	0	16	Cars	17	can	18	travel	19	far.	20	0.039
-1	0	16	Clamps	17	can	18	fasten	19	tight.	20	0.013
-1	0	16	Cooks	17	can	18	fry	19	food.	20	0.016
-1	0	16	Ducks	17	can	18	swim	19	peacefully.	20	0.013
-1	0	16	Ears	17	can	18	ache	19	immensely.	20	0.035
-1	0	16	Engines	17	can	18	roar	19	loudly.	20	0.016
-1	0	16	Farmers	17	can	18	grow	19	fields.	20	0.01
-1	0	16	Fish	17	can	18	cook	19	quickly.	20	0.012
-1	0	16	Grasshoppers	17	can	18	jump	19	high.	20	0.052
-1	0	16	Guides	17	can	18	help	19	confidently.	20	0.032
-1	0	16	Heads	17	can	18	think	19	quickly.	20	0.021
-1	0	16	Helicopters	17	can	18	crash	19	suddenly.	20	0.02
-1	0	16	Inventors	17	can	18	discover	19	unconsciously.	20	0.014
-1	0	16	Kangaroos	17	can	18	bounce	19	high.	20	0.019
-1	0	16	Knees	17	can	18	jerk	19	rapidly.	20	0.048
-1	0	16	Lips	17	can	18	talk	19	lovingly.	20	0.024
-1	0	16	Mildew	17	can	18	smell	19	distinctly.	20	0.02
-1	0	16	Muscles	17	can	18	build	19	involuntarily.	20	0.014
-1	0	16	Noses	17	can	18	sneeze	19	immensely.	20	0.02
-1	0	16	Ovens	17	can	18	toast	19	thoroughly.	20	0.012
-1	0	16	Parrots	17	can	18	mimic	19	annoyingly.	20	0.021
-1	0	16	Plants	17	can	18	live	19	vibrantly.	20	0.011
-1	0	16	Politicians	17	can	18	cheat	19	dishonestly.	20	0.014
-1	0	16	Rabbits	17	can	18	hop	19	high.	20	0.011
-1	0	16	Sharks	17	can	18	kill	19	indiscriminately.	20	0.034
-1	0	16	Singers	17	can	18	perform	19	admirably.	20	0.015
-1	0	16	Snakes	17	can	18	slither	19	quickly.	20	0.061
-1	0	16	Stomachs	17	can	18	upset	19	annoyingly.	20	0.014
-1	0	16	Teeth	17	can	18	bite	19	food.	20	0.021
-1	0	16	Thorns	17	can	18	hurt	19	gardeners.	20	0.035
-1	0	16	Traffic	17	can	18	stop	19	traffic.	20	0.034
-1	0	16	Trays	17	can	18	hold	19	food.	20	0.014
-1	0	16	Volcanos	17	can	18	explode	19	violently.	20	0.036
-1	0	16	Warriors	17	can	18	kill	19	enemies.	20	0.014
-1	0	16	Weapons	17	can	18	defend	19	people.	20	0.014
-0	0	0	This	1	is	2	for	3	practice.	4	0
-0	0	0	Practice	1	is	2	very	3	useful.	4	0
-1	1	24	Airplanes	25	can	26	fly	27	far.	28	0.32
-1	1	24	Anchors	25	can	26	hold	27	boats.	28	0.04
-1	1	24	Architects	25	can	26	build	27	houses.	28	0.053
-1	1	24	Babies	25	can	26	cry	27	loudly.	28	0.115
-1	1	24	Bands	25	can	26	play	27	loudly.	28	0.056
-1	1	24	Bees	25	can	26	sting	27	painfully.	28	0.362
-1	1	24	Bombs	25	can	26	explode	27	abruptly.	28	0.15
-1	1	24	Brains	25	can	26	think	27	quickly.	28	0.239
-1	1	24	Burglars	25	can	26	steal	27	unnoticeably.	28	0.095
-1	1	24	Children	25	can	26	play	27	joyfully.	28	0.121
-1	1	24	Clorox	25	can	26	bleach	27	clothes.	28	0.787
-1	1	24	Critics	25	can	26	analyze	27	movies.	28	0.054
-1	1	24	Eagles	25	can	26	soar	27	majestically.	28	0.081
-1	1	24	Earthquakes	25	can	26	shake	27	buildings.	28	0.241
-1	1	24	Eyes	25	can	26	see	27	far.	28	0.362
-1	1	24	Feets	25	can	26	smell	27	badly.	28	0.047
-1	1	24	Frogs	25	can	26	jump	27	high.	28	0.068
-1	1	24	Guards	25	can	26	protect	27	strongly.	28	0.139
-1	1	24	Gymnasts	25	can	26	tumble	27	gracefully.	28	0.026
-1	1	24	Hearts	25	can	26	beat	27	often.	28	0.183
-1	1	24	Insects	25	can	26	bite	27	annoyingly.	28	0.126
-1	1	24	Judges	25	can	26	decide	27	justly.	28	0.034
-1	1	24	Kettles	25	can	26	boil	27	quickly.	28	0.074
-1	1	24	Legs	25	can	26	run	27	quickly.	28	0.034
-1	1	24	Masks	25	can	26	hide	27	noticeably.	28	0.182
-1	1	24	Mosquitos	25	can	26	bite	27	painfully.	28	0.362
-1	1	24	Needles	25	can	26	sew	27	quickly.	28	0.224
-1	1	24	Oil	25	can	26	spill	27	haphazardly.	28	0.101
-1	1	24	Pans	25	can	26	cook	27	quickly.	28	0.155
-1	1	24	Planes	25	can	26	fly	27	distantly.	28	0.238
-1	1	24	Police	25	can	26	help	27	honorably.	28	0.087
-1	1	24	Puzzles	25	can	26	confuse	27	immensely.	28	0.094
-1	1	24	Rivers	25	can	26	flow	27	deeply.	28	0.063
-1	1	24	Ships	25	can	26	sink	27	dramatically.	28	0.031
-1	1	24	Skin	25	can	26	tan	27	unknowingly.	28	0.141
-1	1	24	Soap	25	can	26	wash	27	well.	28	0.076
-1	1	24	Suns	25	can	26	tan	27	skin.	28	0.173
-1	1	24	Telescopes	25	can	26	see	27	space.	28	0.041
-1	1	24	Threats	25	can	26	scare	27	everyone.	28	0.092
-1	1	24	Traitors	25	can	26	betray	27	people.	28	0.027
-1	1	24	Tweezers	25	can	26	pluck	27	hair.	28	0.127
-1	1	24	Volunteers	25	can	26	help	27	victims.	28	0.268
-1	1	24	Wasps	25	can	26	sting	27	people.	28	0.365
-1	1	24	Whistles	25	can	26	blow	27	alertly.	28	0.175
+block	bin_strength	trigger_fix	prime	trigger_prime	aux	trigger_aux	target	trigger_target	post	trigger_post	strength	probe	probe_answer
+0	0	0	This	1	is	2	a	3	sentence.	4	0	Question: This is a sentence.	2
+0	0	0	Practice	1	is	2	very	3	important.	4	0	Question: This is a sentence.	2
+1	0	16	Acrobats	17	can	18	fly	19	high.	20	0.019	Question: This is a sentence.	2
+1	0	16	Alarms	17	can	18	scare	19	people.	20	0.048	Question: AIRPLANES are inanimate.	2
+1	0	16	Ants	17	can	18	sting	19	people.	20	0.017	Question: ANCHORS are inanimate.	2
+1	0	16	Artists	17	can	18	draw	19	everything.	20	0.015	Question: ARCHITECTS are inanimate.	1
+1	0	16	Balloons	17	can	18	float	19	abruptly.	20	0.054	Question: BABIES are inanimate.	1
+1	0	16	Bats	17	can	18	bite	19	blindly.	20	0.016	Question: BANDS are inanimate.	1
+1	0	16	Birds	17	can	18	chirp	19	sweetly.	20	0.013	Question: BEES are inanimate.	1
+1	0	16	Boxers	17	can	18	hit	19	hard.	20	0.026	Question: BOMBS are inanimate.	2
+1	0	16	Bugs	17	can	18	annoy	19	easily.	20	0.013	Question: BRAINS are inanimate.	1
+1	0	16	Cars	17	can	18	travel	19	far.	20	0.039	Question: BURGLARS are inanimate.	1
+1	0	16	Clamps	17	can	18	fasten	19	tight.	20	0.013	Question: CHILDREN are inanimate.	1
+1	0	16	Cooks	17	can	18	fry	19	food.	20	0.016	Question: CLOROX are inanimate.	2
+1	0	16	Ducks	17	can	18	swim	19	peacefully.	20	0.013	Question: CRITICS are inanimate.	1
+1	0	16	Ears	17	can	18	ache	19	immensely.	20	0.035	Question: EAGLES are inanimate.	1
+1	0	16	Engines	17	can	18	roar	19	loudly.	20	0.016	Question: EARTHQUAKES are inanimate.	2
+1	0	16	Farmers	17	can	18	grow	19	fields.	20	0.01	Question: EYES are inanimate.	1
+1	0	16	Fish	17	can	18	cook	19	quickly.	20	0.012	Question: FEET are inanimate.	1
+1	0	16	Grasshoppers	17	can	18	jump	19	high.	20	0.052	Question: FROGS are inanimate.	1
+1	0	16	Guides	17	can	18	help	19	confidently.	20	0.032	Question: GUARDS are inanimate.	1
+1	0	16	Heads	17	can	18	think	19	quickly.	20	0.021	Question: GYMNASTS are inanimate.	1
+1	0	16	Helicopters	17	can	18	crash	19	suddenly.	20	0.02	Question: HEARTS are inanimate.	1
+1	0	16	Inventors	17	can	18	discover	19	unconsciously.	20	0.014	Question: INSECTS are inanimate.	1
+1	0	16	Kangaroos	17	can	18	bounce	19	high.	20	0.019	Question: JUDGES are inanimate.	1
+1	0	16	Knees	17	can	18	jerk	19	rapidly.	20	0.048	Question: KETTLES are inanimate.	2
+1	0	16	Lips	17	can	18	talk	19	lovingly.	20	0.024	Question: LEGS are inanimate.	1
+1	0	16	Mildew	17	can	18	smell	19	distinctly.	20	0.02	Question: MASKS are inanimate.	2
+1	0	16	Muscles	17	can	18	build	19	involuntarily.	20	0.014	Question: MOSQUITOS are inanimate.	1
+1	0	16	Noses	17	can	18	sneeze	19	immensely.	20	0.02	Question: NEEDLES are inanimate.	2
+1	0	16	Ovens	17	can	18	toast	19	thoroughly.	20	0.012	Question: OIL are inanimate.	2
+1	0	16	Parrots	17	can	18	mimic	19	annoyingly.	20	0.021	Question: PANS are inanimate.	2
+1	0	16	Plants	17	can	18	live	19	vibrantly.	20	0.011	Question: PLANES are inanimate.	2
+1	0	16	Politicians	17	can	18	cheat	19	dishonestly.	20	0.014	Question: POLICE are inanimate.	1
+1	0	16	Rabbits	17	can	18	hop	19	high.	20	0.011	Question: PUZZLES are inanimate.	2
+1	0	16	Sharks	17	can	18	kill	19	indiscriminately.	20	0.034	Question: RIVERS are inanimate.	2
+1	0	16	Singers	17	can	18	perform	19	admirably.	20	0.015	Question: SHIPS are inanimate.	2
+1	0	16	Snakes	17	can	18	slither	19	quickly.	20	0.061	Question: SKIN are inanimate.	1
+1	0	16	Stomachs	17	can	18	upset	19	annoyingly.	20	0.014	Question: SOAP are inanimate.	2
+1	0	16	Teeth	17	can	18	bite	19	food.	20	0.021	Question: SUN is inanimate.	2
+1	0	16	Thorns	17	can	18	hurt	19	gardeners.	20	0.035	Question: TELESCOPES are inanimate.	2
+1	0	16	Traffic	17	can	18	stop	19	traffic.	20	0.034	Question: THREATS are inanimate.	2
+1	0	16	Trays	17	can	18	hold	19	food.	20	0.014	Question: TRAITORS are inanimate.	1
+1	0	16	Volcanos	17	can	18	explode	19	violently.	20	0.036	Question: TWEEZERS are inanimate.	2
+1	0	16	Warriors	17	can	18	kill	19	enemies.	20	0.014	Question: VOLUNTEERS are inanimate.	1
+1	0	16	Weapons	17	can	18	defend	19	people.	20	0.014	Question: WASPS are inanimate.	1
+0	0	0	This	1	is	2	for	3	practice.	4	0	Question: This is a sentence.	2
+0	0	0	Practice	1	is	2	very	3	useful.	4	0	Question: This is a sentence.	2
+1	1	24	Airplanes	25	can	26	fly	27	far.	28	0.32	Question: AIRPLANES are animate.	1
+1	1	24	Anchors	25	can	26	hold	27	boats.	28	0.04	Question: ANCHORS are animate.	1
+1	1	24	Architects	25	can	26	build	27	houses.	28	0.053	Question: ARCHITECTS are animate.	2
+1	1	24	Babies	25	can	26	cry	27	loudly.	28	0.115	Question: BABIES are animate.	2
+1	1	24	Bands	25	can	26	play	27	loudly.	28	0.056	Question: BANDS are animate.	2
+1	1	24	Bees	25	can	26	sting	27	painfully.	28	0.362	Question: BEES are animate.	2
+1	1	24	Bombs	25	can	26	explode	27	abruptly.	28	0.15	Question: BOMBS are animate.	1
+1	1	24	Brains	25	can	26	think	27	quickly.	28	0.239	Question: BRAINS are animate.	2
+1	1	24	Burglars	25	can	26	steal	27	unnoticeably.	28	0.095	Question: BURGLARS are animate.	2
+1	1	24	Children	25	can	26	play	27	joyfully.	28	0.121	Question: CHILDREN are animate.	2
+1	1	24	Clorox	25	can	26	bleach	27	clothes.	28	0.787	Question: CLOROX are animate.	1
+1	1	24	Critics	25	can	26	analyze	27	movies.	28	0.054	Question: CRITICS are animate.	2
+1	1	24	Eagles	25	can	26	soar	27	majestically.	28	0.081	Question: EAGLES are animate.	2
+1	1	24	Earthquakes	25	can	26	shake	27	buildings.	28	0.241	Question: EARTHQUAKES are animate.	1
+1	1	24	Eyes	25	can	26	see	27	far.	28	0.362	Question: EYES are animate.	2
+1	1	24	Feet	25	can	26	smell	27	badly.	28	0.047	Question: FEET are animate.	2
+1	1	24	Frogs	25	can	26	jump	27	high.	28	0.068	Question: FROGS are animate.	2
+1	1	24	Guards	25	can	26	protect	27	strongly.	28	0.139	Question: GUARDS are animate.	2
+1	1	24	Gymnasts	25	can	26	tumble	27	gracefully.	28	0.026	Question: GYMNASTS are animate.	2
+1	1	24	Hearts	25	can	26	beat	27	often.	28	0.183	Question: HEARTS are animate.	2
+1	1	24	Insects	25	can	26	bite	27	annoyingly.	28	0.126	Question: INSECTS are animate.	2
+1	1	24	Judges	25	can	26	decide	27	justly.	28	0.034	Question: JUDGES are animate.	2
+1	1	24	Kettles	25	can	26	boil	27	quickly.	28	0.074	Question: KETTLES are animate.	1
+1	1	24	Legs	25	can	26	run	27	quickly.	28	0.034	Question: LEGS are animate.	2
+1	1	24	Masks	25	can	26	hide	27	noticeably.	28	0.182	Question: MASKS are animate.	1
+1	1	24	Mosquitos	25	can	26	bite	27	painfully.	28	0.362	Question: MOSQUITOS are animate.	2
+1	1	24	Needles	25	can	26	sew	27	quickly.	28	0.224	Question: NEEDLES are animate.	1
+1	1	24	Oil	25	can	26	spill	27	haphazardly.	28	0.101	Question: OIL are animate.	1
+1	1	24	Pans	25	can	26	cook	27	quickly.	28	0.155	Question: PANS are animate.	1
+1	1	24	Planes	25	can	26	fly	27	distantly.	28	0.238	Question: PLANES are animate.	1
+1	1	24	Police	25	can	26	help	27	honorably.	28	0.087	Question: POLICE are animate.	2
+1	1	24	Puzzles	25	can	26	confuse	27	immensely.	28	0.094	Question: PUZZLES are animate.	1
+1	1	24	Rivers	25	can	26	flow	27	deeply.	28	0.063	Question: RIVERS are animate.	1
+1	1	24	Ships	25	can	26	sink	27	dramatically.	28	0.031	Question: SHIPS are animate.	1
+1	1	24	Skin	25	can	26	tan	27	unknowingly.	28	0.141	Question: SKIN are animate.	2
+1	1	24	Soap	25	can	26	wash	27	well.	28	0.076	Question: SOAP are animate.	1
+1	1	24	Sun	25	can	26	tan	27	skin.	28	0.173	Question: SUN is animate.	1
+1	1	24	Telescopes	25	can	26	see	27	space.	28	0.041	Question: TELESCOPES are animate.	1
+1	1	24	Threats	25	can	26	scare	27	everyone.	28	0.092	Question: THREATS are animate.	1
+1	1	24	Traitors	25	can	26	betray	27	people.	28	0.027	Question: TRAITORS are animate.	2
+1	1	24	Tweezers	25	can	26	pluck	27	hair.	28	0.127	Question: TWEEZERS are animate.	1
+1	1	24	Volunteers	25	can	26	help	27	victims.	28	0.268	Question: VOLUNTEERS are animate.	2
+1	1	24	Wasps	25	can	26	sting	27	people.	28	0.365	Question: WASPS are animate.	2
+1	1	24	Whistles	25	can	26	blow	27	alertly.	28	0.175	Question: WHISTLES are animate.	1

@@ -1,4 +1,4 @@
-item,,block,scenario,relatedness,nonword,identifier,trigger_fix,prime,trigger_prime,target,trigger_target,post,trigger_post,probe,nonword
+item,blank,block,scenario,relatedness,nonword,identifier,trigger_fix,prime,trigger_prime,target,trigger_target,post,trigger_post,probe,nonword
 000, ,0,000,0,0,000 000000,0,ANIMAL,1,RED,2,MAID,3,Correct! Press button to move to the next trial,0
 000, ,0,000,0,0,000 000000,0,ANIMAL,1,RED,2,MAID,3,Correct! Press button to move to the next trial,0
 000, ,0,000,0,1,000 000001,4,dass,5,Incorrect,6,Incorrect,7,Incorrect,1
