@@ -23,7 +23,7 @@ mne.epochs.equalize_epoch_counts(epochs_list)
 evoked = epochs_list[1].average() - epochs_list[0].average()
 p = evoked.plot(show=False)
 p.savefig(op.join(plot_path, 'A0148_OLDT_word-nonword' + ica + '_evoked.pdf'))
-p = evoked.plot_topomap(np.linspace(0, .50, 15), show=False); 
+p = evoked.plot_topomap(np.linspace(0, .50, 15), show=False)
 p.savefig(op.join(plot_path, 'A0148_OLDT_word-nonword' + ica + '_ev_topo.pdf'))
 
 

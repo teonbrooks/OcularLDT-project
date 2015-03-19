@@ -1,5 +1,6 @@
 from glob import glob
 import inspect
+import os
 
 file = os.path.abspath(inspect.getfile(inspect.currentframe()))
 path = os.path.dirname(file)

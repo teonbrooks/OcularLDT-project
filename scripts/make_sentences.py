@@ -8,7 +8,7 @@ import fa
 #     words = FILE.readlines()
 #     words = [x.strip() for x in words]
 
-free = fa.Free() 
+free = fa.Free()
 words = set([x['CUE'] for x in free._free if x['QPS'] == 'N'])
 
 stims = []
@@ -21,8 +21,8 @@ for word in words:
             targets = [x['TARGET'].lower() for x in entries]
             if len(targets) > 1:
                 strengths = [entry['FSG'] for entry in entries]
-                ranks =[(i, rank) for i, rank in enumerate(strengths)] 
-    
+                ranks = [(i, rank) for i, rank in enumerate(strengths)]
+
                 high = entries[strengths.index(max(strengths))]['TARGET']
                 high_s = max(strengths)
                 low = entries[strengths.index(min(strengths))]['TARGET']
