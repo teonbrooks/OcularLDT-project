@@ -3,8 +3,9 @@ import numpy as np
 import os.path as op
 
 
-path = '/Volumes/teon-backup/Experiments/E-MEG/data/A0148/mne/'
-raw_file = 'A0148_OLDT_calm_lp40-raw.fif'
+subject = 'A0149'
+path = '/Volumes/teon-backup/Experiments/E-MEG/data/%s/mne/' % subject
+raw_file = '%s_OLDT_calm-raw.fif' % subject
 raw = mne.io.Raw(op.join(path, raw_file), verbose=False, preload=False)
 
 evts = mne.find_stim_steps(raw)
@@ -44,7 +45,7 @@ evts = np.vstack((words, priming))
 idx = zip(evts[:, 0], np.arange(evts.size))
 idx = list(zip(*sorted(idx))[-1])
 evts = evts[idx]
-mne.write_events(op.join(path, 'A0148_OLDT-eve.txt'), evts)
+mne.write_events(op.join(path, '%s_OLDT-eve.txt') % subject, evts)
 
 # key
 # 1: nonword, 2: word, 3: unprimed, 4: primed
