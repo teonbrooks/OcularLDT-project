@@ -32,7 +32,7 @@ item	block	scenario	relatedness	nonword	identifier	trigger_fix	prime	trigger_pri
 902	1	051	0	3	902 105103	44	soft	45	beach	46	thand	47	Incorrect	3
 906	1	053	0	0	906 105300	32	bride	33	chair	34	copy	35	Correct! Press button to move to the next trial	0
 910	1	055	0	3	910 105503	44	leap	45	clock	46	hus	47	Incorrect	3
-914	1	057	0	3	914 105703	44	up	45	cold	46	mank	47	Incorrect	3
+914	1	057	0	3	914 105703	44	up	45	cold	46	mank 	47	Incorrect	3
 918	1	059	0	0	918 105900	32	supper	33	crazy	34	pants	35	Correct! Press button to move to the next trial	0
 922	1	061	0	0	922 106100	32	open	33	dirt	34	work	35	Correct! Press button to move to the next trial	0
 926	1	063	0	0	926 106300	32	sofa	33	early	34	rule	35	Correct! Press button to move to the next trial	0
@@ -54,7 +54,7 @@ item	block	scenario	relatedness	nonword	identifier	trigger_fix	prime	trigger_pri
 990	1	095	0	3	990 109503	44	run	45	arrow	46	yiss	47	Incorrect	3
 402	1	097	0	1	402 109701	36	pels           	37	INCORRECT	38	INCORRECT	39	Incorrect	1
 406	1	099	0	1	406 109901	36	kib  	37	INCORRECT	38	INCORRECT	39	Incorrect	1
-410	1	101	0	1	410 110101	36	doss	37	INCORRECT	38	INCORRECT	39	Incorrect	1
+410	1	101	0	1	410 110101	36	doss 	37	INCORRECT	38	INCORRECT	39	Incorrect	1
 414	1	103	0	1	414 110301	36	brare	37	INCORRECT	38	INCORRECT	39	Incorrect	1
 418	1	105	0	1	418 110501	36	yade          	37	INCORRECT	38	INCORRECT	39	Incorrect	1
 422	1	107	0	1	422 110701	36	fum             	37	INCORRECT	38	INCORRECT	39	Incorrect	1
@@ -117,7 +117,7 @@ item	block	scenario	relatedness	nonword	identifier	trigger_fix	prime	trigger_pri
 654	1	221	0	2	654 122102	40	deep	41	tweeps	42	INCORRECT	43	Incorrect	2
 658	1	223	0	2	658 122302	40	rough	41	jark	42	INCORRECT	43	Incorrect	2
 662	1	225	0	2	662 122502	40	smoke	41	soarl	42	INCORRECT	43	Incorrect	2
-666	1	227	0	2	666 122702	40	door	41	sile	42	INCORRECT	43	Incorrect	2
+666	1	227	0	2	666 122702	40	door	41	sile 	42	INCORRECT	43	Incorrect	2
 670	1	229	0	2	670 122902	40	peace	41	speigs	42	INCORRECT	43	Incorrect	2
 674	1	231	0	2	674 123102	40	plead	41	skulb	42	INCORRECT	43	Incorrect	2
 678	1	233	0	2	678 123302	40	blue	41	melp	42	INCORRECT	43	Incorrect	2
@@ -132,12 +132,12 @@ item	block	scenario	relatedness	nonword	identifier	trigger_fix	prime	trigger_pri
 803	1	002	1	3	803 100213	60	asleep	61	awake	62	dyct	63	Incorrect	3
 807	1	004	1	0	807 100410	48	keg	49	beer	50	buyer	51	Correct! Press button to move to the next trial	1
 811	1	006	1	0	811 100610	48	rye	49	bread	50	foot	51	Correct! Press button to move to the next trial	0
-815	1	008	1	3	815 100813	60	doe	61	deer	62	lale	63	Incorrect	3
+815	1	008	1	3	815 100813	60	doe	61	deer	62	lale 	63	Incorrect	3
 819	1	010	1	3	819 101013	60	sketch	61	draw	62	yoam	63	Incorrect	3
 823	1	012	1	3	823 101213	60	thumb	61	finger	62	zore	63	Incorrect	3
 827	1	014	1	3	827 101413	60	trout	61	fish	62	fars            	63	Incorrect	3
 831	1	016	1	3	831 101613	60	silver	61	gold	62	norg	63	Incorrect	3
-835	1	018	1	3	835 101813	60	low	61	high	62	dure	63	Incorrect	3
+835	1	018	1	3	835 101813	60	low	61	high	62	dure 	63	Incorrect	3
 839	1	020	1	3	839 102013	60	more	61	less	62	tomp         	63	Incorrect	3
 843	1	022	1	3	843 102213	60	found	61	lost	62	dup	63	Incorrect	3
 847	1	024	1	3	847 102413	60	hammer	61	nail	62	jafts	63	Incorrect	3
@@ -145,7 +145,7 @@ item	block	scenario	relatedness	nonword	identifier	trigger_fix	prime	trigger_pri
 855	1	028	1	3	855 102813	60	king	61	queen	62	nild	63	Incorrect	3
 859	1	030	1	3	859 103013	60	pepper	61	salt	62	hine	63	Incorrect	3
 863	1	032	1	3	863 103213	60	nap	61	sleep	62	skake	63	Incorrect	3
-867	1	034	1	3	867 103413	60	herb	61	spice	62	fent	63	Incorrect	3
+867	1	034	1	3	867 103413	60	herb	61	spice	62	fent   	63	Incorrect	3
 871	1	036	1	3	871 103613	60	weak	61	strong	62	whep             	63	Incorrect	3
 875	1	038	1	3	875 103813	60	road	61	street	62	sprefs	63	Incorrect	3
 879	1	040	1	3	879 104013	60	lion	61	tiger	62	grerns	63	Incorrect	3
@@ -183,7 +183,7 @@ item	block	scenario	relatedness	nonword	identifier	trigger_fix	prime	trigger_pri
 415	1	104	0	1	415 110401	36	chents	37	INCORRECT	38	INCORRECT	39	Incorrect	1
 419	1	106	0	1	419 110601	36	crench	37	INCORRECT	38	INCORRECT	39	Incorrect	1
 423	1	108	0	1	423 110801	36	skurk	37	INCORRECT	38	INCORRECT	39	Incorrect	1
-427	1	110	0	1	427 111001	36	zear	37	INCORRECT	38	INCORRECT	39	Incorrect	1
+427	1	110	0	1	427 111001	36	zear 	37	INCORRECT	38	INCORRECT	39	Incorrect	1
 431	1	112	0	1	431 111201	36	pank         	37	INCORRECT	38	INCORRECT	39	Incorrect	1
 435	1	114	0	1	435 111401	36	yalt	37	INCORRECT	38	INCORRECT	39	Incorrect	1
 439	1	116	0	1	439 111601	36	chulke	37	INCORRECT	38	INCORRECT	39	Incorrect	1
@@ -196,7 +196,7 @@ item	block	scenario	relatedness	nonword	identifier	trigger_fix	prime	trigger_pri
 467	1	130	0	1	467 113001	36	jav             	37	INCORRECT	38	INCORRECT	39	Incorrect	1
 471	1	132	0	1	471 113201	36	fraine	37	INCORRECT	38	INCORRECT	39	Incorrect	1
 475	1	134	0	1	475 113401	36	hace	37	INCORRECT	38	INCORRECT	39	Incorrect	1
-479	1	136	0	1	479 113601	36	luts	37	INCORRECT	38	INCORRECT	39	Incorrect	1
+479	1	136	0	1	479 113601	36	luts 	37	INCORRECT	38	INCORRECT	39	Incorrect	1
 483	1	138	0	1	483 113801	36	nang           	37	INCORRECT	38	INCORRECT	39	Incorrect	1
 487	1	140	0	1	487 114001	36	clibs	37	INCORRECT	38	INCORRECT	39	Incorrect	1
 491	1	142	0	1	491 114201	36	briep	37	INCORRECT	38	INCORRECT	39	Incorrect	1
@@ -242,7 +242,7 @@ item	block	scenario	relatedness	nonword	identifier	trigger_fix	prime	trigger_pri
 655	1	222	0	2	655 122202	40	health	41	furte	42	INCORRECT	43	Incorrect	2
 659	1	224	0	2	659 122402	40	talk	41	len    	42	INCORRECT	43	Incorrect	2
 663	1	226	0	2	663 122602	40	drug	41	dold	42	INCORRECT	43	Incorrect	2
-667	1	228	0	2	667 122802	40	little	41	gens	42	INCORRECT	43	Incorrect	2
+667	1	228	0	2	667 122802	40	little	41	gens 	42	INCORRECT	43	Incorrect	2
 671	1	230	0	2	671 123002	40	coffee	41	pome	42	INCORRECT	43	Incorrect	2
 675	1	232	0	2	675 123202	40	then	41	mape	42	INCORRECT	43	Incorrect	2
 679	1	234	0	2	679 123402	40	cut	41	meve	42	INCORRECT	43	Incorrect	2
