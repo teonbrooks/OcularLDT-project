@@ -1,251 +1,251 @@
-item	block	scenario	relatedness	nonword	identifier	trigger_fix	prime	trigger_prime	target	trigger_target	post	trigger_post	probe	nonword
-000	0	000	0	0	000 000000	0	animal	1	red	2	maid	3	Correct! Press button to move to the next trial	0
-000	0	000	0	2	000 000002	8	spider	9	lomb	10	INCORRECT	11	Incorrect	2
-000	0	000	0	0	000 000000	0	year	1	twelve	2	enemy	3	Correct! Press button to move to the next trial	0
-000	0	000	0	2	000 000002	8	love	9	jurp	10	INCORRECT	11	Incorrect	2
-000	0	000	0	0	000 000000	0	pie	1	sword	2	art	3	Correct! Press button to move to the next trial	0
-801	1	001	1	3	801 100113	60	together	61	apart	62	sorthe	63	Incorrect	3
-805	1	003	1	0	805 100310	48	bat	49	ball	50	window	51	Correct! Press button to move to the next trial	0
-809	1	005	1	3	809 100513	60	text	61	book	62	dags          	63	Incorrect	3
-813	1	007	1	3	813 100713	60	priest	61	church	62	flokes	63	Incorrect	3
-817	1	009	1	0	817 100910	48	nickel	49	dime	50	wall	51	Correct! Press button to move to the next trial	0
-821	1	011	1	0	821 101110	48	quack	49	duck	50	human	51	Correct! Press button to move to the next trial	0
-825	1	013	1	0	825 101310	48	blaze	49	fire	50	glass	51	Correct! Press button to move to the next trial	0
-829	1	015	1	0	829 101510	48	boy	49	girl	50	water	51	Correct! Press button to move to the next trial	0
-833	1	017	1	0	833 101710	48	heaven	49	hell	50	gum	51	Correct! Press button to move to the next trial	0
-837	1	019	1	0	837 101910	48	fork	49	knife	50	fat	51	Correct! Press button to move to the next trial	0
-841	1	021	1	0	841 102110	48	key	49	lock	50	school	51	Correct! Press button to move to the next trial	0
-845	1	023	1	0	845 102310	48	bank	49	money	50	clam	51	Correct! Press button to move to the next trial	0
-849	1	025	1	0	849 102510	48	jet	49	plane	50	army	51	Correct! Press button to move to the next trial	0
-853	1	027	1	0	853 102710	48	shove	49	push	50	recipe	51	Correct! Press button to move to the next trial	0
-857	1	029	1	0	857 102910	48	left	49	right	50	number	51	Correct! Press button to move to the next trial	0
-861	1	031	1	0	861 103110	48	tall	49	short	50	color	51	Correct! Press button to move to the next trial	0
-865	1	033	1	0	865 103310	48	north	49	south	50	ice	51	Correct! Press button to move to the next trial	0
-869	1	035	1	0	869 103510	48	rob	49	steal	50	shovel	51	Correct! Press button to move to the next trial	0
-873	1	037	1	0	873 103710	48	halt	49	stop	50	fun	51	Correct! Press button to move to the next trial	0
-877	1	039	1	0	877 103910	48	quiz	49	test	50	tale	51	Correct! Press button to move to the next trial	0
-881	1	041	1	0	881 104110	48	flush	49	toilet	50	toe	51	Correct! Press button to move to the next trial	0
-885	1	043	1	0	885 104310	48	false	49	true	50	stream	51	Correct! Press button to move to the next trial	0
-889	1	045	1	0	889 104510	48	height	49	weight	50	face	51	Correct! Press button to move to the next trial	0
-893	1	047	1	0	893 104710	48	rip	49	tear	50	smile	51	Correct! Press button to move to the next trial	0
-897	1	049	1	0	897 104910	48	below	49	above	50	sea	51	Correct! Press button to move to the next trial	0
-901	1	051	1	3	901 105113	60	sand	61	beach	62	thand	63	Incorrect	3
-905	1	053	1	0	905 105310	48	table	49	chair	50	copy	51	Correct! Press button to move to the next trial	0
-909	1	055	1	3	909 105513	60	time	61	clock	62	hus	63	Incorrect	3
-913	1	057	1	3	913 105713	60	hot	61	cold	62	mank 	63	Incorrect	3
-917	1	059	1	0	917 105910	48	insane	49	crazy	50	pants	51	Correct! Press button to move to the next trial	0
-921	1	061	1	0	921 106110	48	soil	49	dirt	50	work	51	Correct! Press button to move to the next trial	0
-925	1	063	1	0	925 106310	48	late	49	early	50	rule	51	Correct! Press button to move to the next trial	0
-929	1	065	1	0	929 106510	48	toad	49	frog	50	place	51	Correct! Press button to move to the next trial	0
-933	1	067	1	0	933 106710	48	bad	49	good	50	syrup	51	Correct! Press button to move to the next trial	0
-937	1	069	1	0	937 106910	48	soft	49	hard	50	speed	51	Correct! Press button to move to the next trial	0
-941	1	071	1	0	941 107110	48	leap	49	jump	50	coal	51	Correct! Press button to move to the next trial	0
-945	1	073	1	0	945 107310	48	lemon	49	lime	50	candy	51	Correct! Press button to move to the next trial	0
-949	1	075	1	0	949 107510	48	noise	49	loud	50	boring	51	Correct! Press button to move to the next trial	0
-953	1	077	1	0	953 107710	48	niece	49	nephew	50	music	51	Correct! Press button to move to the next trial	0
-957	1	079	1	0	957 107910	48	under	49	over	50	cow	51	Correct! Press button to move to the next trial	0
-961	1	081	1	0	961 108110	48	sock	49	shoe	50	stone	51	Correct! Press button to move to the next trial	0
-965	1	083	1	0	965 108310	48	satin	49	silk	50	bird	51	Correct! Press button to move to the next trial	0
-969	1	085	1	0	969 108510	48	wag	49	tail	50	jail	51	Correct! Press button to move to the next trial	0
-973	1	087	1	0	973 108710	48	quench	49	thirst	50	ear	51	Correct! Press button to move to the next trial	0
-977	1	089	1	0	977 108910	48	once	49	twice	50	milk	51	Correct! Press button to move to the next trial	0
-981	1	091	1	0	981 109110	48	noun	49	verb	50	horse	51	Correct! Press button to move to the next trial	0
-985	1	093	1	0	985 109310	48	black	49	white	50	square	51	Correct! Press button to move to the next trial	0
-989	1	095	1	3	989 109513	60	bow	61	arrow	62	yiss	63	Incorrect	3
-401	1	097	0	1	401 109701	36	pels           	37	INCORRECT	38	INCORRECT	39	Incorrect	1
-405	1	099	0	1	405 109901	36	kib  	37	INCORRECT	38	INCORRECT	39	Incorrect	1
-409	1	101	0	1	409 110101	36	doss 	37	INCORRECT	38	INCORRECT	39	Incorrect	1
-413	1	103	0	1	413 110301	36	brare	37	INCORRECT	38	INCORRECT	39	Incorrect	1
-417	1	105	0	1	417 110501	36	yade          	37	INCORRECT	38	INCORRECT	39	Incorrect	1
-421	1	107	0	1	421 110701	36	fum             	37	INCORRECT	38	INCORRECT	39	Incorrect	1
-425	1	109	0	1	425 110901	36	slagn	37	INCORRECT	38	INCORRECT	39	Incorrect	1
-429	1	111	0	1	429 111101	36	ouce	37	INCORRECT	38	INCORRECT	39	Incorrect	1
-433	1	113	0	1	433 111301	36	nur           	37	INCORRECT	38	INCORRECT	39	Incorrect	1
-437	1	115	0	1	437 111501	36	pone	37	INCORRECT	38	INCORRECT	39	Incorrect	1
-441	1	117	0	1	441 111701	36	tarb           	37	INCORRECT	38	INCORRECT	39	Incorrect	1
-445	1	119	0	1	445 111901	36	vounce	37	INCORRECT	38	INCORRECT	39	Incorrect	1
-449	1	121	0	1	449 112101	36	heasts	37	INCORRECT	38	INCORRECT	39	Incorrect	1
-453	1	123	0	1	453 112301	36	yarm	37	INCORRECT	38	INCORRECT	39	Incorrect	1
-457	1	125	0	1	457 112501	36	snigs	37	INCORRECT	38	INCORRECT	39	Incorrect	1
-461	1	127	0	1	461 112701	36	dryss	37	INCORRECT	38	INCORRECT	39	Incorrect	1
-465	1	129	0	1	465 112901	36	trich	37	INCORRECT	38	INCORRECT	39	Incorrect	1
-469	1	131	0	1	469 113101	36	stib	37	INCORRECT	38	INCORRECT	39	Incorrect	1
-473	1	133	0	1	473 113301	36	sweeve	37	INCORRECT	38	INCORRECT	39	Incorrect	1
-477	1	135	0	1	477 113501	36	sirth	37	INCORRECT	38	INCORRECT	39	Incorrect	1
-481	1	137	0	1	481 113701	36	keer	37	INCORRECT	38	INCORRECT	39	Incorrect	1
-485	1	139	0	1	485 113901	36	lafe            	37	INCORRECT	38	INCORRECT	39	Incorrect	1
-489	1	141	0	1	489 114101	36	tovs            	37	INCORRECT	38	INCORRECT	39	Incorrect	1
-493	1	143	0	1	493 114301	36	chutch	37	INCORRECT	38	INCORRECT	39	Incorrect	1
-501	1	145	0	2	501 114502	40	never	41	birf	42	INCORRECT	43	Incorrect	2
-505	1	147	0	2	505 114702	40	flower	41	blome	42	INCORRECT	43	Incorrect	2
-509	1	149	0	2	509 114902	40	monkey	41	deab	42	INCORRECT	43	Incorrect	2
-513	1	151	0	2	513 115102	40	order	41	gloke	42	INCORRECT	43	Incorrect	2
-517	1	153	0	2	517 115302	40	head	41	hoch	42	INCORRECT	43	Incorrect	2
-521	1	155	0	2	521 115502	40	truth	41	hoce	42	INCORRECT	43	Incorrect	2
-525	1	157	0	2	525 115702	40	dream	41	gech	42	INCORRECT	43	Incorrect	2
-529	1	159	0	2	529 115902	40	salad	41	sewk	42	INCORRECT	43	Incorrect	2
-533	1	161	0	2	533 116102	40	die	41	spo	42	INCORRECT	43	Incorrect	2
-537	1	163	0	2	537 116302	40	star	41	trause	42	INCORRECT	43	Incorrect	2
-541	1	165	0	2	541 116502	40	letter	41	muth	42	INCORRECT	43	Incorrect	2
-545	1	167	0	2	545 116702	40	fast	41	woand	42	INCORRECT	43	Incorrect	2
-549	1	169	0	2	549 116902	40	round	41	blos	42	INCORRECT	43	Incorrect	2
-553	1	171	0	2	553 117102	40	meat	41	cofe	42	INCORRECT	43	Incorrect	2
-557	1	173	0	2	557 117302	40	smell	41	fipe	42	INCORRECT	43	Incorrect	2
-561	1	175	0	2	561 117502	40	skull	41	keet	42	INCORRECT	43	Incorrect	2
-565	1	177	0	2	565 117702	40	drink	41	rafe	42	INCORRECT	43	Incorrect	2
-569	1	179	0	2	569 117902	40	knit	41	tupe	42	INCORRECT	43	Incorrect	2
-573	1	181	0	2	573 118102	40	hill	41	borch	42	INCORRECT	43	Incorrect	2
-577	1	183	0	2	577 118302	40	moth	41	lert	42	INCORRECT	43	Incorrect	2
-581	1	185	0	2	581 118502	40	stand	41	broin	42	INCORRECT	43	Incorrect	2
-585	1	187	0	2	585 118702	40	bull	41	beeg	42	INCORRECT	43	Incorrect	2
-589	1	189	0	2	589 118902	40	fuel	41	heak	42	INCORRECT	43	Incorrect	2
-593	1	191	0	2	593 119102	40	cat	41	nep	42	INCORRECT	43	Incorrect	2
-597	1	193	0	2	597 119302	40	mad	41	trape	42	INCORRECT	43	Incorrect	2
-601	1	195	0	2	601 119502	40	god	41	snuth	42	INCORRECT	43	Incorrect	2
-605	1	197	0	2	605 119702	40	kitchen	41	churbe	42	INCORRECT	43	Incorrect	2
-609	1	199	0	2	609 119902	40	plate	41	smoof	42	INCORRECT	43	Incorrect	2
-613	1	201	0	2	613 120102	40	end	41	blels	42	INCORRECT	43	Incorrect	2
-617	1	203	0	2	617 120302	40	spring	41	founge	42	INCORRECT	43	Incorrect	2
-621	1	205	0	2	621 120502	40	hand	41	sarp	42	INCORRECT	43	Incorrect	2
-625	1	207	0	2	625 120702	40	joy	41	julpe	42	INCORRECT	43	Incorrect	2
-629	1	209	0	2	629 120902	40	bizarre	41	nount	42	INCORRECT	43	Incorrect	2
-633	1	211	0	2	633 121102	40	apple	41	vuff	42	INCORRECT	43	Incorrect	2
-637	1	213	0	2	637 121302	40	paper	41	obbs	42	INCORRECT	43	Incorrect	2
-641	1	215	0	2	641 121502	40	cake	41	zole	42	INCORRECT	43	Incorrect	2
-645	1	217	0	2	645 121702	40	dress	41	kark           	42	INCORRECT	43	Incorrect	2
-649	1	219	0	2	649 121902	40	afraid	41	jull	42	INCORRECT	43	Incorrect	2
-653	1	221	0	2	653 122102	40	deep	41	tweeps	42	INCORRECT	43	Incorrect	2
-657	1	223	0	2	657 122302	40	rough	41	jark	42	INCORRECT	43	Incorrect	2
-661	1	225	0	2	661 122502	40	smoke	41	soarl	42	INCORRECT	43	Incorrect	2
-665	1	227	0	2	665 122702	40	door	41	sile 	42	INCORRECT	43	Incorrect	2
-669	1	229	0	2	669 122902	40	peace	41	speigs	42	INCORRECT	43	Incorrect	2
-673	1	231	0	2	673 123102	40	plead	41	skulb	42	INCORRECT	43	Incorrect	2
-677	1	233	0	2	677 123302	40	blue	41	melp	42	INCORRECT	43	Incorrect	2
-681	1	235	0	2	681 123502	40	lobe	41	zist            	42	INCORRECT	43	Incorrect	2
-685	1	237	0	2	685 123702	40	weep	41	yurk	42	INCORRECT	43	Incorrect	2
-689	1	239	0	2	689 123902	40	pot	41	sace             	42	INCORRECT	43	Incorrect	2
-000	0	000	0	1	000 000001	4	dass	5	INCORRECT	6	INCORRECT	7	Incorrect	1
-000	0	000	0	3	000 000003	12	baby	13	cob	14	drate	15	Incorrect	3
-000	0	000	0	1	000 000001	4	fowns	5	INCORRECT	6	INCORRECT	7	Incorrect	1
-000	0	000	0	3	000 000003	12	glove	13	lava	14	degent	15	Incorrect	3
-000	0	000	0	1	000 000001	4	smout	5	INCORRECT	6	INCORRECT	7	Incorrect	1
-804	1	002	0	3	804 100203	44	heaven	45	awake	46	dyct	47	Incorrect	3
-808	1	004	0	0	808 100400	32	low	33	beer	34	buyer	35	Correct! Press button to move to the next trial	2
-812	1	006	0	0	812 100600	32	bat	33	bread	34	foot	35	Correct! Press button to move to the next trial	0
-816	1	008	0	3	816 100803	44	boy	45	deer	46	lale 	47	Incorrect	3
-820	1	010	0	3	820 101003	44	asleep	45	draw	46	yoam	47	Incorrect	3
-824	1	012	0	3	824 101203	44	blaze	45	finger	46	zore	47	Incorrect	3
-828	1	014	0	3	828 101403	44	thumb	45	fish	46	fars            	47	Incorrect	3
-832	1	016	0	3	832 101603	44	priest	45	gold	46	norg	47	Incorrect	3
-836	1	018	0	3	836 101803	44	rye	45	high	46	dure 	47	Incorrect	3
-840	1	020	0	3	840 102003	44	bank	45	less	46	tomp         	47	Incorrect	3
-844	1	022	0	3	844 102203	44	trout	45	lost	46	dup	47	Incorrect	3
-848	1	024	0	3	848 102403	44	sketch	45	nail	46	jafts	47	Incorrect	3
-852	1	026	0	3	852 102603	44	east	45	poor	46	marn	47	Incorrect	3
-856	1	028	0	3	856 102803	44	halt	45	queen	46	nild	47	Incorrect	3
-860	1	030	0	3	860 103003	44	height	45	salt	46	hine	47	Incorrect	3
-864	1	032	0	3	864 103203	44	jet	45	sleep	46	skake	47	Incorrect	3
-868	1	034	0	3	868 103403	44	left	45	spice	46	fent   	47	Incorrect	3
-872	1	036	0	3	872 103603	44	lion	45	strong	46	whep             	47	Incorrect	3
-876	1	038	0	3	876 103803	44	rich	45	street	46	sprefs	47	Incorrect	3
-880	1	040	0	3	880 104003	44	quiz	45	tiger	46	grerns	47	Incorrect	3
-884	1	042	0	3	884 104203	44	rip	45	tree	46	murf	47	Incorrect	3
-888	1	044	0	3	888 104403	44	flush	45	washer	46	brotch	47	Incorrect	3
-892	1	046	0	3	892 104603	44	road	45	west	46	stoins	47	Incorrect	3
-896	1	048	0	3	896 104803	44	rob	45	old	46	staw	47	Incorrect	3
-900	1	050	0	0	900 105000	32	there	33	back	34	actor	35	Correct! Press button to move to the next trial	0
-904	1	052	0	0	904 105200	32	front	33	blade	34	bee	35	Correct! Press button to move to the next trial	0
-908	1	054	0	0	908 105400	32	brawl	33	cheese	34	vein	35	Correct! Press button to move to the next trial	0
-912	1	056	0	0	912 105600	32	late	33	close	34	boat	35	Correct! Press button to move to the next trial	0
-916	1	058	0	0	916 105800	32	soil	33	couch	34	jelly	35	Correct! Press button to move to the next trial	0
-920	1	060	0	3	920 106003	44	murder	45	dinner	46	trulps	47	Incorrect	3
-924	1	062	0	3	924 106203	44	bad	45	down	46	rilds	47	Incorrect	3
-928	1	064	0	3	928 106403	44	empty	45	fight	46	cile            	47	Incorrect	3
-932	1	066	0	3	932 106603	44	razor	45	full	46	prot           	47	Incorrect	3
-936	1	068	0	3	936 106803	44	below	45	groom	46	soag            	47	Incorrect	3
-940	1	070	0	3	940 107003	44	swiss	45	here	46	dape	47	Incorrect	3
-944	1	072	0	3	944 107203	44	insane	45	kill	46	swip            	47	Incorrect	3
-948	1	074	0	3	948 107403	44	bow	45	lose	46	hule	47	Incorrect	3
-952	1	076	0	3	952 107603	44	aunt	45	movie	46	domp	47	Incorrect	3
-956	1	078	0	3	956 107803	44	ill	45	night	46	skoon	47	Incorrect	3
-960	1	080	0	3	960 108003	44	quench	45	shine	46	tief	47	Incorrect	3
-964	1	082	0	3	964 108203	44	day	45	sick	46	zepth	47	Incorrect	3
-968	1	084	0	3	968 108403	44	tame	45	steel	46	delche	47	Incorrect	3
-972	1	086	0	3	972 108603	44	spool	45	thin	46	spress	47	Incorrect	3
-976	1	088	0	3	976 108803	44	under	45	thread	46	rooc	47	Incorrect	3
-980	1	090	0	3	980 109003	44	once	45	uncle	46	soit          	47	Incorrect	3
-984	1	092	0	3	984 109203	44	ink	45	walk	46	helf           	47	Incorrect	3
-988	1	094	0	3	988 109403	44	noun	45	wild	46	drung	47	Incorrect	3
-992	1	096	0	3	992 109603	44	wag	45	pen	46	zans	47	Incorrect	3
-404	1	098	0	1	404 109801	36	nurche	37	INCORRECT	38	INCORRECT	39	Incorrect	1
-408	1	100	0	1	408 110001	36	fusk           	37	INCORRECT	38	INCORRECT	39	Incorrect	1
-412	1	102	0	1	412 110201	36	palb	37	INCORRECT	38	INCORRECT	39	Incorrect	1
-416	1	104	0	1	416 110401	36	chents	37	INCORRECT	38	INCORRECT	39	Incorrect	1
-420	1	106	0	1	420 110601	36	crench	37	INCORRECT	38	INCORRECT	39	Incorrect	1
-424	1	108	0	1	424 110801	36	skurk	37	INCORRECT	38	INCORRECT	39	Incorrect	1
-428	1	110	0	1	428 111001	36	zear 	37	INCORRECT	38	INCORRECT	39	Incorrect	1
-432	1	112	0	1	432 111201	36	pank         	37	INCORRECT	38	INCORRECT	39	Incorrect	1
-436	1	114	0	1	436 111401	36	yalt	37	INCORRECT	38	INCORRECT	39	Incorrect	1
-440	1	116	0	1	440 111601	36	chulke	37	INCORRECT	38	INCORRECT	39	Incorrect	1
-444	1	118	0	1	444 111801	36	rurd	37	INCORRECT	38	INCORRECT	39	Incorrect	1
-448	1	120	0	1	448 112001	36	mume             	37	INCORRECT	38	INCORRECT	39	Incorrect	1
-452	1	122	0	1	452 112201	36	rond	37	INCORRECT	38	INCORRECT	39	Incorrect	1
-456	1	124	0	1	456 112401	36	margs	37	INCORRECT	38	INCORRECT	39	Incorrect	1
-460	1	126	0	1	460 112601	36	foafs	37	INCORRECT	38	INCORRECT	39	Incorrect	1
-464	1	128	0	1	464 112801	36	dofe	37	INCORRECT	38	INCORRECT	39	Incorrect	1
-468	1	130	0	1	468 113001	36	jav             	37	INCORRECT	38	INCORRECT	39	Incorrect	1
-472	1	132	0	1	472 113201	36	fraine	37	INCORRECT	38	INCORRECT	39	Incorrect	1
-476	1	134	0	1	476 113401	36	hace	37	INCORRECT	38	INCORRECT	39	Incorrect	1
-480	1	136	0	1	480 113601	36	luts 	37	INCORRECT	38	INCORRECT	39	Incorrect	1
-484	1	138	0	1	484 113801	36	nang           	37	INCORRECT	38	INCORRECT	39	Incorrect	1
-488	1	140	0	1	488 114001	36	clibs	37	INCORRECT	38	INCORRECT	39	Incorrect	1
-492	1	142	0	1	492 114201	36	briep	37	INCORRECT	38	INCORRECT	39	Incorrect	1
-496	1	144	0	1	496 114401	36	guve	37	INCORRECT	38	INCORRECT	39	Incorrect	1
-504	1	146	0	2	504 114602	40	sweet	41	boit	42	INCORRECT	43	Incorrect	2
-508	1	148	0	2	508 114802	40	sister	41	blik	42	INCORRECT	43	Incorrect	2
-512	1	150	0	2	512 115002	40	rug	41	feap	42	INCORRECT	43	Incorrect	2
-516	1	152	0	2	516 115202	40	take	41	glief	42	INCORRECT	43	Incorrect	2
-520	1	154	0	2	520 115402	40	hair	41	hobe	42	INCORRECT	43	Incorrect	2
-524	1	156	0	2	524 115602	40	food	41	cump	42	INCORRECT	43	Incorrect	2
-528	1	158	0	2	528 115802	40	bug	41	scoge	42	INCORRECT	43	Incorrect	2
-532	1	160	0	2	532 116002	40	mouth	41	soirce	42	INCORRECT	43	Incorrect	2
-536	1	162	0	2	536 116202	40	yours	41	toach	42	INCORRECT	43	Incorrect	2
-540	1	164	0	2	540 116402	40	ketchup	41	whiat	42	INCORRECT	43	Incorrect	2
-544	1	166	0	2	544 116602	40	buy	41	warth	42	INCORRECT	43	Incorrect	2
-548	1	168	0	2	548 116802	40	tune	41	wape	42	INCORRECT	43	Incorrect	2
-552	1	170	0	2	552 117002	40	add	41	bowb	42	INCORRECT	43	Incorrect	2
-556	1	172	0	2	556 117202	40	grass	41	doyt	42	INCORRECT	43	Incorrect	2
-560	1	174	0	2	560 117402	40	gums	41	glie	42	INCORRECT	43	Incorrect	2
-564	1	176	0	2	564 117602	40	car	41	cabe	42	INCORRECT	43	Incorrect	2
-568	1	178	0	2	568 117802	40	arm	41	sule	42	INCORRECT	43	Incorrect	2
-572	1	180	0	2	572 118002	40	box	41	garl	42	INCORRECT	43	Incorrect	2
-576	1	182	0	2	576 118202	40	ugly	41	caze	42	INCORRECT	43	Incorrect	2
-580	1	184	0	2	580 118402	40	look	41	mavic	42	INCORRECT	43	Incorrect	2
-584	1	186	0	2	584 118602	40	taxi	41	cleun	42	INCORRECT	43	Incorrect	2
-588	1	188	0	2	588 118802	40	woman	41	citton	42	INCORRECT	43	Incorrect	2
-592	1	190	0	2	592 119002	40	pistol	41	hourle	42	INCORRECT	43	Incorrect	2
-596	1	192	0	2	596 119202	40	one	41	aif	42	INCORRECT	43	Incorrect	2
-600	1	194	0	2	600 119402	40	child	41	dweln	42	INCORRECT	43	Incorrect	2
-604	1	196	0	2	604 119602	40	town	41	zash	42	INCORRECT	43	Incorrect	2
-608	1	198	0	2	608 119802	40	light	41	hulm	42	INCORRECT	43	Incorrect	2
-612	1	200	0	2	612 120002	40	ground	41	bap	42	INCORRECT	43	Incorrect	2
-616	1	202	0	2	616 120202	40	vote	41	lind             	42	INCORRECT	43	Incorrect	2
-620	1	204	0	2	620 120402	40	pole	41	zun	42	INCORRECT	43	Incorrect	2
-624	1	206	0	2	624 120602	40	green	41	shreb	42	INCORRECT	43	Incorrect	2
-628	1	208	0	2	628 120802	40	might	41	cype	42	INCORRECT	43	Incorrect	2
-632	1	210	0	2	632 121002	40	doctor	41	kemn	42	INCORRECT	43	Incorrect	2
-636	1	212	0	2	636 121202	40	shirt	41	stous	42	INCORRECT	43	Incorrect	2
-640	1	214	0	2	640 121402	40	crowd	41	mep            	42	INCORRECT	43	Incorrect	2
-644	1	216	0	2	644 121602	40	friend	41	brugue	42	INCORRECT	43	Incorrect	2
-648	1	218	0	2	648 121802	40	wage	41	kep  	42	INCORRECT	43	Incorrect	2
-652	1	220	0	2	652 122002	40	itch	41	mab           	42	INCORRECT	43	Incorrect	2
-656	1	222	0	2	656 122202	40	health	41	furte	42	INCORRECT	43	Incorrect	2
-660	1	224	0	2	660 122402	40	talk	41	len    	42	INCORRECT	43	Incorrect	2
-664	1	226	0	2	664 122602	40	drug	41	dold	42	INCORRECT	43	Incorrect	2
-668	1	228	0	2	668 122802	40	little	41	gens 	42	INCORRECT	43	Incorrect	2
-672	1	230	0	2	672 123002	40	coffee	41	pome	42	INCORRECT	43	Incorrect	2
-676	1	232	0	2	676 123202	40	then	41	mape	42	INCORRECT	43	Incorrect	2
-680	1	234	0	2	680 123402	40	cut	41	meve	42	INCORRECT	43	Incorrect	2
-684	1	236	0	2	684 123602	40	yolk	41	crine	42	INCORRECT	43	Incorrect	2
-688	1	238	0	2	688 123802	40	hive	41	dink  	42	INCORRECT	43	Incorrect	2
-692	1	240	0	2	692 124002	40	dad	41	swirs	42	INCORRECT	43	Incorrect	2
+item	block	scenario	relatedness	nonword	identifier	trigger_fix	prime	trigger_prime	target	trigger_target	post	trigger_post	probe
+0	0	0	0	0	000 000000	0	animal	1	red	2	maid	3	Correct! Press button to move to the next trial
+0	0	0	0	2	000 000002	8	spider	9	lomb	10	INCORRECT	11	Incorrect
+0	0	0	0	0	000 000000	0	year	1	twelve	2	enemy	3	Correct! Press button to move to the next trial
+0	0	0	0	2	000 000002	8	love	9	jurp	10	INCORRECT	11	Incorrect
+0	0	0	0	0	000 000000	0	pie	1	sword	2	art	3	Correct! Press button to move to the next trial
+0	0	0	0	1	000 000001	4	dass	5	INCORRECT	6	INCORRECT	7	Incorrect
+0	0	0	0	3	000 000003	12	baby	13	cob	14	drate	15	Incorrect
+0	0	0	0	1	000 000001	4	fowns	5	INCORRECT	6	INCORRECT	7	Incorrect
+0	0	0	0	3	000 000003	12	glove	13	lava	14	degent	15	Incorrect
+0	0	0	0	1	000 000001	4	smout	5	INCORRECT	6	INCORRECT	7	Incorrect
+801	1	1	1	3	801 100113	60	together	61	apart	62	sorthe	63	Incorrect
+805	1	3	1	3	805 100313	60	bat	61	ball	62	dyct	63	Incorrect
+809	1	5	1	3	809 100513	60	text	61	book	62	dags          	63	Incorrect
+813	1	7	1	3	813 100713	60	priest	61	church	62	flokes	63	Incorrect
+817	1	9	1	3	817 100913	60	nickel	61	dime	62	lale 	63	Incorrect
+821	1	11	1	3	821 101113	60	quack	61	duck	62	yoam	63	Incorrect
+825	1	13	1	3	825 101313	60	blaze	61	fire	62	zore	63	Incorrect
+829	1	15	1	3	829 101513	60	boy	61	girl	62	fars            	63	Incorrect
+833	1	17	1	3	833 101713	60	heaven	61	hell	62	norg	63	Incorrect
+837	1	19	1	3	837 101913	60	fork	61	knife	62	dure 	63	Incorrect
+841	1	21	1	3	841 102113	60	key	61	lock	62	tomp         	63	Incorrect
+845	1	23	1	3	845 102313	60	bank	61	money	62	dup	63	Incorrect
+849	1	25	1	3	849 102513	60	jet	61	plane	62	jafts	63	Incorrect
+853	1	27	1	3	853 102713	60	shove	61	push	62	marn	63	Incorrect
+857	1	29	1	3	857 102913	60	left	61	right	62	nild	63	Incorrect
+861	1	31	1	3	861 103113	60	tall	61	short	62	hine	63	Incorrect
+865	1	33	1	3	865 103313	60	north	61	south	62	skake	63	Incorrect
+869	1	35	1	3	869 103513	60	rob	61	steal	62	fent   	63	Incorrect
+873	1	37	1	3	873 103713	60	halt	61	stop	62	whep             	63	Incorrect
+877	1	39	1	3	877 103913	60	quiz	61	test	62	sprefs	63	Incorrect
+881	1	41	1	3	881 104113	60	flush	61	toilet	62	grerns	63	Incorrect
+885	1	43	1	3	885 104313	60	false	61	true	62	murf	63	Incorrect
+889	1	45	1	3	889 104513	60	height	61	weight	62	brotch	63	Incorrect
+893	1	47	1	3	893 104713	60	rip	61	tear	62	stoins	63	Incorrect
+897	1	49	1	3	897 104913	60	below	61	above	62	staw	63	Incorrect
+901	1	51	1	3	901 105113	60	sand	61	beach	62	thand	63	Incorrect
+905	1	53	1	3	905 105313	60	table	61	chair	62	zans	63	Incorrect
+909	1	55	1	3	909 105513	60	time	61	clock	62	hus	63	Incorrect
+913	1	57	1	3	913 105713	60	hot	61	cold	62	mank 	63	Incorrect
+917	1	59	1	3	917 105913	60	insane	61	crazy	62	trulps	63	Incorrect
+921	1	61	1	3	921 106113	60	soil	61	dirt	62	rilds	63	Incorrect
+925	1	63	1	3	925 106313	60	late	61	early	62	cile            	63	Incorrect
+929	1	65	1	3	929 106513	60	toad	61	frog	62	prot           	63	Incorrect
+933	1	67	1	3	933 106713	60	bad	61	good	62	soag            	63	Incorrect
+937	1	69	1	3	937 106913	60	soft	61	hard	62	dape	63	Incorrect
+941	1	71	1	3	941 107113	60	leap	61	jump	62	swip            	63	Incorrect
+945	1	73	1	3	945 107313	60	lemon	61	lime	62	hule	63	Incorrect
+949	1	75	1	3	949 107513	60	noise	61	loud	62	domp	63	Incorrect
+953	1	77	1	3	953 107713	60	niece	61	nephew	62	skoon	63	Incorrect
+957	1	79	1	3	957 107913	60	under	61	over	62	tief	63	Incorrect
+961	1	81	1	3	961 108113	60	sock	61	shoe	62	zepth	63	Incorrect
+965	1	83	1	3	965 108313	60	satin	61	silk	62	delche	63	Incorrect
+969	1	85	1	3	969 108513	60	wag	61	tail	62	spress	63	Incorrect
+973	1	87	1	3	973 108713	60	quench	61	thirst	62	rooc	63	Incorrect
+977	1	89	1	3	977 108913	60	once	61	twice	62	soit	63	Incorrect
+981	1	91	1	3	981 109113	60	noun	61	verb	62	helf           	63	Incorrect
+985	1	93	1	3	985 109313	60	black	61	white	62	drung	63	Incorrect
+989	1	95	1	3	989 109513	60	bow	61	arrow	62	yiss	63	Incorrect
+401	1	97	0	1	401 109701	36	pels           	37	INCORRECT	38	INCORRECT	39	Incorrect
+405	1	99	0	1	405 109901	36	kib  	37	INCORRECT	38	INCORRECT	39	Incorrect
+409	1	101	0	1	409 110101	36	doss 	37	INCORRECT	38	INCORRECT	39	Incorrect
+413	1	103	0	1	413 110301	36	brare	37	INCORRECT	38	INCORRECT	39	Incorrect
+417	1	105	0	1	417 110501	36	yade          	37	INCORRECT	38	INCORRECT	39	Incorrect
+421	1	107	0	1	421 110701	36	fum             	37	INCORRECT	38	INCORRECT	39	Incorrect
+425	1	109	0	1	425 110901	36	slagn	37	INCORRECT	38	INCORRECT	39	Incorrect
+429	1	111	0	1	429 111101	36	ouce	37	INCORRECT	38	INCORRECT	39	Incorrect
+433	1	113	0	1	433 111301	36	nur           	37	INCORRECT	38	INCORRECT	39	Incorrect
+437	1	115	0	1	437 111501	36	pone	37	INCORRECT	38	INCORRECT	39	Incorrect
+441	1	117	0	1	441 111701	36	tarb           	37	INCORRECT	38	INCORRECT	39	Incorrect
+445	1	119	0	1	445 111901	36	vounce	37	INCORRECT	38	INCORRECT	39	Incorrect
+449	1	121	0	1	449 112101	36	heasts	37	INCORRECT	38	INCORRECT	39	Incorrect
+453	1	123	0	1	453 112301	36	yarm	37	INCORRECT	38	INCORRECT	39	Incorrect
+457	1	125	0	1	457 112501	36	snigs	37	INCORRECT	38	INCORRECT	39	Incorrect
+461	1	127	0	1	461 112701	36	dryss	37	INCORRECT	38	INCORRECT	39	Incorrect
+465	1	129	0	1	465 112901	36	trich	37	INCORRECT	38	INCORRECT	39	Incorrect
+469	1	131	0	1	469 113101	36	stib	37	INCORRECT	38	INCORRECT	39	Incorrect
+473	1	133	0	1	473 113301	36	sweeve	37	INCORRECT	38	INCORRECT	39	Incorrect
+477	1	135	0	1	477 113501	36	sirth	37	INCORRECT	38	INCORRECT	39	Incorrect
+481	1	137	0	1	481 113701	36	keer	37	INCORRECT	38	INCORRECT	39	Incorrect
+485	1	139	0	1	485 113901	36	lafe            	37	INCORRECT	38	INCORRECT	39	Incorrect
+489	1	141	0	1	489 114101	36	tovs            	37	INCORRECT	38	INCORRECT	39	Incorrect
+493	1	143	0	1	493 114301	36	chutch	37	INCORRECT	38	INCORRECT	39	Incorrect
+501	1	145	0	2	501 114502	40	never	41	birf	42	INCORRECT	43	Incorrect
+505	1	147	0	2	505 114702	40	flower	41	blome	42	INCORRECT	43	Incorrect
+509	1	149	0	2	509 114902	40	monkey	41	deab	42	INCORRECT	43	Incorrect
+513	1	151	0	2	513 115102	40	order	41	gloke	42	INCORRECT	43	Incorrect
+517	1	153	0	2	517 115302	40	head	41	hoch	42	INCORRECT	43	Incorrect
+521	1	155	0	2	521 115502	40	truth	41	hoce	42	INCORRECT	43	Incorrect
+525	1	157	0	2	525 115702	40	dream	41	gech	42	INCORRECT	43	Incorrect
+529	1	159	0	2	529 115902	40	salad	41	sewk	42	INCORRECT	43	Incorrect
+533	1	161	0	2	533 116102	40	die	41	spo	42	INCORRECT	43	Incorrect
+537	1	163	0	2	537 116302	40	star	41	trause	42	INCORRECT	43	Incorrect
+541	1	165	0	2	541 116502	40	letter	41	muth	42	INCORRECT	43	Incorrect
+545	1	167	0	2	545 116702	40	fast	41	woand	42	INCORRECT	43	Incorrect
+549	1	169	0	2	549 116902	40	round	41	blos	42	INCORRECT	43	Incorrect
+553	1	171	0	2	553 117102	40	meat	41	cofe	42	INCORRECT	43	Incorrect
+557	1	173	0	2	557 117302	40	smell	41	fipe	42	INCORRECT	43	Incorrect
+561	1	175	0	2	561 117502	40	skull	41	keet	42	INCORRECT	43	Incorrect
+565	1	177	0	2	565 117702	40	drink	41	rafe	42	INCORRECT	43	Incorrect
+569	1	179	0	2	569 117902	40	knit	41	tupe	42	INCORRECT	43	Incorrect
+573	1	181	0	2	573 118102	40	hill	41	borch	42	INCORRECT	43	Incorrect
+577	1	183	0	2	577 118302	40	moth	41	lert	42	INCORRECT	43	Incorrect
+581	1	185	0	2	581 118502	40	stand	41	broin	42	INCORRECT	43	Incorrect
+585	1	187	0	2	585 118702	40	bull	41	beeg	42	INCORRECT	43	Incorrect
+589	1	189	0	2	589 118902	40	fuel	41	heak	42	INCORRECT	43	Incorrect
+593	1	191	0	2	593 119102	40	cat	41	nep	42	INCORRECT	43	Incorrect
+597	1	193	0	2	597 119302	40	mad	41	trape	42	INCORRECT	43	Incorrect
+601	1	195	0	2	601 119502	40	god	41	snuth	42	INCORRECT	43	Incorrect
+605	1	197	0	2	605 119702	40	kitchen	41	churbe	42	INCORRECT	43	Incorrect
+609	1	199	0	2	609 119902	40	plate	41	smoof	42	INCORRECT	43	Incorrect
+613	1	201	0	2	613 120102	40	end	41	blels	42	INCORRECT	43	Incorrect
+617	1	203	0	2	617 120302	40	spring	41	founge	42	INCORRECT	43	Incorrect
+621	1	205	0	2	621 120502	40	hand	41	sarp	42	INCORRECT	43	Incorrect
+625	1	207	0	2	625 120702	40	joy	41	julpe	42	INCORRECT	43	Incorrect
+629	1	209	0	2	629 120902	40	bizarre	41	nount	42	INCORRECT	43	Incorrect
+633	1	211	0	2	633 121102	40	apple	41	vuff	42	INCORRECT	43	Incorrect
+637	1	213	0	2	637 121302	40	paper	41	obbs	42	INCORRECT	43	Incorrect
+641	1	215	0	2	641 121502	40	cake	41	zole	42	INCORRECT	43	Incorrect
+645	1	217	0	2	645 121702	40	dress	41	kark           	42	INCORRECT	43	Incorrect
+649	1	219	0	2	649 121902	40	afraid	41	jull	42	INCORRECT	43	Incorrect
+653	1	221	0	2	653 122102	40	deep	41	tweeps	42	INCORRECT	43	Incorrect
+657	1	223	0	2	657 122302	40	rough	41	jark	42	INCORRECT	43	Incorrect
+661	1	225	0	2	661 122502	40	smoke	41	soarl	42	INCORRECT	43	Incorrect
+665	1	227	0	2	665 122702	40	door	41	sile 	42	INCORRECT	43	Incorrect
+669	1	229	0	2	669 122902	40	peace	41	speigs	42	INCORRECT	43	Incorrect
+673	1	231	0	2	673 123102	40	plead	41	skulb	42	INCORRECT	43	Incorrect
+677	1	233	0	2	677 123302	40	blue	41	melp	42	INCORRECT	43	Incorrect
+681	1	235	0	2	681 123502	40	lobe	41	zist            	42	INCORRECT	43	Incorrect
+685	1	237	0	2	685 123702	40	weep	41	yurk	42	INCORRECT	43	Incorrect
+689	1	239	0	2	689 123902	40	pot	41	sace             	42	INCORRECT	43	Incorrect
+804	1	2	0	0	804 100200	32	heaven	33	awake	34	window	35	Correct! Press button to move to the next trial
+808	1	4	0	0	808 100400	32	low	33	beer	34	buyer	35	Correct! Press button to move to the next trial
+812	1	6	0	0	812 100600	32	bat	33	bread	34	foot	35	Correct! Press button to move to the next trial
+816	1	8	0	0	816 100800	32	boy	33	deer	34	wall	35	Correct! Press button to move to the next trial
+820	1	10	0	0	820 101000	32	asleep	33	draw	34	human	35	Correct! Press button to move to the next trial
+824	1	12	0	0	824 101200	32	blaze	33	finger	34	glass	35	Correct! Press button to move to the next trial
+828	1	14	0	0	828 101400	32	thumb	33	fish	34	water	35	Correct! Press button to move to the next trial
+832	1	16	0	0	832 101600	32	priest	33	gold	34	gum	35	Correct! Press button to move to the next trial
+836	1	18	0	0	836 101800	32	rye	33	high	34	fat	35	Correct! Press button to move to the next trial
+840	1	20	0	0	840 102000	32	bank	33	less	34	school	35	Correct! Press button to move to the next trial
+844	1	22	0	0	844 102200	32	trout	33	lost	34	clam	35	Correct! Press button to move to the next trial
+848	1	24	0	0	848 102400	32	sketch	33	nail	34	army	35	Correct! Press button to move to the next trial
+852	1	26	0	0	852 102600	32	east	33	poor	34	recipe	35	Correct! Press button to move to the next trial
+856	1	28	0	0	856 102800	32	halt	33	queen	34	number	35	Correct! Press button to move to the next trial
+860	1	30	0	0	860 103000	32	height	33	salt	34	color	35	Correct! Press button to move to the next trial
+864	1	32	0	0	864 103200	32	jet	33	sleep	34	ice	35	Correct! Press button to move to the next trial
+868	1	34	0	0	868 103400	32	left	33	spice	34	shovel	35	Correct! Press button to move to the next trial
+872	1	36	0	0	872 103600	32	lion	33	strong	34	fun	35	Correct! Press button to move to the next trial
+876	1	38	0	0	876 103800	32	rich	33	street	34	tale	35	Correct! Press button to move to the next trial
+880	1	40	0	0	880 104000	32	quiz	33	tiger	34	toe	35	Correct! Press button to move to the next trial
+884	1	42	0	0	884 104200	32	rip	33	tree	34	stream	35	Correct! Press button to move to the next trial
+888	1	44	0	0	888 104400	32	flush	33	washer	34	face	35	Correct! Press button to move to the next trial
+892	1	46	0	0	892 104600	32	road	33	west	34	smile	35	Correct! Press button to move to the next trial
+896	1	48	0	0	896 104800	32	rob	33	old	34	sea	35	Correct! Press button to move to the next trial
+900	1	50	0	0	900 105000	32	there	33	back	34	actor	35	Correct! Press button to move to the next trial
+904	1	52	0	0	904 105200	32	front	33	blade	34	bee	35	Correct! Press button to move to the next trial
+908	1	54	0	0	908 105400	32	brawl	33	cheese	34	vein	35	Correct! Press button to move to the next trial
+912	1	56	0	0	912 105600	32	late	33	close	34	boat	35	Correct! Press button to move to the next trial
+916	1	58	0	0	916 105800	32	soil	33	couch	34	jelly	35	Correct! Press button to move to the next trial
+920	1	60	0	0	920 106000	32	murder	33	dinner	34	pants	35	Correct! Press button to move to the next trial
+924	1	62	0	0	924 106200	32	bad	33	down	34	work	35	Correct! Press button to move to the next trial
+928	1	64	0	0	928 106400	32	empty	33	fight	34	rule	35	Correct! Press button to move to the next trial
+932	1	66	0	0	932 106600	32	razor	33	full	34	place	35	Correct! Press button to move to the next trial
+936	1	68	0	0	936 106800	32	below	33	groom	34	syrup	35	Correct! Press button to move to the next trial
+940	1	70	0	0	940 107000	32	swiss	33	here	34	speed	35	Correct! Press button to move to the next trial
+944	1	72	0	0	944 107200	32	insane	33	kill	34	coal	35	Correct! Press button to move to the next trial
+948	1	74	0	0	948 107400	32	bow	33	lose	34	candy	35	Correct! Press button to move to the next trial
+952	1	76	0	0	952 107600	32	aunt	33	movie	34	boring	35	Correct! Press button to move to the next trial
+956	1	78	0	0	956 107800	32	ill	33	night	34	music	35	Correct! Press button to move to the next trial
+960	1	80	0	0	960 108000	32	quench	33	shine	34	cow	35	Correct! Press button to move to the next trial
+964	1	82	0	0	964 108200	32	day	33	sick	34	stone	35	Correct! Press button to move to the next trial
+968	1	84	0	0	968 108400	32	tame	33	steel	34	bird	35	Correct! Press button to move to the next trial
+972	1	86	0	0	972 108600	32	spool	33	thin	34	jail	35	Correct! Press button to move to the next trial
+976	1	88	0	0	976 108800	32	under	33	thread	34	ear	35	Correct! Press button to move to the next trial
+980	1	90	0	0	980 109000	32	once	33	uncle	34	milk	35	Correct! Press button to move to the next trial
+984	1	92	0	0	984 109200	32	ink	33	walk	34	horse	35	Correct! Press button to move to the next trial
+988	1	94	0	0	988 109400	32	noun	33	wild	34	square	35	Correct! Press button to move to the next trial
+992	1	96	0	0	992 109600	32	wag	33	pen	34	copy	35	Correct! Press button to move to the next trial
+404	1	98	0	1	404 109801	36	nurche	37	INCORRECT	38	INCORRECT	39	Incorrect
+408	1	100	0	1	408 110001	36	fusk           	37	INCORRECT	38	INCORRECT	39	Incorrect
+412	1	102	0	1	412 110201	36	palb	37	INCORRECT	38	INCORRECT	39	Incorrect
+416	1	104	0	1	416 110401	36	chents	37	INCORRECT	38	INCORRECT	39	Incorrect
+420	1	106	0	1	420 110601	36	crench	37	INCORRECT	38	INCORRECT	39	Incorrect
+424	1	108	0	1	424 110801	36	skurk	37	INCORRECT	38	INCORRECT	39	Incorrect
+428	1	110	0	1	428 111001	36	zear 	37	INCORRECT	38	INCORRECT	39	Incorrect
+432	1	112	0	1	432 111201	36	pank         	37	INCORRECT	38	INCORRECT	39	Incorrect
+436	1	114	0	1	436 111401	36	yalt	37	INCORRECT	38	INCORRECT	39	Incorrect
+440	1	116	0	1	440 111601	36	chulke	37	INCORRECT	38	INCORRECT	39	Incorrect
+444	1	118	0	1	444 111801	36	rurd	37	INCORRECT	38	INCORRECT	39	Incorrect
+448	1	120	0	1	448 112001	36	mume             	37	INCORRECT	38	INCORRECT	39	Incorrect
+452	1	122	0	1	452 112201	36	rond	37	INCORRECT	38	INCORRECT	39	Incorrect
+456	1	124	0	1	456 112401	36	margs	37	INCORRECT	38	INCORRECT	39	Incorrect
+460	1	126	0	1	460 112601	36	foafs	37	INCORRECT	38	INCORRECT	39	Incorrect
+464	1	128	0	1	464 112801	36	dofe	37	INCORRECT	38	INCORRECT	39	Incorrect
+468	1	130	0	1	468 113001	36	jav             	37	INCORRECT	38	INCORRECT	39	Incorrect
+472	1	132	0	1	472 113201	36	fraine	37	INCORRECT	38	INCORRECT	39	Incorrect
+476	1	134	0	1	476 113401	36	hace	37	INCORRECT	38	INCORRECT	39	Incorrect
+480	1	136	0	1	480 113601	36	luts 	37	INCORRECT	38	INCORRECT	39	Incorrect
+484	1	138	0	1	484 113801	36	nang           	37	INCORRECT	38	INCORRECT	39	Incorrect
+488	1	140	0	1	488 114001	36	clibs	37	INCORRECT	38	INCORRECT	39	Incorrect
+492	1	142	0	1	492 114201	36	briep	37	INCORRECT	38	INCORRECT	39	Incorrect
+496	1	144	0	1	496 114401	36	guve	37	INCORRECT	38	INCORRECT	39	Incorrect
+504	1	146	0	2	504 114602	40	sweet	41	boit	42	INCORRECT	43	Incorrect
+508	1	148	0	2	508 114802	40	sister	41	blik	42	INCORRECT	43	Incorrect
+512	1	150	0	2	512 115002	40	rug	41	feap	42	INCORRECT	43	Incorrect
+516	1	152	0	2	516 115202	40	take	41	glief	42	INCORRECT	43	Incorrect
+520	1	154	0	2	520 115402	40	hair	41	hobe	42	INCORRECT	43	Incorrect
+524	1	156	0	2	524 115602	40	food	41	cump	42	INCORRECT	43	Incorrect
+528	1	158	0	2	528 115802	40	bug	41	scoge	42	INCORRECT	43	Incorrect
+532	1	160	0	2	532 116002	40	mouth	41	soirce	42	INCORRECT	43	Incorrect
+536	1	162	0	2	536 116202	40	yours	41	toach	42	INCORRECT	43	Incorrect
+540	1	164	0	2	540 116402	40	ketchup	41	whiat	42	INCORRECT	43	Incorrect
+544	1	166	0	2	544 116602	40	buy	41	warth	42	INCORRECT	43	Incorrect
+548	1	168	0	2	548 116802	40	tune	41	wape	42	INCORRECT	43	Incorrect
+552	1	170	0	2	552 117002	40	add	41	bowb	42	INCORRECT	43	Incorrect
+556	1	172	0	2	556 117202	40	grass	41	doyt	42	INCORRECT	43	Incorrect
+560	1	174	0	2	560 117402	40	gums	41	glie	42	INCORRECT	43	Incorrect
+564	1	176	0	2	564 117602	40	car	41	cabe	42	INCORRECT	43	Incorrect
+568	1	178	0	2	568 117802	40	arm	41	sule	42	INCORRECT	43	Incorrect
+572	1	180	0	2	572 118002	40	box	41	garl	42	INCORRECT	43	Incorrect
+576	1	182	0	2	576 118202	40	ugly	41	caze	42	INCORRECT	43	Incorrect
+580	1	184	0	2	580 118402	40	look	41	mavic	42	INCORRECT	43	Incorrect
+584	1	186	0	2	584 118602	40	taxi	41	cleun	42	INCORRECT	43	Incorrect
+588	1	188	0	2	588 118802	40	woman	41	citton	42	INCORRECT	43	Incorrect
+592	1	190	0	2	592 119002	40	pistol	41	hourle	42	INCORRECT	43	Incorrect
+596	1	192	0	2	596 119202	40	one	41	aif	42	INCORRECT	43	Incorrect
+600	1	194	0	2	600 119402	40	child	41	dweln	42	INCORRECT	43	Incorrect
+604	1	196	0	2	604 119602	40	town	41	zash	42	INCORRECT	43	Incorrect
+608	1	198	0	2	608 119802	40	light	41	hulm	42	INCORRECT	43	Incorrect
+612	1	200	0	2	612 120002	40	ground	41	bap	42	INCORRECT	43	Incorrect
+616	1	202	0	2	616 120202	40	vote	41	lind             	42	INCORRECT	43	Incorrect
+620	1	204	0	2	620 120402	40	pole	41	zun	42	INCORRECT	43	Incorrect
+624	1	206	0	2	624 120602	40	green	41	shreb	42	INCORRECT	43	Incorrect
+628	1	208	0	2	628 120802	40	might	41	cype	42	INCORRECT	43	Incorrect
+632	1	210	0	2	632 121002	40	doctor	41	kemn	42	INCORRECT	43	Incorrect
+636	1	212	0	2	636 121202	40	shirt	41	stous	42	INCORRECT	43	Incorrect
+640	1	214	0	2	640 121402	40	crowd	41	mep            	42	INCORRECT	43	Incorrect
+644	1	216	0	2	644 121602	40	friend	41	brugue	42	INCORRECT	43	Incorrect
+648	1	218	0	2	648 121802	40	wage	41	kep  	42	INCORRECT	43	Incorrect
+652	1	220	0	2	652 122002	40	itch	41	mab           	42	INCORRECT	43	Incorrect
+656	1	222	0	2	656 122202	40	health	41	furte	42	INCORRECT	43	Incorrect
+660	1	224	0	2	660 122402	40	talk	41	len    	42	INCORRECT	43	Incorrect
+664	1	226	0	2	664 122602	40	drug	41	dold	42	INCORRECT	43	Incorrect
+668	1	228	0	2	668 122802	40	little	41	gens 	42	INCORRECT	43	Incorrect
+672	1	230	0	2	672 123002	40	coffee	41	pome	42	INCORRECT	43	Incorrect
+676	1	232	0	2	676 123202	40	then	41	mape	42	INCORRECT	43	Incorrect
+680	1	234	0	2	680 123402	40	cut	41	meve	42	INCORRECT	43	Incorrect
+684	1	236	0	2	684 123602	40	yolk	41	crine	42	INCORRECT	43	Incorrect
+688	1	238	0	2	688 123802	40	hive	41	dink  	42	INCORRECT	43	Incorrect
+692	1	240	0	2	692 124002	40	dad	41	swirs	42	INCORRECT	43	Incorrect
