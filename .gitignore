@@ -8,3 +8,5 @@ input/stim/free_association/fa.egg-info/SOURCES.txt
 input/stim/free_association/fa.egg-info/PKG-INFO
 
 input/stim/free_association/fa.egg-info/dependency_links.txt
+
+*-checkpoint.ipynb
