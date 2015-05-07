@@ -13,3 +13,4 @@ data_dir = '/Users/teon/Google Drive/E-MEG/data/'
 results_dir = '/Applications/packages/E-MEG/output/results/'
 
 reject = dict(mag=3e-12)
+img = 'png'
