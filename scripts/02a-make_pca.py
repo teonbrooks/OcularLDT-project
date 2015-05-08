@@ -11,9 +11,11 @@ except NameError:
 layout = mne.channels.read_layout('KIT-AD.lout')
 img = config.img
 
-for subject in subjects:
+for subject in config.subjects:
+    print subject
     path = op.join(config.data_dir, subject, 'mne')
     for exp in config.subjects[subject]:
+        print exp
         r = Report()
         report_path = op.join(op.dirname(file), '..', 'output', 'results',
                               subject, 'meg', '%s_%s_pca-report.html'
@@ -25,7 +27,7 @@ for subject in subjects:
 
         evts = mne.read_events(event_file)
         raw = mne.io.Raw(raw_file)
-        raw.info['bads'] = ['MEG 130', 'MEG 072', 'MEG 087', 'MEG 121']
+        raw.info['bads'] = config.bads[subject]
 
         # plot evoked
         epochs = mne.Epochs(raw, evts, {'prime': 5}, tmin=-.2, tmax=.5,
@@ -92,33 +94,34 @@ for subject in subjects:
                 r.save(report_path, overwrite=True)
             eog = raw_input('eog: ')
             if isinstance(eog, str):
-                eog = int(eog)
-                # plot evoked - bad projs
-                bad_projs = [projs[eog]]
-                bad_projs_idx = eog
-                evoked.add_proj(bad_projs, remove_existing=True)
+                if eog == 'None':
+                    r.save(report_path, overwrite=True, open_browser=False)
+                else:
+                    eog = int(eog)
+                    # plot evoked - bad projs
+                    bad_projs = [projs[eog]]
+                    bad_projs_idx = eog
+                    evoked.add_proj(bad_projs, remove_existing=True)
 
-                p = evoked.plot(titles={'mag': 'PCA %d' % bad_projs_idx},
-                                proj=True, show=False)
-                r.add_figs_to_section(p, 'Evoked - EOG-related PC', 'Summary',
-                                      image_format=img)
+                    p = evoked.plot(titles={'mag': 'PCA %d' % bad_projs_idx},
+                                    proj=True, show=False)
+                    r.add_figs_to_section(p, 'Evoked - EOG-related PC', 'Summary',
+                                          image_format=img)
 
-                # plot new cov and whitened evoked
-                cov = mne.compute_covariance(ep_proj, projs=bad_projs,
-                                             tmin=-.2, tmax=0, method='auto',
-                                             verbose=False)
-                p = cov.plot(raw.info, show_svd=False, show=False)[0]
-                r.add_figs_to_section(p, 'Covariance Matrix After PCA Removal',
-                                      'Summary', image_format=img)
-                p = evoked.plot_white(cov, show=False)
-                r.add_figs_to_section(p, 'Whitened Evoked after PCA removal',
-                                      'Summary', image_format=img)
-                r.save(report_path, overwrite=True, open_browser=False)
+                    # plot new cov and whitened evoked
+                    cov = mne.compute_covariance(ep_proj, projs=bad_projs,
+                                                 tmin=-.2, tmax=0, method='auto',
+                                                 verbose=False)
+                    p = cov.plot(raw.info, show_svd=False, show=False)[0]
+                    r.add_figs_to_section(p, 'Covariance Matrix After PCA Removal',
+                                          'Summary', image_format=img)
+                    p = evoked.plot_white(cov, show=False)
+                    r.add_figs_to_section(p, 'Whitened Evoked after PCA removal',
+                                          'Summary', image_format=img)
+                    r.save(report_path, overwrite=True, open_browser=False)
 
-                # add proj to raw
-                mne.write_proj(proj_file, bad_projs)
-            elif eog == 'None':
-                r.save(report_path, overwrite=True, open_browser=False)
+                    # add proj to raw
+                    mne.write_proj(proj_file, bad_projs)
             else:
                 raise TypeError('Response must be int or None, not %s'
                                 % type(eog))
