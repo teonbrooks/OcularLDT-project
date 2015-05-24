@@ -161,7 +161,7 @@ for o in order:
     plt.close('all')
     fig = plt.figure()    
     iirs = list()
-    for Fp in Fps: 
+    for Fp in Fps:
         sos = signal.butter(o, Fp/nyq, 'highpass', False, 'sos')
         iir = signal.sosfilt(sos, N400)
         iir = signal.sosfilt(sos, iir[::-1])[::-1]
@@ -175,5 +175,29 @@ for o in order:
     plt.tight_layout()
     r.add_figs_to_section(fig, 'IIR Comparison: Order=%s' % o, 'IIR')
     plt.close('all')
+
+# Compute different SG - Savitzky-Golay filters for comparison
+order = [1, 2, 3, 4, 5]
+Fps = [.01, .03, 0.05, 0.07, .1]
+for o in order:
+    plt.close('all')
+    fig = plt.figure()    
+    sgs = list()
+    for Fp in Fps:
+        window_length = (int(np.round(Fs / Fp)) // 2) * 2 + 1
+        sg = signal.savgol_filter(N400, axis=0, polyorder=o,
+                                  window_length=window_length)
+        sg = N400 - sg
+        sgs.append(sg)
+
+    plt.plot(times, N400)
+    for sg in sgs:
+        plt.plot(times, sg)
+    plt.legend(['raw'] + Fps)
+    plt.title('Simulated Data vs. Different SG Filters: Order %d' % o)
+    plt.tight_layout()
+    r.add_figs_to_section(fig, 'SG Comparison: Order=%s' % o, 'SG')
+    plt.close('all')
+
 
 r.save(op.join(plot_path, 'Filter_Simulation_report.html'), overwrite=True)

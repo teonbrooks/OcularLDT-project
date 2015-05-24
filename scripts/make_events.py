@@ -4,15 +4,21 @@ import numpy as np
 import mne
 
 
-def make_events(datadir, subject, expt):
-    datadir = op.join(datadir, subject, 'mne')
-    raw_file = '%s_%s_calm_lp40-raw.fif' % (subject, expt)
-    raw = mne.io.Raw(op.join(datadir, raw_file), verbose=False, preload=False)
+def make_events(raw, subject, exp):
+    # E-MEG alignment
+    evts = mne.find_stim_steps(raw)
+    alignment = deepcopy(evts)
+    idx = np.nonzero(alignment[:, 2])[0]
+    alignment = alignment[idx]
+    current_pos = np.array([(x & (2 ** 1 + 2 ** 0)) >> 0 for x in
+                            alignment[:, 2]])
+    idx = np.where(current_pos == 1)[0]
+    alignment[idx, 2] = 50
+    alignment = alignment[idx]
 
-    if expt.startswith('OLDT'):
-        evts = mne.find_stim_steps(raw)
-        exp = np.array([(x & 2 ** 5) >> 5 for x in evts[:, 2]], dtype=bool)
-        evts = evts[exp]
+    if exp.startswith('OLDT'):
+        expt = np.array([(x & 2 ** 5) >> 5 for x in evts[:, 2]], dtype=bool)
+        evts = evts[expt]
         idx = np.nonzero(evts[:, 2])[0]
         evts = evts[idx]
         triggers = evts[:, 2]
@@ -35,10 +41,9 @@ def make_events(datadir, subject, expt):
         primes_idx = np.intersect1d(np.where(current_pos == 1)[0], words_idx)
         targets_idx = np.intersect1d(np.where(current_pos == 2)[0], words_idx)
 
-    elif expt.startswith('SENT'):
-        evts = mne.find_stim_steps(raw)
-        exp = np.array([(x & 2 ** 4) >> 4 for x in evts[:, 2]], dtype=bool)
-        evts = evts[exp]
+    elif exp.startswith('SENT'):
+        expt = np.array([(x & 2 ** 4) >> 4 for x in evts[:, 2]], dtype=bool)
+        evts = evts[expt]
         idx = np.nonzero(evts[:, 2])[0]
         evts = evts[idx]
         triggers = evts[:, 2]
@@ -54,9 +59,9 @@ def make_events(datadir, subject, expt):
 
     else:
         raise ValueError('This function only works for '
-                         'OLDTX or SENTX experiments, not %s.' % expt)
+                         'OLDTX or SENTX experiments, not %s.' % exp)
 
-    if expt.startswith('OLDT'):
+    if exp.startswith('OLDT'):
         # word vs nonword
         words = deepcopy(evts)
         words[words_idx, 2] = 2
@@ -85,14 +90,16 @@ def make_events(datadir, subject, expt):
     fix[fix_idx, 2] = 99
     fix = fix[fix_idx]
 
-    if expt.startswith('OLDT'):
-        evts = np.vstack((words, priming, pos, fix))
+    if exp.startswith('OLDT'):
+        evts = np.vstack((words, priming, pos, fix, alignment))
     else:
-        evts = np.vstack((priming, pos, fix))
+        evts = np.vstack((priming, pos, fix, alignment))
     idx = zip(evts[:, 0], np.arange(evts.size))
     idx = list(zip(*sorted(idx))[-1])
     evts = evts[idx]
-    mne.write_events(op.join(datadir, '%s_%s-eve.txt') % (subject, expt), evts)
+    path = op.dirname(raw.info['filename'])
+    mne.write_events(op.join(path, '..', 'mne', '%s_%s-eve.txt')
+                     % (subject, exp), evts)
 
     # key
-    # 1: nonword, 2: word, 3: unprimed, 4: primed, 5: prime, 6: target, 99: fixation
+    # 1: nonword, 2: word, 3: unprimed, 4: primed, 5: prime, 6: target, 50: alignment, 99: fixation

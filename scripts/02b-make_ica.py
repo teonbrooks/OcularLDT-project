@@ -19,7 +19,7 @@ for subject in config.subjects:
         print exp
         r = Report()
         report_path = op.join(op.dirname(file), '..', 'output', 'results',
-                              subject, 'meg', '%s_%s_ica-report.html'
+                              subject, 'meg', '%s_%s_ica-report-2.html'
                               % (subject, exp))
         # ecg, eog = 0, 1
         raw_file = op.join(path, '%s_%s_calm_lp40-raw.fif' % (subject, exp))
@@ -55,7 +55,7 @@ for subject in config.subjects:
                               image_format=img)
         
         # fastica is used to fix the state
-        ica = mne.preprocessing.ICA(.9, random_state=42, method='fastica')
+        ica = mne.preprocessing.ICA(.9, random_state=42, method='infomax')
         ica.fit(raw, decim=4)
 
         # # remove ecg

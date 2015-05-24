@@ -4,9 +4,17 @@ import os.path as op
 import config
 from make_events import make_events
 
-from config import subjects, data_dir
-
-for subject in subjects:
+drive = 'nyu'
+for subject in config.subjects:
     print subject
-    for expt in subjects[subject]:
-        make_events(data_dir, subject, expt)
+    exps = config.subjects[subject]
+    path = config.drives[drive]
+    evt_file = op.join(path, subject, 'mne', subject + '_OLDT-eve.txt')
+    if not op.exists(evt_file):
+        raw = config.kit2fiff(subject=subject, exp=exps[0],
+                              path=config.drives[drive], preload=False)
+        raw2 = config.kit2fiff(subject=subject, exp=exps[2],
+                              path=config.drives[drive], preload=False)
+        mne.concatenate_raws([raw, raw2])
+        make_events(raw, subject, 'OLDT')
+        del raw, raw2
