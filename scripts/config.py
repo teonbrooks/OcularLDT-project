@@ -9,8 +9,11 @@ ds_factor = 8
 
 # arrange the OLDT in the presentation order
 subjects = {'A0023': ['OLDT2', 'SENT2', 'OLDT1'],
+            'A0078': ['OLDT1', 'SENT1', 'OLDT2'],
             'A0085': ['OLDT2', 'SENT2', 'OLDT1'],
             # 'A0100': ['OLDT1', 'SENT1', 'OLDT2'],
+            'A0106': ['OLDT1', 'SENT1', 'OLDT2'],
+            'A0110': ['OLDT2', 'SENT2', 'OLDT1'],
             'A0123': ['OLDT1', 'SENT1', 'OLDT2'],
             'A0125': ['OLDT1', 'SENT2', 'OLDT2'],
             'A0127': ['OLDT2', 'SENT1', 'OLDT1'],
@@ -24,11 +27,12 @@ subjects = {'A0023': ['OLDT2', 'SENT2', 'OLDT1'],
             'A0159': ['OLDT1', 'SENT1', 'OLDT2'],
             'A0161': ['OLDT1', 'SENT1', 'OLDT2'],
             'A0163': ['OLDT2', 'SENT2', 'OLDT1'],
+            # 'A0164': ['OLDT2', 'SENT2', 'OLDT1'],
             }
 
 mne_bin = '/Applications/packages/mne-c/bin'
 # drives
-drives = {'nyu': op.join(op.expanduser('~'), 'Experiments', 'E-MEG', 'data'),
+drives = {'local': op.join(op.expanduser('~'), 'Experiments', 'E-MEG', 'data'),
           'server': op.join('/Volumes', 'server', 'MORPHLAB', 'Teon',
                             'E-MEG', 'data'),
           'home': op.join('/Volumes', 'teon-backup', 'Experiments',
@@ -46,10 +50,6 @@ reject = dict(mag=3e-12)
 img = 'png'
 
 bads = defaultdict(lambda: ['MEG 130'])
-bads['A0148'] = ['MEG 035', 'MEG 095', 'MEG 182', 'MEG 087']
-bads['A0149'] = ['MEG 087', 'MEG 067', 'MEG 078', 'MEG 095',
-                 'MEG 102', 'MEG 138', 'MEG 160', 'MEG 176', 'MEG 183',
-                 'MEG 195']
 
 # # mri dir
 # 'mri_sdir': op.join('{mri_dir}', '{subject}'),
