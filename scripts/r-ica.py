@@ -9,22 +9,25 @@ subject = 'A0129'
 drive = 'google_drive'
 exps = [config.subjects[subject][0], config.subjects[subject][2]]
 path = config.drives[drive]
-ep_fname = '%s_OLDT_target_calm_filt_full-epo.fif' % subject
+ep_fname = '%s_OLDT_ica_calm_filt_full-epo.fif' % subject
 ep_fname = op.join(path, subject, 'mne', ep_fname)
 if op.exists(ep_fname):
     epochs = mne.read_epochs(ep_fname)
+    epochs = epochs['prime']
 else:
     raw = config.kit2fiff(subject, exps[0], config.drives[drive])
     raw2 = config.kit2fiff(subject, exps[1], config.drives[drive])
     raw.append(raw2)
     raw.preload_data()
-    raw.filter(1, 40, method='iir')
+    raw.filter(.1, 40, l_trans_bandwidth=.05, method='fft')
     raw.info['bads'] = config.bads[subject]
     evts = mne.read_events(op.join(config.drives[drive], subject, 'mne',
                            subject + '_OLDT-eve.txt'))
 
-    # {'prime': 5}
-    epochs = mne.Epochs(raw, evts, [1, 2], tmin=-.2, tmax=.6,
+    # key
+    # 1: nonword, 2: word, 3: unprimed, 4: primed
+    # 5: prime, 6: target, 50: alignment, 99: fixation
+    epochs = mne.Epochs(raw, evts, 5, tmin=-.2, tmax=.6,
                         baseline=(None,0), reject=config.reject,
                         verbose=False, preload=True)
     epochs.save(ep_fname)
@@ -51,9 +54,9 @@ ica.plot_sources(ep_ica.average(), picks=idx)
 ica.exclude = idx
 epochs_r = ica.apply(epochs, copy=True)
 epochs_r.average().plot()
+
+
 #
-# # ica.exclude = [1, 4, 5, 12, 18, 25]
-# # epochs_r = ica.apply(epochs, copy=True)
 #
 # # Recursive ICA step
 # ica = mne.preprocessing.ICA(.9, random_state=42, method='infomax')
