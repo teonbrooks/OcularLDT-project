@@ -4,7 +4,7 @@ import os.path as op
 import config
 from make_events import make_events
 
-drive = 'nyu'
+drive = 'home'
 for subject in config.subjects:
     print subject
     exps = config.subjects[subject]
@@ -17,4 +17,3 @@ for subject in config.subjects:
                               path=config.drives[drive], preload=False)
         mne.concatenate_raws([raw, raw2])
         make_events(raw, subject, 'OLDT')
-        del raw, raw2

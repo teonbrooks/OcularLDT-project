@@ -38,8 +38,8 @@ def make_events(raw, subject, exp):
         words_idx = np.intersect1d(idx, idy)
         nonwords_idx = np.intersect1d(n_idx, n_idy)
         fix_idx = np.where(current_pos == 0)[0]
-        primes_idx = np.intersect1d(np.where(current_pos == 1)[0], words_idx)
-        targets_idx = np.intersect1d(np.where(current_pos == 2)[0], words_idx)
+        primes_idx = np.where(current_pos == 1)[0]
+        targets_idx = np.where(current_pos == 2)[0]
 
     elif exp.startswith('SENT'):
         expt = np.array([(x & 2 ** 4) >> 4 for x in evts[:, 2]], dtype=bool)
