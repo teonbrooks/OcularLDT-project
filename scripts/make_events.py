@@ -69,10 +69,13 @@ def make_events(raw, subject, exp):
         idx = np.hstack((nonwords_idx, words_idx))
         words = words[idx]
 
+
     # semantic priming condition
     priming = deepcopy(evts)
-    primed_idx = np.intersect1d(semantic_idx, targets_idx)
-    unprimed_idx = np.setdiff1d(targets_idx, primed_idx)
+    target_words_idx = np.intersect1d(targets_idx, words_idx)  # target words
+
+    primed_idx = np.intersect1d(semantic_idx, target_words_idx)
+    unprimed_idx = np.setdiff1d(target_words_idx, primed_idx)
     priming[primed_idx, 2] = 4
     priming[unprimed_idx, 2] = 3
     idx = np.hstack((unprimed_idx, primed_idx))
