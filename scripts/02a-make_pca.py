@@ -19,7 +19,8 @@ for subject in config.subjects:
     path = op.join(config.drives[drive], subject, 'mne')
 
     r = Report()
-    report_path = op.join(op.dirname(file), '..', 'output', 'results',
+    report_path = op.join(op.expanduser('~'), 'Dropbox', 'academic', 
+                          'Experiments', 'E-MEG', 'output', 'results',
                           subject, '%s_%s_filt_pca-report.html' % (subject, exp))
 
     ep_fname = op.join(path, '%s_%s_ica_calm_filt-epo.fif'
