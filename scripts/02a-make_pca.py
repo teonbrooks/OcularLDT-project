@@ -10,7 +10,7 @@ except NameError:
     file = '/Applications/packages/E-MEG/scripts/make_pca.py'
 layout = mne.channels.read_layout('KIT-AD.lout')
 img = config.img
-drive = 'google_drive'
+drive = 'local'
 
 
 for subject in config.subjects:
@@ -20,9 +20,9 @@ for subject in config.subjects:
 
     r = Report()
     report_path = op.join(op.dirname(file), '..', 'output', 'results',
-                          subject, '%s_%s_pca-report.html' % (subject, exp))
+                          subject, '%s_%s_filt_pca-report.html' % (subject, exp))
 
-    ep_fname = op.join(path, '%s_%s_ica_calm_filt_full-epo.fif'
+    ep_fname = op.join(path, '%s_%s_ica_calm_filt-epo.fif'
                        % (subject, exp))
     epochs = mne.read_epochs(ep_fname)
     epochs.pick_types(meg=True, exclude='bads')
@@ -42,7 +42,8 @@ for subject in config.subjects:
                           image_format=img, scale=1)
 
     # plot covariance and whitened evoked
-    ep_proj = epochs.crop(-.1, .1, copy=True)
+    ep_proj = epochs.crop(-.1, .03, copy=True)
+    ev_proj = ep_proj.average()
     cov = mne.compute_covariance(epochs, tmin=-.2, tmax=-.1, method='auto',
                                  verbose=False)
     p = cov.plot(epochs.info, show_svd=0, show=False)[0]
@@ -55,7 +56,7 @@ for subject in config.subjects:
                           image_format=img)
 
     # compute the SSP
-    projs = mne.compute_proj_epochs(ep_proj, n_mag=2)
+    projs = mne.compute_proj_evoked(ev_proj, n_mag=2)
 
     # apply projector step-wise
     evokeds = list()
