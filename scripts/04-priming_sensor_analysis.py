@@ -18,9 +18,10 @@ from sklearn.svm import SVC
 from sklearn.cross_validation import cross_val_score, KFold
 
 
-prep = 'calm_lp40'
-drive = 'local'
-# drive = 'home'
+# drive = 'local'
+# drive = 'google_drive'
+drive = 'home'
+
 exp = 'OLDT'
 decim = 5
 # smoothing window
@@ -37,10 +38,14 @@ for subject in config.subjects:
     path = config.drives[drive]
     exps = config.subjects[subject]
 
+    proj_fname = op.join(path, subject, 'mne', '%s_OLDT-proj.fif' % subject)
     ep_fname = op.join(path, subject, 'mne',
                        '%s_OLDT_priming_calm_filt-epo.fif' % subject)
     epochs = mne.read_epochs(ep_fname)
     epochs.pick_types(meg=True, exclude='bads')
+    proj = mne.read_proj(proj_fname)
+    epochs.add_proj(proj)
+    epochs.apply_proj()
 
     epochs.equalize_event_counts(['unprimed', 'primed'], copy=False)
     # plotting grand average

@@ -81,7 +81,7 @@ def make_events(raw, subject, exp):
     idx = np.hstack((unprimed_idx, primed_idx))
     priming = priming[idx]
 
-    # prime vs target
+    # prime vs target; word positions on screen
     pos = deepcopy(evts)
     pos[targets_idx, 2] = 6
     pos[primes_idx, 2] = 5

@@ -4,7 +4,7 @@ import os.path as op
 import config
 
 
-drive = 'google_drive'
+drive = 'home'
 reject = None
 baseline = (None, -.1)
 event_id = {'nonword': 1,
@@ -27,11 +27,11 @@ for subject in config.subjects:
     path = config.drives[drive]
     evt_file = op.join(path, subject, 'mne', subject + '_OLDT-eve.txt')
     epo_priming_file = op.join(path, subject, 'mne',
-                               subject + '_OLDT_priming_calm_filt_full-epo.fif')
+                               subject + '_OLDT_priming_calm_filt-epo.fif')
     epo_ica_file = op.join(path, subject, 'mne',
-                           subject + '_OLDT_ica_calm_filt_full-epo.fif')
+                           subject + '_OLDT_ica_calm_filt-epo.fif')
     epo_target_file = op.join(path, subject, 'mne',
-                              subject + '_OLDT_target_calm_filt_full-epo.fif')
+                              subject + '_OLDT_target_calm_filt-epo.fif')
 
     if not op.exists(epo_priming_file):
         evts = mne.read_events(evt_file)
