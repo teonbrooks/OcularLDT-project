@@ -7,7 +7,7 @@ import config
 from glob import glob
 
 
-path = config.drives['office']
+path = config.drive
 group_ds = [list(), list(), list(), list(), list(), list(), list()]
 group_file = op.join(path, 'group', 'group_OLDT_target_times.txt')
 for subject in config.subjects:

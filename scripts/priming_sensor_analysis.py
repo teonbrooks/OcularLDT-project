@@ -18,10 +18,6 @@ from sklearn.svm import SVC
 from sklearn.cross_validation import cross_val_score, KFold
 
 
-# drive = 'local'
-# drive = 'google_drive'
-drive = 'home'
-
 exp = 'OLDT'
 decim = 5
 # smoothing window
@@ -35,7 +31,7 @@ for subject in config.subjects:
     r_path = op.join(config.results_dir, subject, subject + \
                      '_OLDT_priming_sensor_analysis.html')
     r = Report()
-    path = config.drives[drive]
+    path = config.drive
     exps = config.subjects[subject]
 
     proj_fname = op.join(path, subject, 'mne', '%s_OLDT-proj.fif' % subject)
@@ -44,6 +40,15 @@ for subject in config.subjects:
     epochs = mne.read_epochs(ep_fname)
     epochs.pick_types(meg=True, exclude='bads')
     proj = mne.read_proj(proj_fname)
+    proj = [proj[0]]
+
+    # temporary hack
+    epochs._raw_times = epochs.times
+    epochs._offset = None
+    epochs.detrend = None
+    epochs.decim = None
+
+    # back to coding
     epochs.add_proj(proj)
     epochs.apply_proj()
 
@@ -73,21 +78,22 @@ for subject in config.subjects:
     s = stats['priming'].mlog10_p_val
     # plot t-values
     # vmax = np.max
-    p = s.plot_topomap(np.linspace(0, .20, 10), unit='-log10 p-val', 
+    p = s.plot_topomap(np.linspace(0, .20, 10), unit='-log10 p-val',
                        scale=1, vmin=0, vmax=4, cmap='Reds', show=False)
     r.add_figs_to_section(p, '%s: -log10 p-val Topomap 0-200 ms' % subject,
                           'Regression Analysis',
                           image_format='png')
-    p = s.plot_topomap(np.linspace(.20, .40, 10), unit='-log10 p-val', 
+    p = s.plot_topomap(np.linspace(.20, .40, 10), unit='-log10 p-val',
                        scale=1, vmin=0, vmax=4, cmap='Reds', show=False)
     r.add_figs_to_section(p, '%s: -log10 p-val Topomap 200-400 ms' % subject,
                           'Regression Analysis',
                           image_format='png')
-    p = s.plot_topomap(np.linspace(.40, .60, 10), unit='-log10 p-val', 
+    p = s.plot_topomap(np.linspace(.40, .60, 10), unit='-log10 p-val',
                        scale=1, vmin=0, vmax=4, cmap='Reds', show=False)
     r.add_figs_to_section(p, '%s: -log10 p-val Topomap 400-600 ms' % subject,
                           'Regression Analysis',
                           image_format='png')
+    r.save(r_path, open_browser=False, overwrite=True)
 
         # get ready for decoding ;)
     for kernel in kernels:

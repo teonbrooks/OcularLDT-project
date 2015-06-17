@@ -4,7 +4,8 @@ import os.path as op
 import config
 
 
-drive = 'home'
+redo = True
+drive = config.drive
 reject = None
 baseline = (None, -.1)
 event_id = {'nonword': 1,
@@ -24,7 +25,7 @@ target = {'target': 6}
 for subject in config.subjects:
     print subject
     exps = config.subjects[subject]
-    path = config.drives[drive]
+    path = config.drive
     evt_file = op.join(path, subject, 'mne', subject + '_OLDT-eve.txt')
     epo_priming_file = op.join(path, subject, 'mne',
                                subject + '_OLDT_priming_calm_filt-epo.fif')
@@ -33,12 +34,12 @@ for subject in config.subjects:
     epo_target_file = op.join(path, subject, 'mne',
                               subject + '_OLDT_target_calm_filt-epo.fif')
 
-    if not op.exists(epo_priming_file):
+    if not op.exists(epo_priming_file) or redo:
         evts = mne.read_events(evt_file)
         raw = config.kit2fiff(subject=subject, exp=exps[0],
-                              path=config.drives[drive], preload=False)
+                              path=path, preload=False)
         raw2 = config.kit2fiff(subject=subject, exp=exps[2],
-                              path=config.drives[drive], preload=False)
+                              path=path, preload=False)
         mne.concatenate_raws([raw, raw2])
         raw.info['bads'] = config.bads[subject]
         raw.preload_data()

@@ -6,7 +6,7 @@ import mne
 
 def make_events(raw, subject, exp):
     # E-MEG alignment
-    evts = mne.find_stim_steps(raw)
+    evts = mne.find_stim_steps(raw, merge=-2)
     alignment = deepcopy(evts)
     idx = np.nonzero(alignment[:, 2])[0]
     alignment = alignment[idx]
@@ -93,6 +93,34 @@ def make_events(raw, subject, exp):
     fix[fix_idx, 2] = 99
     fix = fix[fix_idx]
 
+    # trial alignment
+    trials = deepcopy(evts)
+    idx = np.hstack((fix_idx, targets_idx))
+    trials = trials[idx]
+
+    # write the co-registration event file
+    idx = zip(trials[:, 0], np.arange(trials.size))
+    idx = list(zip(*sorted(idx))[-1])
+    trials = trials[idx]
+    path = op.dirname(raw.info['filename'])
+    mne.write_events(op.join(path, '..', 'mne', '%s_%s_coreg-eve.txt')
+                     % (subject, exp), trials)
+
+    # write the co-registration file
+    coreg_fname = op.join(path, '..', 'mne', '%s_%s-coreg.txt') % (subject, exp)
+    with open(coreg_fname, 'w') as FILE:
+        FILE.write('TrialID\ti_start\tprev_trigger\ttrigger\n')
+        ii = 0
+        for trial in trials:
+            if trial[1] == 0:
+                ii += 1
+            else:
+                trial = [ii] + list(trial)
+                trial = '\t'.join(map(str, trial)) + '\n'
+                FILE.write(trial)
+
+
+    # write the events
     if exp.startswith('OLDT'):
         evts = np.vstack((words, priming, pos, fix, alignment))
     else:

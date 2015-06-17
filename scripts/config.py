@@ -4,8 +4,32 @@ import itertools
 import numpy as np
 from collections import defaultdict
 
+
+mne_bin = '/Applications/packages/mne-c/bin'
+# drives
+drives = {'local': op.join(op.expanduser('~'), 'Experiments', 'E-MEG', 'data'),
+          'server': op.join('/Volumes', 'server', 'MORPHLAB', 'Teon',
+                            'E-MEG', 'data'),
+          'home': op.join('/Volumes', 'teon-backup', 'Experiments',
+                          'E-MEG', 'data'),
+          'office': op.join('/Volumes', 'GLYPH-1 TB', 'Experiments',
+                            'E-MEG', 'data'),
+          'google_drive': op.join(op.expanduser('~'), 'Google Drive',
+                                  'E-MEG', 'data'),
+          'dropbox': op.join(op.expanduser('~'), 'Dropbox', 'academic',
+                             'Experiments', 'E-MEG', 'output'),
+         }
+
+
 # Parameters:
+drive = drives['office']
+results_dir = '/Users/teon/Dropbox/academic/Experiments/E-MEG/output/results/'
 ds_factor = 8
+
+reject = dict(mag=3e-12)
+img = 'png'
+
+bads = defaultdict(lambda: ['MEG 130'])
 
 # arrange the OLDT in the presentation order
 subjects = {'A0023': ['OLDT2', 'SENT2', 'OLDT1'],
@@ -29,39 +53,6 @@ subjects = {'A0023': ['OLDT2', 'SENT2', 'OLDT1'],
             'A0163': ['OLDT2', 'SENT2', 'OLDT1'],
             # 'A0164': ['OLDT2', 'SENT2', 'OLDT1'],
             }
-
-mne_bin = '/Applications/packages/mne-c/bin'
-# drives
-drives = {'local': op.join(op.expanduser('~'), 'Experiments', 'E-MEG', 'data'),
-          'server': op.join('/Volumes', 'server', 'MORPHLAB', 'Teon',
-                            'E-MEG', 'data'),
-          'home': op.join('/Volumes', 'teon-backup', 'Experiments',
-                          'E-MEG', 'data'),
-          'office': op.join('/Volumes', 'GLYPH-1 TB', 'Experiments',
-                            'E-MEG', 'data'),
-          'google_drive': op.join(op.expanduser('~'), 'Google Drive',
-                                  'E-MEG', 'data'),
-          'dropbox': op.join(op.expanduser('~'), 'Dropbox', 'academic',
-                             'Experiments', 'E-MEG', 'output'),
-         }
-results_dir = '/Users/teon/Dropbox/academic/Experiments/E-MEG/output/results/'
-
-reject = dict(mag=3e-12)
-img = 'png'
-
-bads = defaultdict(lambda: ['MEG 130'])
-
-# # mri dir
-# 'mri_sdir': op.join('{mri_dir}', '{subject}'),
-# 'label_sdir': op.join('{mri_sdir}', 'label'),
-
-# # fwd model
-# 'bem_head': op.join('{mri_sdir}', 'bem', '{subject}-head.fif'),
-# 'bem': op.join('{mri_sdir}', 'bem', '{subject}-*-bem.fif'),
-# 'bem-sol': op.join('{mri_sdir}', 'bem', '{subject}-*-bem-sol.fif'),
-# 'src': op.join('{mri_sdir}', 'bem', '{subject}-ico-4-src.fif'),
-# 'common_src': op.join('{mri_dir}', 'fsaverage', 'bem',
-#                            'fsaverage-ico-4-src.fif'),
 
 
 def kit2fiff(subject, exp, path, preload=False):

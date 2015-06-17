@@ -7,7 +7,7 @@ import config
 from glob import glob
 
 
-path = config.drives['google_drive']
+path = config.drive
 ds = [list(), list(), list(), list(), list(), list(), list()]
 for subject in config.subjects:
     print subject
@@ -26,10 +26,10 @@ for subject in config.subjects:
         times = np.array([int(x[(len(pat) + 1):]) for x in msgs], int)
         assert triggers.shape[0] == times.shape[0]
 
-        # clean empty
-        idx = np.where(times != -1)[0]
-        triggers = triggers[idx]
-        times = times[idx]
+        # # clean empty
+        # idx = np.where(times != -1)[0]
+        # triggers = triggers[idx]
+        # times = times[idx]
 
 
         # coding trigger events
@@ -61,7 +61,7 @@ for subject in config.subjects:
         ds[5].append(means)
         ds[6].append(stds)
 
-    ds_file = op.join(path, subject, '%s_OLDT_target_times.txt' % subject)
+    ds_file = op.join(path, subject, 'edf', '%s_OLDT_target_times.txt' % subject)
     ds = [np.hstack(d) for d in ds]
     ds = np.vstack(ds).T
     np.savetxt(ds_file, ds, fmt='%s')
