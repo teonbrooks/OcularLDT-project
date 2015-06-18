@@ -22,7 +22,7 @@ drives = {'local': op.join(op.expanduser('~'), 'Experiments', 'E-MEG', 'data'),
 
 
 # Parameters:
-drive = drives['office']
+drive = drives['local']
 results_dir = '/Users/teon/Dropbox/academic/Experiments/E-MEG/output/results/'
 ds_factor = 8
 
@@ -54,6 +54,7 @@ subjects = {'A0023': ['OLDT2', 'SENT2', 'OLDT1'],
             # 'A0164': ['OLDT2', 'SENT2', 'OLDT1'],
             }
 
+# subjects = {'A0129': ['OLDT1', 'SENT1', 'OLDT2']}
 
 def kit2fiff(subject, exp, path, preload=False):
     from mne.io import read_raw_kit

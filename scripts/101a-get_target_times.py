@@ -8,9 +8,9 @@ from glob import glob
 
 
 path = config.drive
-ds = [list(), list(), list(), list(), list(), list(), list()]
 for subject in config.subjects:
     print subject
+    ds = [list(), list(), list(), list(), list(), list(), list(), list()]
     for exp in [config.subjects[subject][0], config.subjects[subject][2]]:
         raw_file = op.join(path, subject, 'edf', '%s_%s.edf' % (subject, exp))
 
@@ -25,12 +25,6 @@ for subject in config.subjects:
         msgs = raw.find_events(pat, 1)[:,-1]
         times = np.array([int(x[(len(pat) + 1):]) for x in msgs], int)
         assert triggers.shape[0] == times.shape[0]
-
-        # # clean empty
-        # idx = np.where(times != -1)[0]
-        # triggers = triggers[idx]
-        # times = times[idx]
-
 
         # coding trigger events
         semantics = np.array([(x & 2 ** 4) >> 4 for x in triggers], dtype=bool)
@@ -53,16 +47,28 @@ for subject in config.subjects:
         means = np.ones(times.shape[0]) * times.mean()
         stds = np.ones(times.shape[0]) * times.std()
 
-        ds[0].append(labels)
-        ds[1].append(triggers)
-        ds[2].append(words)
-        ds[3].append(semantics)
-        ds[4].append(times)
-        ds[5].append(means)
-        ds[6].append(stds)
+        # trial id
+        trialids = np.arange(triggers.shape[0]) + 1
 
+        ds[0].append(labels)
+        ds[1].append(trialids)
+        ds[2].append(triggers)
+        ds[3].append(words)
+        ds[4].append(semantics)
+        ds[5].append(times)
+        ds[6].append(means)
+        ds[7].append(stds)
+
+    header = ['subject', 'trialids', 'triggers', 'words', 'semantics',
+              'duration', 'mean', 'std']
     ds_file = op.join(path, subject, 'edf', '%s_OLDT_target_times.txt' % subject)
     ds = [np.hstack(d) for d in ds]
     ds = np.vstack(ds).T
-    np.savetxt(ds_file, ds, fmt='%s')
+    ds = np.vstack((header, ds))
+
+    # # clean empty
+    # idx = np.where(times != -1)[0]
+    # ds = ds[idx]
+    
+    np.savetxt(ds_file, ds, fmt='%s', delimiter='\t')
 
