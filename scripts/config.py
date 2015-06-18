@@ -29,7 +29,9 @@ ds_factor = 8
 reject = dict(mag=3e-12)
 img = 'png'
 
+# Bad Channels
 bads = defaultdict(lambda: ['MEG 130'])
+bads['A0129'] += ['MEG 041', 'MEG 092', 'MEG 102']
 
 # arrange the OLDT in the presentation order
 subjects = {'A0023': ['OLDT2', 'SENT2', 'OLDT1'],

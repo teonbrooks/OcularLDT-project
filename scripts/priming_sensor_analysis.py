@@ -2,6 +2,7 @@ import os
 import os.path as op
 import warnings
 import numpy as np
+from scipy import interp
 import matplotlib.pyplot as plt
 
 import config
@@ -16,20 +17,27 @@ from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler, LabelEncoder
 from sklearn.svm import SVC
 from sklearn.cross_validation import cross_val_score, KFold
+from sklearn.metrics import roc_curve, auc
 
 
 exp = 'OLDT'
+analysis = 'priming_sensor_analysis'
 decim = 5
 # smoothing window
 win = 10
 # kernel
-kernels = ['linear', 'rbf']
+kernels = ['linear']
+random_state = 42
 
 group_r = Report()
+group_fname = op.join(config.results_dir, 'group', 'group_OLDT_%s.html'
+                     % analysis)
+group_scores = []
+group_std_scores = []
 for subject in config.subjects:
 
-    r_path = op.join(config.results_dir, subject, subject + \
-                     '_OLDT_priming_sensor_analysis.html')
+    r_fname = op.join(config.results_dir, subject, subject + \
+                      '_OLDT_%s.html' % analysis)
     r = Report()
     path = config.drive
     exps = config.subjects[subject]
@@ -38,6 +46,7 @@ for subject in config.subjects:
     ep_fname = op.join(path, subject, 'mne',
                        '%s_OLDT_priming_calm_filt-epo.fif' % subject)
     epochs = mne.read_epochs(ep_fname)
+    epochs.info['bads'] = config.bads[subject]
     epochs.pick_types(meg=True, exclude='bads')
     proj = mne.read_proj(proj_fname)
     proj = [proj[0]]
@@ -55,8 +64,10 @@ for subject in config.subjects:
     epochs.equalize_event_counts(['unprimed', 'primed'], copy=False)
     # plotting grand average
     p = epochs.average().plot(show=False)
-    comment = ('This is a grand average over all the target epochs after '
-             'equalizing the numbers in the priming condition.')
+    comment = ("This is a grand average over all the target epochs after"
+               "equalizing the numbers in the priming condition.<br>"
+               'unprimed: %d, and primed: %d, out of 96 possible events.'
+               % (len(epochs['unprimed']), len(epochs['primed'])))
     r.add_figs_to_section(p, '%s: Grand Average on Target' % subject,
                           'Summary', image_format='png', comments=comment)
     # compute/plot difference
@@ -93,7 +104,7 @@ for subject in config.subjects:
     r.add_figs_to_section(p, '%s: -log10 p-val Topomap 400-600 ms' % subject,
                           'Regression Analysis',
                           image_format='png')
-    r.save(r_path, open_browser=False, overwrite=True)
+    r.save(r_fname, open_browser=False, overwrite=True)
 
         # get ready for decoding ;)
     for kernel in kernels:
@@ -101,17 +112,22 @@ for subject in config.subjects:
         times = epochs.times[:-win]
         scores = np.empty(n_times, np.float32)
         std_scores = np.empty(n_times, np.float32)
+        auc_scores = np.empty(n_times, np.float32)
+
 
         # sklearn pipeline
         scaler = StandardScaler()
         concat = ConcatenateChannels()
-        svc = SVC(kernel=kernel)
+        # linear SVM 
+        svc = SVC(kernel=kernel, probability=True,
+                  random_state=random_state)
         # Define a monte-carlo cross-validation generator (reduce variance):
         # cv = ShuffleSplit(len(epochs), 10, test_size=0.2)
         cv = KFold(len(epochs), 10)
 
         for t, tmin in enumerate(times):
-            ep = epochs.crop(tmin, tmin+.05, copy=True)
+            # smoothing window
+            ep = epochs.crop(tmin, tmin + (decim * win * 1e-3), copy=True)
             # Standardize features: mean-centered, normalized by std
             # Concatenate features, shape: (epochs, sensor * time window)
             # Run an SVM
@@ -126,10 +142,30 @@ for subject in config.subjects:
             scores_t = cross_val_score(clf, Xt, y, cv=cv, n_jobs=3)
             scores[t] = scores_t.mean()
             std_scores[t] = scores_t.std()
+            # Run ROC/AUC calculation
+            mean_tpr = 0.0
+            mean_fpr = np.linspace(0, 1, 100)
+            all_tpr = []
+
+            for i, (train, test) in enumerate(cv):
+                probas_ = clf.fit(Xt[train], y[train]).predict_proba(Xt[test])
+                # Compute ROC curve and area the curve
+                fpr, tpr, thresholds = roc_curve(y[test], probas_[:, 1])
+                mean_tpr += interp(mean_fpr, fpr, tpr)
+                mean_tpr[0] = 0.0
+            mean_tpr /= len(cv)
+            mean_tpr[-1] = 1.0
+            auc_scores[t] = auc(mean_fpr, mean_tpr)
 
         scores *= 100  # make it percentage
         std_scores *= 100
+        auc_scores *= 100
 
+        # for group average
+        group_scores.append(scores)
+        group_std_scores.append(std_scores)
+
+        # CV classification score
         plt.close('all')
         fig = plt.figure()
         plt.plot(times, scores, label="Classif. score")
@@ -143,13 +179,52 @@ for subject in config.subjects:
         plt.ylabel('CV classification score (% correct)')
         plt.ylim([30, 100])
         plt.title('Sensor space decoding')
+        # AUC score
+        plt.close('all')
+        auc_fig = plt.figure()
+        plt.plot(times, auc_scores, label="Classif. score")
+        plt.axhline(50, color='k', linestyle='--', label="Chance level")
+        plt.axvline(0, color='r', label='stim onset')
+        plt.xlabel('Times (ms)')
+        plt.ylabel('AUC')
+        plt.ylim([30, 100])
+        plt.title('Sensor space Area Under ROC')
 
+
+        # decoding fig
         r.add_figs_to_section(fig, '%s: %s Decoding Score on Priming'
                               % (subject, kernel), kernel, image_format='png')
-        group_r.add_figs_to_section(fig, '%s: %s Decoding Score on Priming '
-                                    % (subject, kernel), kernel,
+        group_r.add_figs_to_section(fig, '%s: %s Decoding Score on Priming'
+                                    % (subject, kernel), subject,
                                     image_format='png')
-        if not op.exists(op.dirname(r_path)):
-            os.mkdir(op.dirname(r_path))
-    r.save(r_path, open_browser=False, overwrite=True)
-group_r.save(group_path, open_browser=False, overwrite=True)
+        # auc fig
+        r.add_figs_to_section(auc_fig, '%s: %s AUC Score on Priming'
+                              % (subject, kernel), kernel, image_format='png')
+        group_r.add_figs_to_section(auc_fig, '%s: %s Decoding Score on Priming'
+                                    % (subject, kernel), subject,
+                                    image_format='png')
+        if not op.exists(op.dirname(r_fname)):
+            os.mkdir(op.dirname(r_fname))
+    r.save(r_fname, open_browser=False, overwrite=True)
+
+# group average classification score
+group_scores = np.array(group_scores).mean(axis=0)
+group_std_scores = np.array(group_std_scores).mean(axis=0)
+plt.close('all')
+fig = plt.figure()
+plt.plot(times, group_scores, label="Classif. score")
+plt.axhline(50, color='k', linestyle='--', label="Chance level")
+plt.axvline(0, color='r', label='stim onset')
+plt.legend()
+hyp_limits = (group_scores - group_std_scores,
+              group_scores + group_std_scores)
+plt.fill_between(times, hyp_limits[0], y2=hyp_limits[1],
+                 color='b', alpha=0.5)
+plt.xlabel('Times (ms)')
+plt.ylabel('CV classification score (% correct)')
+plt.ylim([30, 100])
+plt.title('Group Average Sensor space decoding')
+group_r.add_figs_to_section(fig, '%s Decoding Score on Priming'
+                            % (kernel), 'Group Summary', image_format='png')
+
+group_r.save(group_fname, open_browser=False, overwrite=True)
