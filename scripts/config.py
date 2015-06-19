@@ -52,7 +52,7 @@ subjects = {'A0023': ['OLDT2', 'SENT2', 'OLDT1'],
             'A0155': ['OLDT2', 'SENT2', 'OLDT1'],
             'A0159': ['OLDT1', 'SENT1', 'OLDT2'],
             'A0161': ['OLDT1', 'SENT1', 'OLDT2'],
-            'A0163': ['OLDT2', 'SENT2', 'OLDT1'],
+            # 'A0163': ['OLDT2', 'SENT2', 'OLDT1'],
             # 'A0164': ['OLDT2', 'SENT2', 'OLDT1'],
             }
 
@@ -75,12 +75,12 @@ def kit2fiff(subject, exp, path, preload=False):
     hsp = glob(hsp)[0]
     kit = glob(kit)[0]
 
-    # raw = read_raw_kit(input_fname=kit, mrk=[mrk_pre, mrk_post],
-    #                    elp=elp, hsp=hsp, stim='>', slope='+',
-    #                    preload=preload, verbose=False)
-
-    raw = read_raw_kit(input_fname=kit, stim='>', slope='+',
+    raw = read_raw_kit(input_fname=kit, mrk=[mrk_pre, mrk_post],
+                       elp=elp, hsp=hsp, stim='>', slope='+',
                        preload=preload, verbose=False)
+
+    # raw = read_raw_kit(input_fname=kit, stim='>', slope='+',
+    #                    preload=preload, verbose=False)
 
     return raw
 

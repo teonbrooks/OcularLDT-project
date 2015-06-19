@@ -23,20 +23,22 @@ import config
 path = config.drive
 exp = 'OLDT'
 analysis = 'reading_regression_sensor_analysis'
-decim = 5
+decim = 1
 random_state = 42
 img = config.img
 win = 10  # smoothing window
+alpha = 1e2
 
 group_r = Report()
 
 # define filenames
-group_fname = op.join(config.results_dir, 'group', 'group_OLDT_%s.html'
-                      % analysis)
-r_fname = op.join(config.results_dir, '%s', '%s_OLDT_%s.html')
-proj_fname = op.join(path, '%s', 'mne', '%s_OLDT-proj.fif')
-ep_fname = op.join(path, '%s', 'mne', '%s_OLDT_coreg_calm_filt-epo.fif')
-dm_fname = op.join(path, '%s', 'mne', '%s_OLDT_design_matrix.txt')
+r_fname = op.join(config.results_dir, '%s', '%s_%s_' + '%s_%s.html'
+                  % (analysis, alpha))
+group_fname = op.join(config.results_dir, 'group', 'group_%s_' + '%s_%s.html'
+                      % (analysis, alpha))
+proj_fname = op.join(path, '%s', 'mne', '%s_%s-proj.fif')
+ep_fname = op.join(path, '%s', 'mne', '%s_%s_coreg_calm_filt-epo.fif')
+dm_fname = op.join(path, '%s', 'mne', '%s_%s_design_matrix.txt')
 
 
 group_scores = []
@@ -58,14 +60,15 @@ def rank_scorer(clf, X, y):
 
 
 for subject in config.subjects:
+    subject_names = (subject, subject, exp)
     r = Report()
 
     # loading design matrix, epochs, proj
-    design_matrix = np.loadtxt(dm_fname % (subject, subject))
-    epochs = mne.read_epochs(ep_fname % (subject, subject))
+    design_matrix = np.loadtxt(dm_fname % subject_names)
+    epochs = mne.read_epochs(ep_fname % subject_names)
     epochs.info['bads'] = config.bads[subject]
     epochs.pick_types(meg=True, exclude='bads')
-    proj = mne.read_proj(proj_fname % (subject, subject))
+    proj = mne.read_proj(proj_fname % subject_names)
     proj = [proj[0]]
 
     # temporary hack
@@ -122,12 +125,12 @@ for subject in config.subjects:
     r.add_figs_to_section(p, '-log10 p-val Topomap 400-600 ms',
                           'Regression Analysis',
                           image_format=img)
-    r.save(r_fname % (subject, subject, analysis), open_browser=False,
-           overwrite=True)
+    r.save(r_fname % subject_names, open_browser=False, overwrite=True)
 
     print "get ready for decoding ;)"
     # handle the window at the end
-    times = epochs.times[:-win]
+    # times = epochs.times[:-win]
+    times = np.arange(.4, .5, .001)  # debug decoding
     # handle downsampling
     times = times[::decim]
     n_times = len(times)
@@ -139,7 +142,7 @@ for subject in config.subjects:
     # sklearn pipeline
     scaler = StandardScaler()
     concat = ConcatenateChannels()
-    regression = Ridge(alpha=1)  # Ridge Regression
+    regression = Ridge(alpha=1e3)  # Ridge Regression
 
     # Define 'y': what you're predicting
     y = design_matrix[:, -1]
@@ -193,7 +196,7 @@ for subject in config.subjects:
     group_r.add_figs_to_section(fig, '%s: Decoding Score on Priming'
                                 % subject, 'Subject Summary',
                                 image_format=img)
-    r.save(r_fname % (subject, subject, analysis), open_browser=False, overwrite=True)
+    r.save(r_fname % subject_names, open_browser=False, overwrite=True)
 
 # group average classification score
 group_scores = np.array(group_scores).mean(axis=0)
@@ -214,4 +217,4 @@ plt.ylim([30, 100])
 plt.title('Group Average Sensor space decoding')
 group_r.add_figs_to_section(fig, 'Decoding Score on Priming', 'Group Summary',
                             image_format=img)
-group_r.save(group_fname, open_browser=False, overwrite=True)
+group_r.save(group_fname % exp, open_browser=False, overwrite=True)

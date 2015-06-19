@@ -4,7 +4,7 @@ import os.path as op
 import config
 
 
-redo = True
+redo = False
 drive = config.drive
 reject = None
 baseline = (None, -.1)
@@ -21,6 +21,7 @@ priming = {'unprimed': 3,
            'primed': 4}
 ica = {'prime': 5}
 target = {'target': 6}
+method = 'iir_'
 
 for subject in config.subjects:
     print subject
@@ -30,13 +31,13 @@ for subject in config.subjects:
     coreg_evt_fname = op.join(path, subject, 'mne',
                               subject + '_OLDT_coreg-eve.txt')
     epo_priming_fname = op.join(path, subject, 'mne',
-                                subject + '_OLDT_priming_calm_filt-epo.fif')
+                                subject + '_OLDT_priming_calm_%sfilt-epo.fif')
     epo_xca_fname = op.join(path, subject, 'mne',
-                            subject + '_OLDT_xca_calm_filt-epo.fif')
+                            subject + '_OLDT_xca_calm_%sfilt-epo.fif')
     epo_target_fname = op.join(path, subject, 'mne',
-                               subject + '_OLDT_target_calm_filt-epo.fif')
+                               subject + '_OLDT_target_calm_%sfilt-epo.fif')
     epo_coreg_fname = op.join(path, subject, 'mne',
-                              subject + '_OLDT_coreg_calm_filt-epo.fif')
+                              subject + '_OLDT_coreg_calm_%sfilt-epo.fif')
 
     if not op.exists(epo_priming_fname) or redo:
         evts = mne.read_events(evt_fname)
@@ -48,7 +49,8 @@ for subject in config.subjects:
         mne.concatenate_raws([raw, raw2])
         raw.info['bads'] = config.bads[subject]
         raw.preload_data()
-        raw.filter(.1, 40, method='fft', l_trans_bandwidth=.05)
+        # raw.filter(.1, 40, method='fft', l_trans_bandwidth=.05)
+        raw.filter(1, 40, method=method[:-1])
 
         # priming
         epochs_priming = mne.Epochs(raw, evts, priming, tmin=-.2, tmax=.6,
