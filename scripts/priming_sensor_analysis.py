@@ -193,15 +193,15 @@ for subject in config.subjects:
 
 
         # decoding fig
-        r.add_figs_to_section(fig, '%s: Decoding Score on Priming'
-                              % subject, 'Decoding', image_format=img)
-        group_r.add_figs_to_section(fig, '%s: %s Decoding Score on Priming'
+        r.add_figs_to_section(fig, 'Decoding Score on Priming',
+                              'Decoding', image_format=img)
+        group_r.add_figs_to_section(fig, '%s: Decoding Score on Priming'
                                     % subject, 'Subject Summary',
                                     image_format=img)
         # auc fig
-        r.add_figs_to_section(auc_fig, '%s: AUC Score on Priming'
-                              % subject, 'Subject Summary', image_format=img)
-        group_r.add_figs_to_section(auc_fig, '%s: Decoding Score on Priming'
+        r.add_figs_to_section(auc_fig, 'AUC Score on Priming',
+                              'Subject Summary', image_format=img)
+        group_r.add_figs_to_section(auc_fig, '%s: AUC Score on Priming'
                                     % subject, 'Subject Summary',
                                     image_format=img)
         if not op.exists(op.dirname(r_fname)):
@@ -225,7 +225,7 @@ plt.xlabel('Times (ms)')
 plt.ylabel('CV classification score (% correct)')
 plt.ylim([30, 100])
 plt.title('Group Average Sensor space decoding')
-group_r.add_figs_to_section(fig, '%s Decoding Score on Priming'
-                            % (kernel), 'Group Summary', image_format=img)
+group_r.add_figs_to_section(fig, 'Group Average Decoding Score on Priming',
+                            'Group Summary', image_format=img)
 
 group_r.save(group_fname % analysis, open_browser=False, overwrite=True)
