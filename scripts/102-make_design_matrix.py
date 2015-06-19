@@ -9,7 +9,7 @@ exp = 'OLDT'
 
 for subject in config.subjects:
     print subject
-    meg_fname = op.join(path, subject, 'mne', '%s_%s-coreg.txt'
+    meg_fname = op.join(path, subject, 'mne', '%s_%s_trials.txt'
                         % (subject, exp))
     em_fname = op.join(path, subject, 'edf', '%s_%s_target_times.txt'
                        % (subject, exp))
