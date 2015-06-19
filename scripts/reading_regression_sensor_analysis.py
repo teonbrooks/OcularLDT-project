@@ -12,7 +12,7 @@ from mne.decoding import ConcatenateChannels
 from mne.stats.regression import linear_regression
 
 from sklearn.pipeline import Pipeline
-from sklearn.preprocessing import StandardScaler, LabelEncoder
+from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import Ridge
 from sklearn.cross_validation import cross_val_score, ShuffleSplit
 
@@ -22,7 +22,7 @@ import config
 # parameters
 path = config.drive
 exp = 'OLDT'
-analysis = 'reading_regression_analysis'
+analysis = 'reading_regression_sensor_analysis'
 decim = 5
 random_state = 42
 img = config.img
@@ -100,7 +100,7 @@ for subject in config.subjects:
                "equalizing the numbers in the priming condition.<br>"
                'Number of epochs: %d.' % (len(epochs)))
     r.add_figs_to_section(p, '%s: Grand Average on Target' % subject,
-                          'Group Summary', image_format=img, comments=comment)
+                          'Summary', image_format=img, comments=comment)
 
     # run a linear regression
     names = ['intercept', 'fixation']
@@ -122,7 +122,8 @@ for subject in config.subjects:
     r.add_figs_to_section(p, '-log10 p-val Topomap 400-600 ms',
                           'Regression Analysis',
                           image_format=img)
-    r.save(r_fname % subject, open_browser=False, overwrite=True)
+    r.save(r_fname % (subject, subject, analysis), open_browser=False,
+           overwrite=True)
 
     print "get ready for decoding ;)"
     # handle the window at the end
@@ -150,8 +151,8 @@ for subject in config.subjects:
         # smoothing window
         ep = epochs.crop(tmin, tmin + (decim * win * 1e-3), copy=True)
         # Pipeline:
-        # Standardize features: mean-centered, normalized by std
         # Concatenate features, shape: (epochs, sensor * time window)
+        # Standardize features: mean-centered, normalized by std
         # Run an Regression
         clf = Pipeline([('concat', concat), ('scaler', scaler),
                         ('regression', regression)])
@@ -189,11 +190,9 @@ for subject in config.subjects:
     # decoding fig
     r.add_figs_to_section(fig, 'Decoding Score on Priming', 'Decoding',
                           image_format=img)
-    group_r.add_figs_to_section(fig, '%s: %s Decoding Score on Priming'
+    group_r.add_figs_to_section(fig, '%s: Decoding Score on Priming'
                                 % subject, 'Subject Summary',
                                 image_format=img)
-    if not op.exists(op.dirname(r_fname)):
-        os.mkdir(op.dirname(r_fname))
     r.save(r_fname % (subject, subject, analysis), open_browser=False, overwrite=True)
 
 # group average classification score
