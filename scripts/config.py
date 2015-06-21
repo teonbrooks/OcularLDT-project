@@ -28,6 +28,9 @@ ds_factor = 8
 
 reject = dict(mag=3e-12)
 img = 'png'
+filt = 'iir'
+banner = ('#' * 9 + '\n# %s #\n' + '#' * 9)
+# banner = ('#' * (len('%s') + 4)  + '\n# %s #\n' + '#' * (len('%s') + 4))
 
 # Bad Channels
 bads = defaultdict(lambda: ['MEG 130'])
@@ -56,9 +59,9 @@ subjects = {'A0023': ['OLDT2', 'SENT2', 'OLDT1'],
             # 'A0164': ['OLDT2', 'SENT2', 'OLDT1'],
             }
 
-# subjects = {'A0129': ['OLDT1', 'SENT1', 'OLDT2']}
+subjects = {'A0129': ['OLDT1', 'SENT1', 'OLDT2']}
 
-def kit2fiff(subject, exp, path, preload=False):
+def kit2fiff(subject, exp, path, dig=True, preload=False):
     from mne.io import read_raw_kit
     kit = op.join(path, subject, 'kit', 
                   subject + '*' + exp + '*' + 'calm.con')
@@ -75,12 +78,13 @@ def kit2fiff(subject, exp, path, preload=False):
     hsp = glob(hsp)[0]
     kit = glob(kit)[0]
 
-    raw = read_raw_kit(input_fname=kit, mrk=[mrk_pre, mrk_post],
-                       elp=elp, hsp=hsp, stim='>', slope='+',
-                       preload=preload, verbose=False)
-
-    # raw = read_raw_kit(input_fname=kit, stim='>', slope='+',
-    #                    preload=preload, verbose=False)
+    if dig:
+        raw = read_raw_kit(input_fname=kit, mrk=[mrk_pre, mrk_post],
+                           elp=elp, hsp=hsp, stim='>', slope='+',
+                           preload=preload, verbose=False)
+    else:
+        raw = read_raw_kit(input_fname=kit, stim='>', slope='+',
+                           preload=preload, verbose=False)
 
     return raw
 
