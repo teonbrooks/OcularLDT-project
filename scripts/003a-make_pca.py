@@ -8,27 +8,29 @@ layout = mne.channels.read_layout('KIT-AD.lout')
 img = config.img
 drive = config.drive
 exp = 'OLDT'
+filt = config.filt
 
 
 for subject in config.subjects:
-    print subject
+    print config.banner % subject
+
+    # define filenames
     path = op.join(drive, subject, 'mne')
-    ep_fname = op.join(path, '%s_%s_ica_calm_filt-epo.fif'
-                       % (subject, exp))
-    proj_fname = op.join(path, op.basename(ep_fname)[:10] + '-proj.fif')
+    fname_rep = op.join(config.results_dir, subject,
+                        subject + '_%s_%s_filt_pca-report.html'
+                        % (exp, filt))
+    fname_epo = op.join(path, subject + '_%s_xca_calm_%s_filt-epo.fif'
+                        % (exp, filt))
+    fname_proj = op.join(path, subject + '_%s_xca_calm_%s_filt-proj.fif'
+                         % (exp, filt))
 
     if not op.exists(proj_fname):
         r = Report()
-        report_fname = op.join(op.expanduser('~'), 'Dropbox', 'academic', 
-                               'Experiments', 'E-MEG', 'output', 'results',
-                               subject, '%s_%s_filt_pca-report.html' % (subject, exp))
-
-        epochs = mne.read_epochs(ep_fname)
+        epochs = mne.read_epochs(fname_epo)
         epochs.pick_types(meg=True, exclude='bads')
 
         # plot evoked
         evoked = epochs.average()
-
         p = evoked.plot(titles={'mag': 'Original Evoked'}, show=False)
         r.add_figs_to_section(p, 'Original Evoked Response to Prime Word',
                               'Summary', image_format=img)
@@ -60,8 +62,7 @@ for subject in config.subjects:
             r.add_figs_to_section([e, p], ['Evoked without PCA %d' %i,
                                            'PCA topography %d' %i],
                                   pca, image_format=img)
-
-        r.save(report_fname, overwrite=True, open_browser=False)
+        r.save(fname_rep, overwrite=True, open_browser=False)
 
         # save projs
-        mne.write_proj(proj_fname, projs)
+        mne.write_proj(fname_proj, projs)

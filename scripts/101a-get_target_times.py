@@ -9,23 +9,41 @@ from glob import glob
 
 path = config.drive
 for subject in config.subjects:
-    print subject
+    print config.banner % subject
+
     ds = [list(), list(), list(), list(), list(), list(), list(), list()]
     for exp in [config.subjects[subject][0], config.subjects[subject][2]]:
         raw_file = op.join(path, subject, 'edf', '%s_%s.edf' % (subject, exp))
 
         # extracting triggering info from datasource file.
         # target trigger is index 10
-        trial_file = glob(op.join(path, subject, 'edf', '*_%s_*BLOCKTRIAL.dat' % exp))[0]
-        triggers = np.loadtxt(trial_file, dtype=str, delimiter='\t')[:,10].astype(int)
+        trial_fname = glob(op.join(path, subject, 'edf', '*_%s_*BLOCKTRIAL.dat' % exp))[0]
+        dat = np.loadtxt(trial_fname, dtype=str, delimiter='\t')
+        prime_triggers = dat[:, 8].astype(int)
+        target_triggers = dat[:,10].astype(int)
 
         # extracting fixation times from the edf file.
         raw = pyeparse.RawEDF(raw_file)
+        times = list()
+        triggers = list()
+        # first for the primes
+        pat = '!V TRIAL_VAR TIME_PRIME'
+        msgs = raw.find_events(pat, 1)[:,-1]
+        prime_times = np.array([int(x[(len(pat) + 1):]) for x in msgs], int)
+        assert prime_triggers.shape[0] == prime_times.shape[0]
+        times.append(prime_times)
+        triggers.append(prime_triggers)
+        # then for the targets
         pat = '!V TRIAL_VAR TIME_TARGET'
         msgs = raw.find_events(pat, 1)[:,-1]
-        times = np.array([int(x[(len(pat) + 1):]) for x in msgs], int)
-        assert triggers.shape[0] == times.shape[0]
+        target_times = np.array([int(x[(len(pat) + 1):]) for x in msgs], int)
+        assert target_triggers.shape[0] == target_times.shape[0]
+        times.append(target_times)
+        triggers.append(target_triggers)
 
+
+        times = np.hstack(times)
+        triggers = np.hstack(triggers)
         # coding trigger events
         semantics = np.array([(x & 2 ** 4) >> 4 for x in triggers], dtype=bool)
         nonword_pos = np.array([(x & (2 ** 3 + 2 ** 2)) >> 2 for x in triggers])

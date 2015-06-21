@@ -8,7 +8,8 @@ path = config.drive
 exp = 'OLDT'
 
 for subject in config.subjects:
-    print subject
+    print config.banner % subject
+
     meg_fname = op.join(path, subject, 'mne', '%s_%s_trials.txt'
                         % (subject, exp))
     em_fname = op.join(path, subject, 'edf', '%s_%s_target_times.txt'
@@ -19,7 +20,7 @@ for subject in config.subjects:
     meg_ds = pandas.read_table(meg_fname, sep='\t')
     em_ds = pandas.read_table(em_fname, sep='\t')
 
-    coreg = em_ds.loc[meg_ds['TrialID']]
+    coreg = em_ds.loc[meg_ds['trialid']]
     durations = coreg['duration']
     intercepts = np.ones(len(durations))
 

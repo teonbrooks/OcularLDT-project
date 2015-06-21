@@ -13,7 +13,8 @@ layout = mne.channels.read_layout('KIT-AD.lout')
 img = config.img
 
 for subject in config.subjects:
-    print subject
+    print config.banner % subject
+
     path = op.join(config.data_dir, subject, 'mne')
     for exp in config.subjects[subject]:
         print exp

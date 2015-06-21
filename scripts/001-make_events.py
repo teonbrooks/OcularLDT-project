@@ -4,6 +4,9 @@ import numpy as np
 import mne
 import config
 
+redo = True
+path = config.drive
+
 
 def make_events(raw, subject, exp):
     # E-MEG alignment
@@ -97,7 +100,7 @@ def make_events(raw, subject, exp):
 
     # trial alignment
     trials = deepcopy(evts)
-    idx = np.hstack((fix_idx, targets_idx))
+    idx = np.hstack((fix_idx, primes_idx, targets_idx))
     trials = trials[idx]
 
     # write the co-registration event file
@@ -147,16 +150,15 @@ def make_events(raw, subject, exp):
 # 50: alignment, 99: fixation
 
 
-redo = True
-path = config.drive
 for subject in config.subjects:
-    print subject
+    print config.banner % subject
+
     exps = config.subjects[subject]
     evt_file = op.join(path, subject, 'mne', subject + '_OLDT-eve.txt')
     if not op.exists(evt_file) or redo:
         raw = config.kit2fiff(subject=subject, exp=exps[0],
-                              path=path, preload=False)
+                              path=path, dig=False, preload=False)
         raw2 = config.kit2fiff(subject=subject, exp=exps[2],
-                              path=path, preload=False)
+                              path=path, dig=False, preload=False)
         mne.concatenate_raws([raw, raw2])
         make_events(raw, subject, 'OLDT')

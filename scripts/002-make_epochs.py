@@ -4,10 +4,12 @@ import os.path as op
 import config
 
 
-redo = False
 drive = config.drive
-reject = None
+filt = config.filt
+reject = config.reject
+redo = False
 baseline = (None, -.1)
+
 event_id = {'nonword': 1,
             'word': 2,
             'unprimed': 3,
@@ -16,30 +18,27 @@ event_id = {'nonword': 1,
             'target': 6,
             'alignment': 50,
             'fixation': 99}
-
 priming = {'unprimed': 3,
            'primed': 4}
 ica = {'prime': 5}
 target = {'target': 6}
-method = 'iir_'
+
 
 for subject in config.subjects:
-    print subject
+    print config.banner % subject
+
     exps = config.subjects[subject]
     path = config.drive
-    evt_fname = op.join(path, subject, 'mne', subject + '_OLDT-eve.txt')
-    coreg_evt_fname = op.join(path, subject, 'mne',
+    fname_evt = op.join(path, subject, 'mne', subject + '_OLDT-eve.txt')
+    fname_coreg_evt = op.join(path, subject, 'mne',
                               subject + '_OLDT_coreg-eve.txt')
-    epo_priming_fname = op.join(path, subject, 'mne',
-                                subject + '_OLDT_priming_calm_%sfilt-epo.fif')
-    epo_xca_fname = op.join(path, subject, 'mne',
-                            subject + '_OLDT_xca_calm_%sfilt-epo.fif')
-    epo_target_fname = op.join(path, subject, 'mne',
-                               subject + '_OLDT_target_calm_%sfilt-epo.fif')
-    epo_coreg_fname = op.join(path, subject, 'mne',
-                              subject + '_OLDT_coreg_calm_%sfilt-epo.fif')
+    fname_epo = op.join(path, subject, 'mne',
+                        subject + '_%s_calm_%s_filt-epo.fif', % (exp, filt))
+    fname_epo_coreg = op.join(path, subject, 'mne',
+                              subject + '_%s_coreg_calm_%s_filt-epo.fif',
+                              % (exp, filt))
 
-    if not op.exists(epo_priming_fname) or redo:
+    if not op.exists(epo_coreg_fname) or redo:
         evts = mne.read_events(evt_fname)
         coreg_evts = mne.read_events(coreg_evt_fname)
         raw = config.kit2fiff(subject=subject, exp=exps[0],
@@ -49,22 +48,16 @@ for subject in config.subjects:
         mne.concatenate_raws([raw, raw2])
         raw.info['bads'] = config.bads[subject]
         raw.preload_data()
-        # raw.filter(.1, 40, method='fft', l_trans_bandwidth=.05)
-        raw.filter(1, 40, method=method[:-1])
+        if filt == 'fft':
+            raw.filter(.1, 40, method=filt, l_trans_bandwidth=.05)
+        else:
+            raw.filter(1, 40, method=filt)
 
-        # priming
-        epochs_priming = mne.Epochs(raw, evts, priming, tmin=-.2, tmax=.6,
-                                    baseline=baseline, reject=reject)
-        epochs_priming.save(epo_priming_fname)
-        # PCA/ICA
-        epochs_xca = mne.Epochs(raw, evts, ica, tmin=-.2, tmax=.6,
-                                baseline=baseline, reject=reject)
-        epochs_xca.save(epo_xca_fname)
-        # target region
-        epochs_target = mne.Epochs(raw, evts, target, tmin=-.2, tmax=.6,
-                                   baseline=baseline, reject=reject)
-        epochs_target.save(epo_target_fname)
+        # full epochs
+        epochs = mne.Epochs(raw, evts, event_id, tmin=-.2, tmax=.6,
+                            baseline=baseline, reject=reject)
+        epochs.save(fname_epo)
         # coreg
         epochs_coreg = mne.Epochs(raw, coreg_evts, None, tmin=-.2, tmax=.6,
                                   baseline=baseline, reject=reject)
-        epochs_coreg.save(epo_coreg_fname)
+        epochs_coreg.save(fname_epo_coreg)
