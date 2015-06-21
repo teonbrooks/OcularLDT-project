@@ -6,7 +6,8 @@ import config
 
 drive = config.drive
 filt = config.filt
-reject = config.reject
+reject = None
+exp = 'OLDT'
 redo = False
 baseline = (None, -.1)
 
@@ -20,8 +21,8 @@ event_id = {'nonword': 1,
             'fixation': 99}
 priming = {'unprimed': 3,
            'primed': 4}
-ica = {'prime': 5}
-target = {'target': 6}
+xca = {'prime': 5,
+       'target': 6}
 
 
 for subject in config.subjects:
@@ -33,14 +34,20 @@ for subject in config.subjects:
     fname_coreg_evt = op.join(path, subject, 'mne',
                               subject + '_OLDT_coreg-eve.txt')
     fname_epo = op.join(path, subject, 'mne',
-                        subject + '_%s_calm_%s_filt-epo.fif', % (exp, filt))
+                        subject + '_%s_calm_%s_filt-epo.fif' % (exp, filt))
+    fname_epo_priming = op.join(path, subject, 'mne',
+                                subject + '_%s_priming_calm_%s_filt-epo.fif'
+                                % (exp, filt))
+    fname_epo_xca = op.join(path, subject, 'mne',
+                            subject + '_%s_xca_calm_%s_filt-epo.fif'
+                            % (exp, filt))
     fname_epo_coreg = op.join(path, subject, 'mne',
-                              subject + '_%s_coreg_calm_%s_filt-epo.fif',
+                              subject + '_%s_coreg_calm_%s_filt-epo.fif'
                               % (exp, filt))
 
-    if not op.exists(epo_coreg_fname) or redo:
-        evts = mne.read_events(evt_fname)
-        coreg_evts = mne.read_events(coreg_evt_fname)
+    if not op.exists(fname_epo_coreg) or redo:
+        evts = mne.read_events(fname_evt)
+        coreg_evts = mne.read_events(fname_coreg_evt)
         raw = config.kit2fiff(subject=subject, exp=exps[0],
                               path=path, preload=False)
         raw2 = config.kit2fiff(subject=subject, exp=exps[2],
@@ -53,11 +60,16 @@ for subject in config.subjects:
         else:
             raw.filter(1, 40, method=filt)
 
-        # full epochs
-        epochs = mne.Epochs(raw, evts, event_id, tmin=-.2, tmax=.6,
+        # because of file size
+        # priming epochs
+        epochs = mne.Epochs(raw, evts, priming, tmin=-.2, tmax=.6,
                             baseline=baseline, reject=reject)
-        epochs.save(fname_epo)
+        epochs.save(fname_epo_priming)
+        # xca: prime and target regions
+        epochs = mne.Epochs(raw, evts, xca, tmin=-.2, tmax=.6,
+                            baseline=baseline, reject=reject)
+        epochs.save(fname_epo_xca)        
         # coreg
-        epochs_coreg = mne.Epochs(raw, coreg_evts, None, tmin=-.2, tmax=.6,
-                                  baseline=baseline, reject=reject)
-        epochs_coreg.save(fname_epo_coreg)
+        epochs = mne.Epochs(raw, coreg_evts, None, tmin=-.2, tmax=.6,
+                            baseline=baseline, reject=reject)
+        epochs.save(fname_epo_coreg)
