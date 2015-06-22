@@ -8,7 +8,7 @@ from glob import glob
 
 
 path = config.drive
-redo = False
+redo = config.redo
 
 
 for subject in config.subjects:

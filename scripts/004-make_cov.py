@@ -9,7 +9,7 @@ img = config.img
 drive = config.drive
 exp = 'OLDT'
 filt = config.filt
-redo = False
+redo = config.redo
 
 
 for subject in config.subjects:

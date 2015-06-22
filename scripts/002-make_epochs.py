@@ -8,7 +8,7 @@ drive = config.drive
 filt = config.filt
 reject = None
 exp = 'OLDT'
-redo = False
+redo = config.redo
 baseline = (None, -.1)
 
 event_id = {'nonword': 1,

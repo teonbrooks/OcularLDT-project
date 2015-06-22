@@ -12,10 +12,8 @@ files = ['001-make_events.py',
          '102-make_design_matrix.py']
 
 for FILE in files:
-    cmd = ['python', FILE]        
+    cmd = ['ipython --pylab=qt', FILE]        
     cwd = '/Applications/packages/E-MEG/scripts/'
-    # sp = subprocess.call(cmd, cwd = cwd)
-    #
     sp = subprocess.Popen(cmd, cwd=cwd,
                           stdout=subprocess.PIPE, 
                           stderr=subprocess.PIPE)
