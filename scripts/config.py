@@ -28,7 +28,6 @@ filt = 'iir'
 banner = ('#' * 9 + '\n# %s #\n' + '#' * 9)
 # running from NY
 drive = 'local'
-drive = drives[drive]
 
 
 # Bad Channels
@@ -58,11 +57,13 @@ subjects = {'A0023': ['OLDT2', 'SENT2', 'OLDT1'],
             # 'A0164': ['OLDT2', 'SENT2', 'OLDT1'],
             }
 
-# running from laptop
-# subjects = {'A0129': ['OLDT1', 'SENT1', 'OLDT2']}
-# drive = 'google_drive'
-# drive = drives[drive]
+for subject, _ in subjects.items():
+    if op.exists(op.join(drives[drive], subject)):
+        continue
+    else:
+        del subjects[subject]
 
+drive = drives[drive]
 
 def kit2fiff(subject, exp, path, dig=True, preload=False):
     from mne.io import read_raw_kit

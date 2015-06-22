@@ -25,7 +25,7 @@ filt = config.filt
 img = config.img
 exp = 'OLDT'
 analysis = 'priming_sensor_analysis'
-decim = 2
+decim = 5
 win = .050  # smoothing window
 random_state = 42
 
@@ -33,9 +33,10 @@ random_state = 42
 # setup group
 fname_group = op.join(config.results_dir, 'group', 'group_OLDT_%s_filt_%s.html'
                       % (filt, analysis))
-group_r = Report()
+group_rep = Report()
 group_scores = []
 group_std_scores = []
+group_auc_scores = []
 
 for subject in config.subjects:
     # define filenames
@@ -50,6 +51,7 @@ for subject in config.subjects:
 
     # loading epochs
     epochs = mne.read_epochs(fname_epo)
+    epochs.drop_bad_epochs(reject=config.reject)
     epochs.decimate(decim)
     epochs.info['bads'] = config.bads[subject]
     epochs.pick_types(meg=True, exclude='bads')
@@ -87,17 +89,17 @@ for subject in config.subjects:
     s = stats['priming'].mlog10_p_val
     # plot t-values
     p = s.plot_topomap(np.linspace(0, .20, 10), unit='-log10 p-val',
-                       scale=1, vmin=0, vmax=4, cmap='Reds', show=False)
+                       scale=1, vmin=0, vmax=3, cmap='Reds', show=False)
     rep.add_figs_to_section(p, '-log10 p-val Topomap 0-200 ms',
                           'Regression Analysis',
                           image_format=img)
     p = s.plot_topomap(np.linspace(.20, .40, 10), unit='-log10 p-val',
-                       scale=1, vmin=0, vmax=4, cmap='Reds', show=False)
+                       scale=1, vmin=0, vmax=3, cmap='Reds', show=False)
     rep.add_figs_to_section(p, '-log10 p-val Topomap 200-400 ms',
                           'Regression Analysis',
                           image_format=img)
     p = s.plot_topomap(np.linspace(.40, .60, 10), unit='-log10 p-val',
-                       scale=1, vmin=0, vmax=4, cmap='Reds', show=False)
+                       scale=1, vmin=0, vmax=3, cmap='Reds', show=False)
     rep.add_figs_to_section(p, '-log10 p-val Topomap 400-600 ms',
                           'Regression Analysis',
                           image_format=img)
@@ -107,7 +109,11 @@ for subject in config.subjects:
     # handle the window at the end
     last_samp = int(win * 1e3 / decim)
     times = epochs.times[:-last_samp]
-    # handle downsampling
+
+    # # temp
+    # times = [.2]
+    # win = .4
+
     n_times = len(times)
 
     scores = np.empty(n_times, np.float32)
