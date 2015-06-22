@@ -23,6 +23,7 @@ drives = {'local': op.join(op.expanduser('~'), 'Experiments', 'E-MEG', 'data'),
 redo = True
 results_dir = '/Users/teon/Dropbox/academic/Experiments/E-MEG/output/results/'
 reject = dict(mag=3e-12)
+flat = dict(mag=1e-13)
 img = 'png'
 filt = 'iir'
 banner = ('#' * 9 + '\n# %s #\n' + '#' * 9)
@@ -32,7 +33,7 @@ drive = 'local'
 
 # Bad Channels
 bads = defaultdict(lambda: ['MEG 130'])
-bads['A0129'] += ['MEG 041', 'MEG 092', 'MEG 102']
+bads['A0129'] += ['MEG 041', 'MEG 092', 'MEG 102', 'MEG 157']
 
 # arrange the OLDT in the presentation order
 subjects = {'A0023': ['OLDT2', 'SENT2', 'OLDT1'],
