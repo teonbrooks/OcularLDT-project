@@ -4,7 +4,7 @@ import numpy as np
 import mne
 import config
 
-redo = True
+redo = False
 path = config.drive
 
 

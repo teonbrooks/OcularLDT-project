@@ -51,7 +51,7 @@ for subject in config.subjects:
         raw = config.kit2fiff(subject=subject, exp=exps[0],
                               path=path, preload=False)
         raw2 = config.kit2fiff(subject=subject, exp=exps[2],
-                              path=path, preload=False)
+                              path=path, dig=False, preload=False)
         mne.concatenate_raws([raw, raw2])
         raw.info['bads'] = config.bads[subject]
         raw.preload_data()

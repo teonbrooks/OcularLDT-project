@@ -41,7 +41,7 @@ for subject in config.subjects:
     # define filenames
     fname_rep = op.join(config.results_dir, subject,
                         '%s_%s_%s.html' % (subject, exp, analysis))
-    fname_proj = op.join(path, subject, 'mne', '%s_%s_xca_calm_%s_filt-proj.fif'
+    fname_proj = op.join(path, subject, 'mne', '%s_%s_calm_%s_filt-proj.fif'
                          % (subject, exp, filt))
     fname_epo = op.join(path, subject, 'mne', 
                         '%s_%s_priming_calm_%s_filt-epo.fif'
@@ -123,6 +123,7 @@ for subject in config.subjects:
     cv = ShuffleSplit(len(y), 10, test_size=0.2, random_state=random_state)
 
     for t, tmin in enumerate(times):
+        print "%d of %d" % (t + 1, len(times))
         # smoothing window
         ep = epochs.crop(tmin, tmin + win, copy=True)
         # Concatenate features, shape: (epochs, sensor * time window)
@@ -151,9 +152,9 @@ for subject in config.subjects:
         mean_tpr[-1] = 1.0
         auc_scores[t] = auc(mean_fpr, mean_tpr)
 
-        scores *= 100  # make it percentage
-        std_scores *= 100
-        auc_scores *= 100
+    scores *= 100  # make it percentage
+    std_scores *= 100
+    auc_scores *= 100
 
     # for group average
     group_scores.append(scores)

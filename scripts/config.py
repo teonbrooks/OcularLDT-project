@@ -19,20 +19,16 @@ drives = {'local': op.join(op.expanduser('~'), 'Experiments', 'E-MEG', 'data'),
           'dropbox': op.join(op.expanduser('~'), 'Dropbox', 'academic',
                              'Experiments', 'E-MEG', 'output'),
          }
-
-
 # Parameters:
-drive = 'local'
-# drive = 'google_drive'
-drive = drives[drive]
 results_dir = '/Users/teon/Dropbox/academic/Experiments/E-MEG/output/results/'
-ds_factor = 8
-
 reject = dict(mag=3e-12)
 img = 'png'
 filt = 'iir'
 banner = ('#' * 9 + '\n# %s #\n' + '#' * 9)
-# banner = ('#' * (len('%s') + 4)  + '\n# %s #\n' + '#' * (len('%s') + 4))
+# running from NY
+drive = 'local'
+drive = drives[drive]
+
 
 # Bad Channels
 bads = defaultdict(lambda: ['MEG 130'])
@@ -61,7 +57,11 @@ subjects = {'A0023': ['OLDT2', 'SENT2', 'OLDT1'],
             # 'A0164': ['OLDT2', 'SENT2', 'OLDT1'],
             }
 
+# running from laptop
 # subjects = {'A0129': ['OLDT1', 'SENT1', 'OLDT2']}
+# drive = 'google_drive'
+# drive = drives[drive]
+
 
 def kit2fiff(subject, exp, path, dig=True, preload=False):
     from mne.io import read_raw_kit
@@ -89,49 +89,3 @@ def kit2fiff(subject, exp, path, dig=True, preload=False):
                            preload=preload, verbose=False)
 
     return raw
-
-def check_bad_chs(subject, raw, threshold=0.1, reject=4e-12, n_chan=5):
-    """
-    Check for flat-line channels or channels that repeatedly exceeded
-    threshold.
-    """
-    basename = op.basename(raw.info['filename']).split('_')
-    subject = basename[0]
-    exp = basename[1]
-    evt_file = op.join(op.dirname(raw.info['filename']), '..', 'mne', 
-                       '_'.join([subject, exp + '-eve.txt']))
-    evts = mne.load_events(evt_file)
-    epochs = mne.Epochs(raw, tmin=-.2, tmax=.6, baseline=(None, 0),
-                        reject={'mag': reject}, preload=True, verbose=False)
-    threshold = epochs.events.shape[0] * threshold
-    asdf
-    if epochs.drop_log:
-        bads = epochs.drop_log
-        bads = E.table.frequencies(bads)
-        bads = bads[bads['n'] > threshold]['cell'].as_labels()
-    else:
-        bads = []
-    picks = mne.pick_types(epochs.info, exclude=[])
-    data = epochs.get_data()[:, picks, :]
-    flats = []
-    diffs = np.diff(data) == 0
-    for epoch in diffs:
-        # channels flat > 50% time period
-        flats.append(np.where(np.mean(epoch, 1) >= .5)[0])
-    flats = np.unique(np.hstack(flats))
-    flats = ['MEG %03d' % (x + 1) for x in flats]
-
-    bad_chs = np.unique(np.hstack((bads, flats)).ravel())
-    if len(bad_chs) > n_chan:
-        drop = 1
-    else:
-        drop = 0
-
-    with open(self.get('bads-file'), 'w') as FILE:
-        import datetime
-        date = datetime.datetime.now().ctime()
-        FILE.write('# Log of bad channels for %s written on %s\n\n'
-                   % (self.get('subject'), date))
-        FILE.write('bads=%s\n' % bad_chs)
-        FILE.write('drop=%s' % drop)
-    return bad_chs
