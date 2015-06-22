@@ -30,7 +30,6 @@ random_state = 42
 img = config.img
 win = .050  # smoothing window in seconds
 reject = config.reject
-alphas = [.001, .01, .1, 1, 10, 100]
 
 group_r = Report()
 
@@ -137,71 +136,71 @@ for subject in config.subjects:
     r.save(r_fname % subject_names, open_browser=False, overwrite=True)
 
     print "get ready for decoding ;)"
-    for alpha in alphas:
-        # handle the window at the end
-        last_samp = int(win * 1e3 / decim)
-        times = epochs.times[:-last_samp]
-        n_times = len(times)
 
-        scores = np.empty(n_times, np.float32)
-        std_scores = np.empty(n_times, np.float32)
+    # handle the window at the end
+    last_samp = int(win * 1e3 / decim)
+    times = epochs.times[:-last_samp]
+    n_times = len(times)
 
-        # sklearn pipeline
-        # scaler = StandardScaler()
-        concat = ConcatenateChannels()
-        # regression = Ridge(alpha=alpha)  # Ridge Regression
-        regression = KernelRidge(kernel='rbf', gamma=alpha)  # KRR
+    scores = np.empty(n_times, np.float32)
+    std_scores = np.empty(n_times, np.float32)
 
-        # Define 'y': what you're predicting
-        y = design_matrix[:, -1]
+    # sklearn pipeline
+    # scaler = StandardScaler()
+    concat = ConcatenateChannels()
+    # regression = Ridge(alpha=alpha)  # Ridge Regression
+    regression = KernelRidge(kernel='linear')  # KRR
 
-        # Define a monte-carlo cross-validation generator (reduce variance):
-        cv = ShuffleSplit(len(y), 10, test_size=0.2, random_state=random_state)
+    # Define 'y': what you're predicting
+    y = design_matrix[:, -1]
 
-        for t, tmin in enumerate(times):
-            # smoothing window
-            ep = epochs.crop(tmin, tmin + win, copy=True)
-            # Pipeline:
-            # Concatenate features, shape: (epochs, sensor * time window)
-            # Standardize features: mean-centered, normalized by std
-            # Run an Regression
-            reg = Pipeline([('concat', concat), ('scaler', scaler),
-                            ('regression', regression)])
-            Xt = ep.get_data()
+    # Define a monte-carlo cross-validation generator (reduce variance):
+    cv = ShuffleSplit(len(y), 10, test_size=0.2, random_state=random_state)
 
-            # Run cross-validation
-            scores_t = cross_val_score(reg, Xt, y, cv=cv, scoring=rank_scorer,
-                                       n_jobs=1)
-            scores[t] = scores_t.mean(axis=0)
-            std_scores[t] = scores_t.std(axis=0)
+    for t, tmin in enumerate(times):
+        # smoothing window
+        ep = epochs.crop(tmin, tmin + win, copy=True)
+        # Pipeline:
+        # Concatenate features, shape: (epochs, sensor * time window)
+        # Standardize features: mean-centered, normalized by std
+        # Run an Regression
+        reg = Pipeline([('concat', concat), ('scaler', scaler),
+                        ('regression', regression)])
+        Xt = ep.get_data()
 
-        scores *= 100  # make it percentage
-        std_scores *= 100
-        group_scores.append(scores)
-        group_std_scores.append(std_scores)
+        # Run cross-validation
+        scores_t = cross_val_score(reg, Xt, y, cv=cv, scoring=rank_scorer,
+                                   n_jobs=1)
+        scores[t] = scores_t.mean(axis=0)
+        std_scores[t] = scores_t.std(axis=0)
 
-        # Regression Rank CV score
-        plt.close('all')
-        fig = plt.figure()
-        plt.plot(times, scores, label="Regression Rank CV score")
-        plt.axhline(50, color='k', linestyle='--', label="Chance level")
-        plt.axvline(0, color='r', label='stim onset')
-        plt.legend()
-        hyp_limits = (scores - std_scores, scores + std_scores)
-        plt.fill_between(times, hyp_limits[0], y2=hyp_limits[1],
-                         color='b', alpha=0.5)
-        plt.xlabel('Times (ms)')
-        plt.ylabel('CV classification score (% correct)')
-        plt.ylim([30, 100])
-        plt.title('Sensor space decoding')
+    scores *= 100  # make it percentage
+    std_scores *= 100
+    group_scores.append(scores)
+    group_std_scores.append(std_scores)
 
-        # decoding fig
-        r.add_figs_to_section(fig, 'alpha=%s: Decoding Score on Priming' % alpha,
-                              'Decoding', image_format=img)
-        group_r.add_figs_to_section(fig, '%s: Decoding Score on Priming'
-                                    % subject, 'Subject Summary',
-                                    image_format=img)
-        r.save(r_fname % subject_names, open_browser=False, overwrite=True)
+    # Regression Rank CV score
+    plt.close('all')
+    fig = plt.figure()
+    plt.plot(times, scores, label="Regression Rank CV score")
+    plt.axhline(50, color='k', linestyle='--', label="Chance level")
+    plt.axvline(0, color='r', label='stim onset')
+    plt.legend()
+    hyp_limits = (scores - std_scores, scores + std_scores)
+    plt.fill_between(times, hyp_limits[0], y2=hyp_limits[1],
+                     color='b', alpha=0.5)
+    plt.xlabel('Times (ms)')
+    plt.ylabel('CV classification score (% correct)')
+    plt.ylim([30, 100])
+    plt.title('Sensor space decoding')
+
+    # decoding fig
+    r.add_figs_to_section(fig, 'alpha=%s: Decoding Score on Priming' % alpha,
+                          'Decoding', image_format=img)
+    group_r.add_figs_to_section(fig, '%s: Decoding Score on Priming'
+                                % subject, 'Subject Summary',
+                                image_format=img)
+    r.save(r_fname % subject_names, open_browser=False, overwrite=True)
 
 # # group average classification score
 # group_scores = np.array(group_scores).mean(axis=0)

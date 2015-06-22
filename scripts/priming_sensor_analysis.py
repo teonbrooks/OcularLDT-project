@@ -65,7 +65,7 @@ for subject in config.subjects:
     epochs.equalize_event_counts(['unprimed', 'primed'], copy=False)
     # plotting grand average
     p = epochs.average().plot(show=False)
-    comment = ("This is a grand average over all the target epochs after"
+    comment = ("This is a grand average over all the target epochs after "
                "equalizing the numbers in the priming condition.<br>"
                'unprimed: %d, and primed: %d, out of 96 possible events.'
                % (len(epochs['unprimed']), len(epochs['primed'])))
@@ -88,21 +88,42 @@ for subject in config.subjects:
     stats = linear_regression(epochs, design_matrix, names)
     s = stats['priming'].mlog10_p_val
     # plot t-values
-    p = s.plot_topomap(np.linspace(0, .20, 10), unit='-log10 p-val',
+    p = s.plot_topomap(np.linspace(-.1, 0, 10), unit='-log10 p-val',
                        scale=1, vmin=0, vmax=3, cmap='Reds', show=False)
-    rep.add_figs_to_section(p, '-log10 p-val Topomap 0-200 ms',
+    rep.add_figs_to_section(p, '-log10 p-val -100-0 ms',
                           'Regression Analysis',
                           image_format=img)
-    p = s.plot_topomap(np.linspace(.20, .40, 10), unit='-log10 p-val',
+    p = s.plot_topomap(np.linspace(0, .1, 10), unit='-log10 p-val',
                        scale=1, vmin=0, vmax=3, cmap='Reds', show=False)
-    rep.add_figs_to_section(p, '-log10 p-val Topomap 200-400 ms',
+    rep.add_figs_to_section(p, '-log10 p-val 0-100 ms',
                           'Regression Analysis',
                           image_format=img)
-    p = s.plot_topomap(np.linspace(.40, .60, 10), unit='-log10 p-val',
+    p = s.plot_topomap(np.linspace(.1, .2, 10), unit='-log10 p-val',
                        scale=1, vmin=0, vmax=3, cmap='Reds', show=False)
-    rep.add_figs_to_section(p, '-log10 p-val Topomap 400-600 ms',
+    rep.add_figs_to_section(p, '-log10 p-val 100-200 ms',
                           'Regression Analysis',
                           image_format=img)
+    p = s.plot_topomap(np.linspace(.2, .3, 10), unit='-log10 p-val',
+                       scale=1, vmin=0, vmax=3, cmap='Reds', show=False)
+    rep.add_figs_to_section(p, '-log10 p-val 200-300 ms',
+                          'Regression Analysis',
+                          image_format=img)
+    p = s.plot_topomap(np.linspace(.3, .4, 10), unit='-log10 p-val',
+                       scale=1, vmin=0, vmax=3, cmap='Reds', show=False)
+    rep.add_figs_to_section(p, '-log10 p-val 300-400 ms',
+                          'Regression Analysis',
+                          image_format=img)
+    p = s.plot_topomap(np.linspace(.4, .5, 10), unit='-log10 p-val',
+                       scale=1, vmin=0, vmax=3, cmap='Reds', show=False)
+    rep.add_figs_to_section(p, '-log10 p-val 400-500 ms',
+                          'Regression Analysis',
+                          image_format=img)
+    p = s.plot_topomap(np.linspace(.5, .6, 10), unit='-log10 p-val',
+                       scale=1, vmin=0, vmax=3, cmap='Reds', show=False)
+    rep.add_figs_to_section(p, '-log10 p-val 500-600 ms',
+                          'Regression Analysis',
+                          image_format=img)
+
     rep.save(fname_rep, open_browser=False, overwrite=True)
 
     print 'get ready for decoding ;)'
