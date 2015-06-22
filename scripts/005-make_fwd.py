@@ -6,7 +6,7 @@ import config
 path = op.join(config.drive, '..', 'MRI')
 exp = 'OLDT'
 filt = config.filt
-redo = False
+redo = config.redo
 
 for subject in config.subjects:
     print config.banner % subject

@@ -6,7 +6,7 @@ import config
 
 path = config.drive
 exp = 'OLDT'
-redo = False
+redo = config.redo
 
 for subject in config.subjects:
     print config.banner % subject
