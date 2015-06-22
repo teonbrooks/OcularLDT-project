@@ -1,4 +1,5 @@
 import os
+import sys
 import os.path as op
 import warnings
 import numpy as np
@@ -25,21 +26,16 @@ path = config.drive
 filt = config.filt
 exp = 'OLDT'
 analysis = 'reading_regression_sensor_analysis'
-decim = 4
+decim = 2
 random_state = 42
 img = config.img
-win = .050  # smoothing window in seconds
+win = .020  # smoothing window in seconds
 reject = config.reject
+flat = config.flat
 
-group_r = Report()
-
-# define filenames
-r_fname = op.join(config.results_dir, '%s', '%s_%s_' + '%s.html' % analysis)
-group_fname = op.join(config.results_dir, 'group', 'group_%s_' + '%s.html'
+group_rep = Report()
+fname_group = op.join(config.results_dir, 'group', 'group_%s_' + '%s.html'
                       % analysis)
-proj_fname = op.join(path, '%s', 'mne', '%s_%s-proj.fif')
-ep_fname = op.join(path, '%s', 'mne', '%s_%s_coreg_calm_%s_filt-epo.fif')
-dm_fname = op.join(path, '%s', 'mne', '%s_%s_design_matrix.txt')
 
 
 group_scores = []
@@ -62,24 +58,36 @@ def rank_scorer(reg, X, y):
 for subject in config.subjects:
     print config.banner % subject
 
-    subject_names = (subject, subject, exp)
-    r = Report()
+    # define filenames
+    fname_rep = op.join(config.results_dir, subject,
+                        subject + '_%s_%s.html' % (exp, analysis))
+    fname_proj = op.join(path, subject, 'mne',
+                         subject + '_%s_calm_%s_filt-proj.fif' % (exp, filt))
+    fname_epo = op.join(path, subject, 'mne',
+                        subject + '_%s_coreg_calm_%s_filt-epo.fif' % (exp, filt))
+    fname_dm = op.join(path, subject, 'mne',
+                       subject + '_%s_design_matrix.txt' % exp)
+
+    rep = Report()
 
     # loading design matrix, epochs, proj
-    design_matrix = np.loadtxt(dm_fname % subject_names)
-    epochs = mne.read_epochs(ep_fname % (subject_names + (filt,)),
-                             verbose=False)
+    design_matrix = np.loadtxt(fname_dm)
+    epochs = mne.read_epochs(fname_epo)
     epochs.decimate(decim)
     epochs.info['bads'] = config.bads[subject]
     epochs.pick_types(meg=True, exclude='bads')
 
     # add and apply proj
-    proj = mne.read_proj(proj_fname % subject_names)
+    proj = mne.read_proj(fname_proj)
     proj = [proj[0]]
     epochs.add_proj(proj)
     epochs.apply_proj()
 
     # epochs rejection: filtering
+    # drop based on MEG rejection, must happen first
+    epochs.reject = reject
+    epochs.drop_bad_epochs(reject=reject, flat=flat)
+    design_matrix = design_matrix[epochs.selection]
     # remove zeros
     idx = design_matrix[:, -1] > 0
     epochs = epochs[idx]
@@ -92,17 +100,7 @@ for subject in config.subjects:
     idx = devs < criterion
     epochs = epochs[idx]
     design_matrix = design_matrix[idx]
-    # # drop based on MEG rejection
-    # epochs.reject = reject
-    # epochs.drop_bad_epochs()
-    # idx = []
-    # for msgs in epochs.drop_log:
-    #     if not msgs:
-    #         idx.append(True)
-    #     else:
-    #         idx.append(any([False if msg.startswith('MEG')
-    #                         else True for msg in msgs]))
-    # design_matrix = design_matrix[idx]
+
     assert len(design_matrix) == len(epochs)
 
     # plotting grand average
@@ -110,7 +108,7 @@ for subject in config.subjects:
     comment = ("This is a grand average over all the target epochs after "
                "equalizing the numbers in the priming condition.<br>"
                'Number of epochs: %d.' % (len(epochs)))
-    r.add_figs_to_section(p, '%s: Grand Average on Target' % subject,
+    rep.add_figs_to_section(p, '%s: Grand Average on Target' % subject,
                           'Summary', image_format=img, comments=comment)
 
     # run a linear regression
@@ -118,22 +116,42 @@ for subject in config.subjects:
     stats = linear_regression(epochs, design_matrix, names)
     s = stats[names[-1]].mlog10_p_val
     # plot t-values
-    p = s.plot_topomap(np.linspace(0, .20, 10), unit='-log10 p-val',
-                       scale=1, vmin=0, vmax=4, cmap='Reds', show=False)
-    r.add_figs_to_section(p, '-log10 p-val Topomap 0-200 ms',
+    p = s.plot_topomap(np.linspace(-.1, 0, 10), unit='-log10 p-val',
+                       scale=1, vmin=0, vmax=3, cmap='Reds', show=False)
+    rep.add_figs_to_section(p, '-log10 p-val -100-0 ms',
                           'Regression Analysis',
                           image_format=img)
-    p = s.plot_topomap(np.linspace(.20, .40, 10), unit='-log10 p-val',
-                       scale=1, vmin=0, vmax=4, cmap='Reds', show=False)
-    r.add_figs_to_section(p, '-log10 p-val Topomap 200-400 ms',
+    p = s.plot_topomap(np.linspace(0, .1, 10), unit='-log10 p-val',
+                       scale=1, vmin=0, vmax=3, cmap='Reds', show=False)
+    rep.add_figs_to_section(p, '-log10 p-val 0-100 ms',
                           'Regression Analysis',
                           image_format=img)
-    p = s.plot_topomap(np.linspace(.40, .60, 10), unit='-log10 p-val',
-                       scale=1, vmin=0, vmax=4, cmap='Reds', show=False)
-    r.add_figs_to_section(p, '-log10 p-val Topomap 400-600 ms',
+    p = s.plot_topomap(np.linspace(.1, .2, 10), unit='-log10 p-val',
+                       scale=1, vmin=0, vmax=3, cmap='Reds', show=False)
+    rep.add_figs_to_section(p, '-log10 p-val 100-200 ms',
                           'Regression Analysis',
                           image_format=img)
-    r.save(r_fname % subject_names, open_browser=False, overwrite=True)
+    p = s.plot_topomap(np.linspace(.2, .3, 10), unit='-log10 p-val',
+                       scale=1, vmin=0, vmax=3, cmap='Reds', show=False)
+    rep.add_figs_to_section(p, '-log10 p-val 200-300 ms',
+                          'Regression Analysis',
+                          image_format=img)
+    p = s.plot_topomap(np.linspace(.3, .4, 10), unit='-log10 p-val',
+                       scale=1, vmin=0, vmax=3, cmap='Reds', show=False)
+    rep.add_figs_to_section(p, '-log10 p-val 300-400 ms',
+                          'Regression Analysis',
+                          image_format=img)
+    p = s.plot_topomap(np.linspace(.4, .5, 10), unit='-log10 p-val',
+                       scale=1, vmin=0, vmax=3, cmap='Reds', show=False)
+    rep.add_figs_to_section(p, '-log10 p-val 400-500 ms',
+                          'Regression Analysis',
+                          image_format=img)
+    p = s.plot_topomap(np.linspace(.5, .6, 10), unit='-log10 p-val',
+                       scale=1, vmin=0, vmax=3, cmap='Reds', show=False)
+    rep.add_figs_to_section(p, '-log10 p-val 500-600 ms',
+                          'Regression Analysis',
+                          image_format=img)
+    rep.save(fname_rep, open_browser=False, overwrite=True)
 
     print "get ready for decoding ;)"
 
@@ -146,10 +164,10 @@ for subject in config.subjects:
     std_scores = np.empty(n_times, np.float32)
 
     # sklearn pipeline
-    # scaler = StandardScaler()
+    scaler = StandardScaler()
     concat = ConcatenateChannels()
-    # regression = Ridge(alpha=alpha)  # Ridge Regression
-    regression = KernelRidge(kernel='linear')  # KRR
+    regression = Ridge(alpha=1e-3)  # Ridge Regression
+    # regression = KernelRidge(kernel='linear')  # KRR
 
     # Define 'y': what you're predicting
     y = design_matrix[:, -1]
@@ -158,6 +176,10 @@ for subject in config.subjects:
     cv = ShuffleSplit(len(y), 10, test_size=0.2, random_state=random_state)
 
     for t, tmin in enumerate(times):
+        # add progress indicator
+        progress = (t + 1.) * 100 / len(times)
+        sys.stdout.write("\r%f%%" % progress)
+        sys.stdout.flush()
         # smoothing window
         ep = epochs.crop(tmin, tmin + win, copy=True)
         # Pipeline:
@@ -182,7 +204,7 @@ for subject in config.subjects:
     # Regression Rank CV score
     plt.close('all')
     fig = plt.figure()
-    plt.plot(times, scores, label="Regression Rank CV score")
+    plt.plot(times, scores, label="CV score")
     plt.axhline(50, color='k', linestyle='--', label="Chance level")
     plt.axvline(0, color='r', label='stim onset')
     plt.legend()
@@ -192,15 +214,15 @@ for subject in config.subjects:
     plt.xlabel('Times (ms)')
     plt.ylabel('CV classification score (% correct)')
     plt.ylim([30, 100])
-    plt.title('Sensor space decoding')
+    plt.title('Sensor space decoding using Rank Scorer')
 
     # decoding fig
-    r.add_figs_to_section(fig, 'alpha=%s: Decoding Score on Priming' % alpha,
-                          'Decoding', image_format=img)
-    group_r.add_figs_to_section(fig, '%s: Decoding Score on Priming'
+    rep.add_figs_to_section(fig, 'Decoding Score on Priming',
+                            'Decoding', image_format=img)
+    group_rep.add_figs_to_section(fig, '%s: Decoding Score on Priming'
                                 % subject, 'Subject Summary',
                                 image_format=img)
-    r.save(r_fname % subject_names, open_browser=False, overwrite=True)
+    rep.save(fname_rep, open_browser=False, overwrite=True)
 
 # # group average classification score
 # group_scores = np.array(group_scores).mean(axis=0)
@@ -219,6 +241,6 @@ for subject in config.subjects:
 # plt.ylabel('CV classification score (% correct)')
 # plt.ylim([30, 100])
 # plt.title('Group Average Sensor space decoding')
-# group_r.add_figs_to_section(fig, 'Group Average Decoding Score on Priming',
+# group_rep.add_figs_to_section(fig, 'Group Average Decoding Score on Priming',
 #                             'Group Summary', image_format=img)
-# group_r.save(group_fname % exp, open_browser=False, overwrite=True)
+# group_rep.save(fname_group % exp, open_browser=False, overwrite=True)
