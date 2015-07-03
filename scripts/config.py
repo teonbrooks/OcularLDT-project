@@ -23,17 +23,50 @@ drives = {'local': op.join(op.expanduser('~'), 'Experiments', 'E-MEG', 'data'),
 redo = True
 results_dir = '/Users/teon/Dropbox/academic/Experiments/E-MEG/output/results/'
 reject = dict(mag=3e-12)
-flat = dict(mag=1e-13)
 img = 'png'
 filt = 'iir'
 banner = ('#' * 9 + '\n# %s #\n' + '#' * 9)
 # running from NY
-drive = 'local'
+drive = 'home'
 
 
 # Bad Channels
 bads = defaultdict(lambda: ['MEG 130'])
-bads['A0129'] += ['MEG 041', 'MEG 092', 'MEG 102', 'MEG 157']
+bads['A0129'] += ['MEG 057', 'MEG 082', 'MEG 087', 'MEG 115',
+                  'MEG 157', 'MEG 179', 'MEG 181', 'MEG 198',
+                  'MEG 092', 'MEG 041', 'MEG 102']  # weird drift
+bads['A0148'] += ['MEG 004', 'MEG 011', 'MEG 019', 'MEG 021',
+                  'MEG 030', 'MEG 032', 'MEG 046', 'MEG 057',
+                  'MEG 072', 'MEG 084', 'MEG 088', 'MEG 109',
+                  'MEG 114', 'MEG 119', 'MEG 122', 'MEG 125',
+                  'MEG 133', 'MEG 147', 'MEG 171', 'MEG 177',
+                  'MEG 179', 'MEG 198', 'MEG 207']
+bads['A0023'] += ['MEG 059']
+bads['A0023'] += ['MEG 049', 'MEG 054']
+bads['A0136'] += ['MEG 057', 'MEG 128', 'MEG 179']
+bads['A0130'] += ['MEG 020', 'MEG 024', 'MEG 025', 'MEG 031',
+                  'MEG 034', 'MEG 046', 'MEG 057', 'MEG 072',
+                  'MEG 078', 'MEG 080', 'MEG 081', 'MEG 082',
+                  'MEG 087', 'MEG 094', 'MEG 111', 'MEG 115',
+                  'MEG 128', 'MEG 130', 'MEG 134', 'MEG 146',
+                  'MEG 149', 'MEG 163', 'MEG 177', 'MEG 179',
+                  'MEG 181', 'MEG 186', 'MEG 195', 'MEG 195']
+bads['A0161'] += ['MEG 005', 'MEG 009', 'MEG 010', 'MEG 012',
+                  'MEG 020', 'MEG 024', 'MEG 029', 'MEG 032',
+                  'MEG 035', 'MEG 038', 'MEG 051', 'MEG 064',
+                  'MEG 068', 'MEG 075', 'MEG 078', 'MEG 080',
+                  'MEG 081', 'MEG 082', 'MEG 084', 'MEG 087',
+                  'MEG 089', 'MEG 095', 'MEG 097', 'MEG 104',
+                  'MEG 108', 'MEG 111', 'MEG 116', 'MEG 136',
+                  'MEG 145', 'MEG 146', 'MEG 149', 'MEG 164',
+                  'MEG 165', 'MEG 166', 'MEG 177', 'MEG 187',
+                  'MEG 194', 'MEG 198', 'MEG 199', 'MEG 202',
+                  'MEG 203', 'MEG 207']
+
+
+
+epochs = {'A0148': 144, 'A0129': 95, 'A0161': 3}
+# A0161 first run drop
 
 # arrange the OLDT in the presentation order
 subjects = {'A0023': ['OLDT2', 'SENT2', 'OLDT1'],
