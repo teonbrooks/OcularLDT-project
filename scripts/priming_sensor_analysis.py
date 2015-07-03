@@ -1,3 +1,4 @@
+import sys
 import os
 import os.path as op
 import warnings
@@ -14,7 +15,7 @@ from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler, LabelEncoder
 from sklearn.svm import SVC
 from sklearn.cross_validation import cross_val_score, ShuffleSplit
-from sklearn.metrics import roc_curve, auc
+from sklearn.metrics import roc_curve, auc, roc_auc_score
 
 import config
 
@@ -26,7 +27,8 @@ img = config.img
 exp = 'OLDT'
 analysis = 'priming_sensor_analysis'
 decim = 5
-win = .050  # smoothing window
+win = 50e-3  # smoothing window
+plt_interval = 10e-3  # plotting interval
 random_state = 42
 
 
@@ -39,6 +41,7 @@ group_std_scores = []
 group_auc_scores = []
 
 for subject in config.subjects:
+    print config.banner % subject
     # define filenames
     fname_rep = op.join(config.results_dir, subject,
                         '%s_%s_%s.html' % (subject, exp, analysis))
@@ -58,7 +61,7 @@ for subject in config.subjects:
 
     # add/apply proj
     proj = mne.read_proj(fname_proj)
-    proj = [proj[0]]
+    # proj = [proj[0]]
     epochs.add_proj(proj)
     epochs.apply_proj()
 
@@ -88,41 +91,14 @@ for subject in config.subjects:
     stats = linear_regression(epochs, design_matrix, names)
     s = stats['priming'].mlog10_p_val
     # plot t-values
-    p = s.plot_topomap(np.linspace(-.1, 0, 10), unit='-log10 p-val',
-                       scale=1, vmin=0, vmax=3, cmap='Reds', show=False)
-    rep.add_figs_to_section(p, '-log10 p-val -100-0 ms',
-                          'Regression Analysis',
-                          image_format=img)
-    p = s.plot_topomap(np.linspace(0, .1, 10), unit='-log10 p-val',
-                       scale=1, vmin=0, vmax=3, cmap='Reds', show=False)
-    rep.add_figs_to_section(p, '-log10 p-val 0-100 ms',
-                          'Regression Analysis',
-                          image_format=img)
-    p = s.plot_topomap(np.linspace(.1, .2, 10), unit='-log10 p-val',
-                       scale=1, vmin=0, vmax=3, cmap='Reds', show=False)
-    rep.add_figs_to_section(p, '-log10 p-val 100-200 ms',
-                          'Regression Analysis',
-                          image_format=img)
-    p = s.plot_topomap(np.linspace(.2, .3, 10), unit='-log10 p-val',
-                       scale=1, vmin=0, vmax=3, cmap='Reds', show=False)
-    rep.add_figs_to_section(p, '-log10 p-val 200-300 ms',
-                          'Regression Analysis',
-                          image_format=img)
-    p = s.plot_topomap(np.linspace(.3, .4, 10), unit='-log10 p-val',
-                       scale=1, vmin=0, vmax=3, cmap='Reds', show=False)
-    rep.add_figs_to_section(p, '-log10 p-val 300-400 ms',
-                          'Regression Analysis',
-                          image_format=img)
-    p = s.plot_topomap(np.linspace(.4, .5, 10), unit='-log10 p-val',
-                       scale=1, vmin=0, vmax=3, cmap='Reds', show=False)
-    rep.add_figs_to_section(p, '-log10 p-val 400-500 ms',
-                          'Regression Analysis',
-                          image_format=img)
-    p = s.plot_topomap(np.linspace(.5, .6, 10), unit='-log10 p-val',
-                       scale=1, vmin=0, vmax=3, cmap='Reds', show=False)
-    rep.add_figs_to_section(p, '-log10 p-val 500-600 ms',
-                          'Regression Analysis',
-                          image_format=img)
+    interval = int(plt_interval * 1e3 / decim)   # plot every 5ms
+    times = evoked.times[::interval]
+    figs = list()
+    for time in times:
+        figs.append(s.plot_topomap(time, vmin=0, vmax=3, unit='',
+                                   scale=1, cmap='Reds', show=False))
+        plt.close()
+    rep.add_slider_to_section(figs, times, 'Regression Analysis (-log10 p-val)')
 
     rep.save(fname_rep, open_browser=False, overwrite=True)
 
@@ -130,10 +106,6 @@ for subject in config.subjects:
     # handle the window at the end
     last_samp = int(win * 1e3 / decim)
     times = epochs.times[:-last_samp]
-
-    # # temp
-    # times = [.2]
-    # win = .4
 
     n_times = len(times)
 
@@ -150,7 +122,10 @@ for subject in config.subjects:
     cv = ShuffleSplit(len(y), 10, test_size=0.2, random_state=random_state)
 
     for t, tmin in enumerate(times):
-        print "%d of %d" % (t + 1, len(times))
+        # add progress indicator
+        progress = (t + 1.) * 100 / len(times)
+        sys.stdout.write("\r%f%%" % progress)
+        sys.stdout.flush()
         # smoothing window
         ep = epochs.crop(tmin, tmin + win, copy=True)
         # Concatenate features, shape: (epochs, sensor * time window)
@@ -165,19 +140,12 @@ for subject in config.subjects:
         scores[t] = scores_t.mean()
         std_scores[t] = scores_t.std()
         # Run ROC/AUC calculation
-        mean_tpr = 0.0
-        mean_fpr = np.linspace(0, 1, 100)
-        all_tpr = []
+        auc_scores_t = []
 
         for i, (train, test) in enumerate(cv):
             probas_ = clf.fit(Xt[train], y[train]).predict_proba(Xt[test])
-            # Compute ROC curve and area the curve
-            fpr, tpr, thresholds = roc_curve(y[test], probas_[:, 1])
-            mean_tpr += interp(mean_fpr, fpr, tpr)
-            mean_tpr[0] = 0.0
-        mean_tpr /= len(cv)
-        mean_tpr[-1] = 1.0
-        auc_scores[t] = auc(mean_fpr, mean_tpr)
+            auc_scores_t.append(roc_auc_score(y[test], probas_[:, 1]))
+        auc_scores[t] = np.array(auc_scores_t).mean()
 
     scores *= 100  # make it percentage
     std_scores *= 100
@@ -185,7 +153,6 @@ for subject in config.subjects:
 
     # for group average
     group_scores.append(scores)
-    group_std_scores.append(std_scores)
     group_auc_scores.append(auc_scores)
 
     # CV classification score
@@ -229,7 +196,7 @@ for subject in config.subjects:
 
 # group average classification score
 group_scores = np.array(group_scores).mean(axis=0)
-group_std_scores = np.array(group_std_scores).mean(axis=0)
+group_std_scores = np.array(group_scores).std(axis=0)
 plt.close('all')
 fig = plt.figure()
 plt.plot(times, group_scores, label="Classif. score")
@@ -248,13 +215,18 @@ group_rep.add_figs_to_section(fig, 'Group Average Decoding Score on Priming',
                             'Group Summary', image_format=img)
 
 # group average AUC score
-group_auc_scores = np.array(group_auc_scores).mean(axis=0)
+group_auc_scores = np.asarray(group_auc_scores).mean(axis=0)
+group_std_auc_scores = np.asarray(group_auc_scores).std(axis=0)
 plt.close('all')
 fig = plt.figure()
-plt.plot(times, group_scores, label="Area Under Curve")
+plt.plot(times, group_auc_scores, label="Area Under Curve")
 plt.axhline(50, color='k', linestyle='--', label="Chance level")
 plt.axvline(0, color='r', label='stim onset')
 plt.legend()
+hyp_limits = (group_auc_scores - group_std_auc_scores,
+              group_auc_scores + group_std_auc_scores)
+plt.fill_between(times, hyp_limits[0], y2=hyp_limits[1],
+                 color='b', alpha=0.5)
 plt.xlabel('Times (ms)')
 plt.ylabel('AUC')
 plt.ylim([30, 100])

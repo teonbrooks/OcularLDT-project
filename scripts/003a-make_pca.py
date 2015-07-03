@@ -39,7 +39,7 @@ for subject in config.subjects:
         # compute the SSP
         epochs.crop(-.1, .03, copy=False)
         ev_proj = epochs.average()
-        projs = mne.compute_proj_evoked(ev_proj, n_mag=2)
+        projs = mne.compute_proj_evoked(ev_proj, n_mag=3)
 
         # apply projector step-wise
         evokeds = list()
@@ -56,7 +56,7 @@ for subject in config.subjects:
 
         # plot evoked - each proj
         for i, ev in enumerate(evokeds):
-            pca = 'PCA %d' % i
+            pca = 'PC %d' % i
             e = ev.plot(titles={'mag': 'PCA %d' % i}, show=False)
             # p = mne.viz.plot_projs_topomap(ev.info['projs'], layout,
             #                                show=False)
@@ -65,6 +65,12 @@ for subject in config.subjects:
             #                       pca, image_format=img)
             rep.add_figs_to_section(e, 'Evoked without PCA %d' %i,
                                     pca, image_format=img)
+
+        # remove both
+        evoked.add_proj(projs).apply_proj()
+        e  = evoked.plot(titles={'mag': 'Both PC'}, show=False)
+        rep.add_figs_to_section(e, 'Evoked without both PCs',
+                                'Both PCs', image_format=img)
 
         rep.save(fname_rep, overwrite=True, open_browser=False)
 
