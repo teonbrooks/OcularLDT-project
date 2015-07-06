@@ -10,6 +10,8 @@ drive = config.drive
 exp = 'OLDT'
 filt = config.filt
 redo = config.redo
+baseline = (-.2, -.1)
+tmin, tmax = -.2, .03
 
 
 for subject in config.subjects:
@@ -27,7 +29,28 @@ for subject in config.subjects:
 
     if not op.exists(fname_proj) or redo:
         rep = Report()
-        epochs = mne.read_epochs(fname_epo)
+        # epochs = mne.read_epochs(fname_epo)
+        # epochs.pick_types(meg=True, exclude='bads')
+
+        # load from raw
+        exps = config.subjects[subject]
+        raw = config.kit2fiff(subject=subject, exp=exps[0],
+                              path=drive, preload=False)
+        raw2 = config.kit2fiff(subject=subject, exp=exps[2],
+                              path=drive, dig=False, preload=False)
+        mne.concatenate_raws([raw, raw2])
+        raw.info['bads'] = config.bads[subject]
+        raw.preload_data()
+        if filt == 'fft':
+            raw.filter(.1, 40, method=filt, l_trans_bandwidth=.05)
+        else:
+            raw.filter(1, 40, method=filt)
+
+        # target eye-movements
+        evts = mne.find_stim_steps(raw, merge=-2)
+        epochs = mne.Epochs(raw, evts, None, tmin=tmin, tmax=tmax,
+                            baseline=baseline, reject=reject,
+                            preload=True, verbose=False)
         epochs.pick_types(meg=True, exclude='bads')
 
         # plot evoked
@@ -66,10 +89,10 @@ for subject in config.subjects:
             rep.add_figs_to_section(e, 'Evoked without PCA %d' %i,
                                     pca, image_format=img)
 
-        # remove both
+        # remove all
         evoked.add_proj(projs).apply_proj()
         e  = evoked.plot(titles={'mag': 'Both PC'}, show=False)
-        rep.add_figs_to_section(e, 'Evoked without both PCs',
+        rep.add_figs_to_section(e, 'Evoked without all PCs',
                                 'Both PCs', image_format=img)
 
         rep.save(fname_rep, overwrite=True, open_browser=False)

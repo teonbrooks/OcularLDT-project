@@ -27,7 +27,7 @@ img = 'png'
 filt = 'iir'
 banner = ('#' * 9 + '\n# %s #\n' + '#' * 9)
 # running from NY
-drive = 'home'
+drive = 'local'
 
 
 # Bad Channels
