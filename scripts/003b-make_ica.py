@@ -56,8 +56,13 @@ for subject in config.subjects:
 
         # compute the ICA
         ica = mne.preprocessing.ICA(.9, random_state=42, method='infomax')
-        ica.fit(epochs)
+        ica.fit(epochs, decim=4)
 
+        ics = ica.get_sources(epochs)
+        import numpy as np
+        freqs = np.arange(4, 30, 2)
+        cycles = freqs / 3.
+        tfr = mne.time_frequency.tfr_morlet(ics, freqs, cycles)
         # # plot ICs
         # p = ica.plot_components(show=False)
         # caption = ['Independent Components']
