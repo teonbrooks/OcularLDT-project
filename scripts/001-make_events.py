@@ -124,7 +124,7 @@ def make_events(raw, subject, exp):
             if trial[1] == 0:
                 ii += 1
             else:
-                coreg_evts.append(trial) 
+                coreg_evts.append(trial)
                 trial = [ii] + list(trial)
                 trial = '\t'.join(map(str, trial)) + '\n'
                 FILE.write(trial)
@@ -153,12 +153,17 @@ def make_events(raw, subject, exp):
 for subject in config.subjects:
     print config.banner % subject
 
-    exps = config.subjects[subject]
+    exps = [config.subjects[subject][0], config.subjects[subject][2]]
     evt_file = op.join(path, subject, 'mne', subject + '_OLDT-eve.txt')
     if not op.exists(evt_file) or redo:
-        raw = config.kit2fiff(subject=subject, exp=exps[0],
-                              path=path, dig=False, preload=False)
-        raw2 = config.kit2fiff(subject=subject, exp=exps[2],
-                              path=path, dig=False, preload=False)
-        mne.concatenate_raws([raw, raw2])
+        if 'n/a' in exps:
+            exps.pop(exps.index('n/a'))
+            raw = config.kit2fiff(subject=subject, exp=exps[0],
+                                  path=path, preload=False)
+        else:
+            raw = config.kit2fiff(subject=subject, exp=exps[0],
+                                  path=path, dig=False, preload=False)
+            raw2 = config.kit2fiff(subject=subject, exp=exps[1],
+                                  path=path, dig=False, preload=False)
+            mne.concatenate_raws([raw, raw2])
         make_events(raw, subject, 'OLDT')

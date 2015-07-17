@@ -10,7 +10,7 @@ import itertools
 import mne
 from mne.report import Report
 from mne.decoding import ConcatenateChannels
-from mne.stats.regression import linear_regression
+from mne.stats import linear_regression, spatio_temporal_cluster_1samp_test
 
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
@@ -23,21 +23,24 @@ import config
 # parameters
 path = config.drive
 filt = config.filt
+img = config.img
 exp = 'OLDT'
 analysis = 'reading_regression_sensor_analysis'
 decim = 5
 random_state = 42
-img = config.img
-win = 20e-3  # smoothing window in seconds
+
+win = 25e-3  # smoothing window in seconds
 plt_interval = 5e-3  # plotting interval
 reject = config.reject
-flat = config.flat
 
+# setup group
+fname_group = op.join(config.results_dir, 'group', 'group_OLDT_%s_filt_%s.html'
+                      % (filt, analysis))
 group_rep = Report()
-fname_group = op.join(config.results_dir, 'group', 'group_%s_' + '%s.html'
-                      % analysis)
 group_scores = []
 group_std_scores = []
+group_auc_scores = []
+
 
 # Ranker
 def rank_scorer(reg, X, y):
@@ -76,13 +79,13 @@ for subject in config.subjects:
 
     # add and apply proj
     proj = mne.read_proj(fname_proj)
-    proj = [proj[0]]
+    # proj = [proj[0]]
     epochs.add_proj(proj)
     epochs.apply_proj()
 
     # epochs rejection: filtering
     # drop based on MEG rejection, must happen first
-    epochs.drop_bad_epochs(reject=reject, flat=flat)
+    epochs.drop_bad_epochs(reject=reject)
     design_matrix = design_matrix[epochs.selection]
     # remove zeros
     idx = design_matrix[:, -1] > 0
@@ -105,28 +108,40 @@ for subject in config.subjects:
                "equalizing the numbers in the priming condition.<br>"
                'Number of epochs: %d.' % (len(epochs)))
     rep.add_figs_to_section(p, '%s: Grand Average on Target' % subject,
-                          'Summary', image_format=img, comments=comment)
+                            'Summary', image_format=img, comments=comment)
 
-    # run a linear regression
     names = ['intercept', 'fixation']
     stats = linear_regression(epochs, design_matrix, names)
-    s = stats[names[-1]].mlog10_p_val
-    # plot t-values
+
+    # run a spatio-temporal linear regression
+    X = stats['fixation'].beta.data.swapaxes(1, 2)
+    connectivity, ch_names = read_ch_connectivity('KIT-208')
+    threshold = 2
+    p_accept = 0.05
+    cluster_stats = spatio_temporal_cluster_1samp_test(X, n_permutations=1000,
+                        threshold=threshold, tail=0, connectivity=connectivity)
+    asdf
+    # s = stats[names[-1]].mlog10_p_val
+    s = stats[names[-1]].t_val
+    # plot p-values
     interval = int(plt_interval * 1e3 / decim)   # plot every 5ms
-    times = evoked.times[::interval]
+    times = epochs.times[::interval]
     figs = list()
     for time in times:
-        figs.append(s.plot_topomap(time, vmin=0, vmax=3, unit='',
+        # figs.append(s.plot_topomap(time, vmin=0, vmax=3, unit='',
+        #                            scale=1, cmap='Reds', show=False))
+        figs.append(s.plot_topomap(time, vmin=1, vmax=4, unit='',
                                    scale=1, cmap='Reds', show=False))
         plt.close()
-    rep.add_slider_to_section(figs, times, 'Regression Analysis (-log10 p-val)')
+    # rep.add_slider_to_section(figs, times, 'Regression Analysis (-log10 p-val)')
+    rep.add_slider_to_section(figs, times, 'Regression Analysis (t-val)')
     rep.save(fname_rep, open_browser=False, overwrite=True)
 
     print "get ready for decoding ;)"
-
     # handle the window at the end
-    last_samp = int(win * 1e3 / decim)
-    times = epochs.times[:-last_samp]
+    first_samp = int(win * 1e3 / decim)
+    last_samp = -first_samp
+    times = epochs.times[first_samp:last_samp]
     n_times = len(times)
 
     scores = np.empty(n_times, np.float32)
@@ -136,21 +151,19 @@ for subject in config.subjects:
     scaler = StandardScaler()
     concat = ConcatenateChannels()
     regression = Ridge(alpha=1e-3)  # Ridge Regression
-    # regression = KernelRidge(kernel='linear')  # KRR
 
     # Define 'y': what you're predicting
     y = design_matrix[:, -1]
-
     # Define a monte-carlo cross-validation generator (reduce variance):
     cv = ShuffleSplit(len(y), 10, test_size=0.2, random_state=random_state)
 
-    for t, tmin in enumerate(times):
+    for t, time in enumerate(times):
         # add progress indicator
         progress = (t + 1.) * 100 / len(times)
         sys.stdout.write("\r%f%%" % progress)
         sys.stdout.flush()
         # smoothing window
-        ep = epochs.crop(tmin, tmin + win, copy=True)
+        ep = epochs.crop(time - win, time + win, copy=True)
         # Pipeline:
         # Concatenate features, shape: (epochs, sensor * time window)
         # Standardize features: mean-centered, normalized by std
@@ -194,16 +207,18 @@ for subject in config.subjects:
     rep.save(fname_rep, open_browser=False, overwrite=True)
 
 # group average classification score
-group_scores = np.array(group_scores).mean(axis=0)
-group_std_scores = np.array(group_std_scores).mean(axis=0)
+first_samp = int(win * 1e3 / decim)
+last_samp = -first_samp
+times = epochs.times[first_samp:last_samp]
+scores = np.array(group_scores).mean(axis=0)
+std_scores = np.array(group_scores).std(axis=0)
 plt.close('all')
 fig = plt.figure()
-plt.plot(times, group_scores, label="Classif. score")
+plt.plot(times, scores, label="Classif. score")
 plt.axhline(50, color='k', linestyle='--', label="Chance level")
 plt.axvline(0, color='r', label='stim onset')
 plt.legend()
-hyp_limits = (group_scores - group_std_scores,
-              group_scores + group_std_scores)
+hyp_limits = (scores - std_scores, scores + std_scores)
 plt.fill_between(times, hyp_limits[0], y2=hyp_limits[1],
                  color='b', alpha=0.5)
 plt.xlabel('Times (ms)')
