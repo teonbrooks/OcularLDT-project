@@ -1,6 +1,7 @@
 import os.path as op
 import numpy as np
 import mne
+import matplotlib.pyplot as plt
 
 path = '/Users/teon/Google Drive/E-MEG/data/A0129/mne/'
 fname_epo = op.join(path, 'A0129_OLDT_xca_calm_iir_filt-epo.fif')
@@ -16,13 +17,21 @@ power, itc = mne.time_frequency.tfr_multitaper(ics, np.arange(10) + 1.,
     (np.arange(10) + 1.) /2, picks=picks, return_itc=True)
 itc.crop(-.1, .03, copy=False)
 
-avg = itc.data.mean(axis=2).mean(1)
-# descending rank
-ranks = np.argsort(avg)[::-1]
-avg = avg[ranks]
-exclude = ranks[avg > .5]
-ica.exclude = exclude
-# idx = np.where((itc.data == itc.data.max(axis=0)).all(axis=2))[0]
-# itc.plot(idx)
-epochs_em = ica.apply(epochs, copy=True)
-after = epochs_em.average().plot()
+rows = columns = np.ceil(np.sqrt(itc.info['nchan'])).astype(int)
+fig, axes = plt.subplots(rows, columns)
+axes = [ax for axe in axes for ax in axe]
+
+itc.plot(picks=picks, axes=axes[:itc.info['nchan']])
+
+# select high ITC pre-onset, but low afterwards
+
+# avg = itc.data.mean(axis=2).mean(1)
+# # descending rank
+# ranks = np.argsort(avg)[::-1]
+# avg = avg[ranks]
+# exclude = ranks[avg > .5]
+# ica.exclude = exclude
+# # idx = np.where((itc.data == itc.data.max(axis=0)).all(axis=2))[0]
+# # itc.plot(idx)
+# epochs_em = ica.apply(epochs, copy=True)
+# after = epochs_em.average().plot()

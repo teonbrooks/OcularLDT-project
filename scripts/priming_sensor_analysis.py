@@ -27,8 +27,8 @@ img = config.img
 exp = 'OLDT'
 analysis = 'priming_sensor_analysis'
 decim = 5
-win = 50e-3  # smoothing window
-plt_interval = 10e-3  # plotting interval
+win = 25e-3  # smoothing window
+plt_interval = 5e-3  # plotting interval
 random_state = 42
 
 
@@ -47,7 +47,7 @@ for subject in config.subjects:
                         '%s_%s_%s.html' % (subject, exp, analysis))
     fname_proj = op.join(path, subject, 'mne', '%s_%s_calm_%s_filt-proj.fif'
                          % (subject, exp, filt))
-    fname_epo = op.join(path, subject, 'mne', 
+    fname_epo = op.join(path, subject, 'mne',
                         '%s_%s_priming_calm_%s_filt-epo.fif'
                         % (subject, exp, filt))
     rep = Report()
@@ -90,7 +90,7 @@ for subject in config.subjects:
     names = ['intercept', 'priming']
     stats = linear_regression(epochs, design_matrix, names)
     s = stats['priming'].mlog10_p_val
-    # plot t-values
+    # plot p-values
     interval = int(plt_interval * 1e3 / decim)   # plot every 5ms
     times = evoked.times[::interval]
     figs = list()
@@ -99,14 +99,13 @@ for subject in config.subjects:
                                    scale=1, cmap='Reds', show=False))
         plt.close()
     rep.add_slider_to_section(figs, times, 'Regression Analysis (-log10 p-val)')
-
     rep.save(fname_rep, open_browser=False, overwrite=True)
 
     print 'get ready for decoding ;)'
     # handle the window at the end
-    last_samp = int(win * 1e3 / decim)
-    times = epochs.times[:-last_samp]
-
+    first_samp = int(win * 1e3 / decim)
+    last_samp = -first_samp
+    times = epochs.times[first_samp:last_samp]
     n_times = len(times)
 
     scores = np.empty(n_times, np.float32)
@@ -116,7 +115,7 @@ for subject in config.subjects:
     # sklearn pipeline
     scaler = StandardScaler()
     concat = ConcatenateChannels()
-    # linear SVM 
+    # linear SVM
     svc = SVC(kernel='linear', probability=True, random_state=random_state)
     # Define a monte-carlo cross-validation generator (reduce variance):
     cv = ShuffleSplit(len(y), 10, test_size=0.2, random_state=random_state)
@@ -127,7 +126,7 @@ for subject in config.subjects:
         sys.stdout.write("\r%f%%" % progress)
         sys.stdout.flush()
         # smoothing window
-        ep = epochs.crop(tmin, tmin + win, copy=True)
+        ep = epochs.crop(tmin - win, tmin + win, copy=True)
         # Concatenate features, shape: (epochs, sensor * time window)
         # Standardize features: mean-centered, normalized by std for each feature
         # Run an SVM

@@ -15,7 +15,7 @@ redo = config.redo
 for subject in config.subjects:
     print config.banner % subject
     # define filenames
-    path = op.join(drive, subject, 'mne') 
+    path = op.join(drive, subject, 'mne')
     fname_epo = op.join(path, subject + '_%s_xca_calm_%s_filt-epo.fif'
                         % (exp, filt))
     fname_cov = op.join(path, subject + '_%s_calm_%s_filt-cov.fif'
@@ -33,7 +33,6 @@ for subject in config.subjects:
 
         # back to coding
         proj = mne.read_proj(fname_proj)
-        proj = [proj[0]]
         epochs.add_proj(proj)
         epochs.apply_proj()
 

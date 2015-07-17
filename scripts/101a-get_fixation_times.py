@@ -1,8 +1,6 @@
-import pyeparse
+import pyeparse as pp
 import os.path as op
 import numpy as np
-import pandas
-from scipy.stats import ttest_ind
 import config
 from glob import glob
 
@@ -16,11 +14,13 @@ for subject in config.subjects:
 
     # Define output
     file_ds = op.join(path, subject, 'edf',
-                      subject + '_OLDT_target_times.txt')
+                      subject + '_OLDT_fixation_times.txt')
     if not op.exists(file_ds) or redo:
         ds = [list(), list(), list(), list(), list(), list(), list(), list()]
         exps = [config.subjects[subject][0], config.subjects[subject][2]]
-        for exp in exps:
+        if 'n/a' in exps:
+            exps.pop(exps.index('n/a'))
+        for ii, exp in enumerate(exps):
             # Define filenames
             fname_trial = glob(op.join(path, subject, 'edf',
                                '*_%s_*BLOCKTRIAL.dat' % exp))[0]
@@ -29,32 +29,45 @@ for subject in config.subjects:
             # prime trigger is index 8, target trigger is index 10
             dat = np.loadtxt(fname_trial, dtype=str, delimiter='\t')
             prime_triggers = dat[:, 8].astype(int)
+            prime_exp = np.array([(x & 2 ** 5) >> 5 for x in prime_triggers],
+                                 dtype=bool)
+            prime_triggers = prime_triggers[prime_exp]
             target_triggers = dat[:,10].astype(int)
+            target_exp = np.array([(x & 2 ** 5) >> 5 for x in target_triggers],
+                                  dtype=bool)
+            target_triggers = target_triggers[target_exp]
+
 
             # extracting fixation times from the edf file.
-            raw = pyeparse.RawEDF(file_raw)
+            raw = pp.RawEDF(file_raw)
             times = list()
             triggers = list()
+            trialids = list()
             # first for the primes
             pat = '!V TRIAL_VAR TIME_PRIME'
             msgs = raw.find_events(pat, 1)[:,-1]
             prime_times = np.array([int(x[(len(pat) + 1):])
                                     for x in msgs], int)
+            prime_times = prime_times[prime_exp]
             assert prime_triggers.shape[0] == prime_times.shape[0]
             times.append(prime_times)
             triggers.append(prime_triggers)
+            trialids.append(np.arange(len(prime_triggers)) + 1 + ii * 240)
             # then for the targets
             pat = '!V TRIAL_VAR TIME_TARGET'
             msgs = raw.find_events(pat, 1)[:,-1]
             target_times = np.array([int(x[(len(pat) + 1):])
                                      for x in msgs], int)
+            target_times = target_times[target_exp]
             assert target_triggers.shape[0] == target_times.shape[0]
             times.append(target_times)
             triggers.append(target_triggers)
+            trialids.append(np.arange(len(target_triggers)) + 1 + ii * 240)
 
-
+            # let's do some re-arranging
             times = np.hstack(times)
             triggers = np.hstack(triggers)
+            trialids = np.hstack(trialids)
             # coding trigger events
             semantics = np.array([(x & 2 ** 4) >> 4
                                   for x in triggers], dtype=bool)
@@ -79,9 +92,6 @@ for subject in config.subjects:
             means = np.ones(times.shape[0]) * times.mean()
             stds = np.ones(times.shape[0]) * times.std()
 
-            # trial id
-            trialids = np.arange(triggers.shape[0]) + 1
-
             ds[0].append(labels)
             ds[1].append(trialids)
             ds[2].append(triggers)
@@ -91,7 +101,7 @@ for subject in config.subjects:
             ds[6].append(means)
             ds[7].append(stds)
 
-        header = ['subject', 'trialids', 'triggers', 'words', 'semantics',
+        header = ['subject', 'trialid', 'trigger', 'word', 'semantics',
                   'duration', 'mean', 'std']
         ds = [np.hstack(d) for d in ds]
         ds = np.vstack(ds).T
@@ -100,6 +110,5 @@ for subject in config.subjects:
         # # clean empty
         # idx = np.where(times != -1)[0]
         # ds = ds[idx]
-    
-        np.savetxt(file_ds, ds, fmt='%s', delimiter='\t')
 
+        np.savetxt(file_ds, ds, fmt='%s', delimiter='\t')
