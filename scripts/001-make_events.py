@@ -159,7 +159,7 @@ for subject in config.subjects:
         if 'n/a' in exps:
             exps.pop(exps.index('n/a'))
             raw = config.kit2fiff(subject=subject, exp=exps[0],
-                                  path=path, preload=False)
+                                  path=path, dig=False, preload=False)
         else:
             raw = config.kit2fiff(subject=subject, exp=exps[0],
                                   path=path, dig=False, preload=False)

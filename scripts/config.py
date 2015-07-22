@@ -20,7 +20,7 @@ drives = {'local': op.join(op.expanduser('~'), 'Experiments', 'E-MEG', 'data'),
                              'Experiments', 'E-MEG', 'output'),
          }
 # Parameters:
-redo = False
+redo = True
 results_dir = '/Users/teon/Dropbox/academic/Experiments/E-MEG/output/results/'
 reject = dict(mag=3e-12)
 baseline = (None, -.1)
@@ -28,7 +28,7 @@ img = 'png'
 filt = 'iir'
 banner = ('#' * 9 + '\n# %s #\n' + '#' * 9)
 # running from NY
-drive = 'local'
+drive = 'office'
 
 
 # Bad Channels
