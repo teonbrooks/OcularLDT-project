@@ -2,6 +2,8 @@ import mne
 import os.path as op
 from mne.report import Report
 import config
+import matplotlib.pyplot as plt
+from matplotlib import gridspec
 
 
 layout = mne.channels.read_layout('KIT-AD.lout')
@@ -23,7 +25,7 @@ for subject in config.subjects:
     fname_rep = op.join(config.results_dir, subject,
                         subject + '_%s_%s_filt_pca-report.html'
                         % (exp, filt))
-    fname_epo = op.join(path, subject + '_%s_xca_calm_%s_filt-epo.fif'
+    fname_epo = op.join(path, subject + '_%s_calm_%s_filt-epo.fif'
                         % (exp, filt))
     fname_proj = op.join(path, subject + '_%s_calm_%s_filt-proj.fif'
                          % (exp, filt))
@@ -32,8 +34,9 @@ for subject in config.subjects:
         rep = Report()
         # pca input is from fixation cross to three hashes
         # no language involved
-        epochs = mne.read_epochs(fname_epo)
+        epochs = mne.read_epochs(fname_epo)['prime']
         epochs.pick_types(meg=True, exclude='bads')
+        epochs.drop_bad_epochs(reject=reject)
 
         # plot evoked
         evoked = epochs.average()
@@ -62,14 +65,14 @@ for subject in config.subjects:
         # plot evoked - each proj
         for i, ev in enumerate(evokeds):
             pca = 'PC %d' % i
-            e = ev.plot(titles={'mag': 'PCA %d' % i}, show=False)
-            # fig, axes = plt.subplots(1, 2)
-            # e = ev.plot(titles={'mag': 'PC %d' % i}, show=False, axes=axes[0])
-            # p = mne.viz.plot_projs_topomap(ev.info['projs'], layout,
-            #                                show=False, axes=axes[1])
-            # rep.add_figs_to_section(fig, 'Evoked without PC %d' %i,
-            #                         pca, image_format=img)
-            rep.add_figs_to_section(e, 'Evoked without PC %d' %i,
+            fig = plt.figure(figsize=(12, 6))
+            gs = gridspec.GridSpec(1, 2, width_ratios=[3, 1])
+            ax0 = plt.subplot(gs[0])
+            ax1 = plt.subplot(gs[1])
+            e = ev.plot(titles={'mag': 'PC %d' % i}, show=False, axes=ax0)
+            p = mne.viz.plot_projs_topomap(ev.info['projs'], layout,
+                                           show=False, axes=ax1)
+            rep.add_figs_to_section(fig, 'Evoked without PC %d' %i,
                                     pca, image_format=img)
 
         # remove all
