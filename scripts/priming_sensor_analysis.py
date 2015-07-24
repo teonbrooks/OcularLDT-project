@@ -56,12 +56,11 @@ for subject in config.subjects:
     epochs = mne.read_epochs(fname_epo)
     epochs.drop_bad_epochs(reject=config.reject)
     epochs.decimate(decim)
-    epochs.info['bads'] = config.bads[subject]
     epochs.pick_types(meg=True, exclude='bads')
+    epochs.info['bads'] = config.bads[subject]
 
     # add/apply proj
     proj = mne.read_proj(fname_proj)
-    # proj = [proj[0]]
     epochs.add_proj(proj)
     epochs.apply_proj()
 
@@ -102,6 +101,7 @@ for subject in config.subjects:
     rep.save(fname_rep, open_browser=False, overwrite=True)
 
     print 'get ready for decoding ;)'
+    # time-resolve decoding
     # handle the window at the end
     first_samp = int(win * 1e3 / decim)
     last_samp = -first_samp
