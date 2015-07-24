@@ -14,7 +14,7 @@ for subject in config.subjects:
 
     # Define output
     file_ds = op.join(path, subject, 'edf',
-                      subject + '_OLDT_fixation_times.txt')
+                      subject + '_OLDT_region_times.txt')
     if not op.exists(file_ds) or redo:
         ds = [list(), list(), list(), list(), list(), list(), list(), list()]
         exps = [config.subjects[subject][0], config.subjects[subject][2]]
@@ -70,14 +70,14 @@ for subject in config.subjects:
             trialids = np.hstack(trialids)
             # coding trigger events
             semantics = np.array([(x & 2 ** 4) >> 4
-                                  for x in triggers], dtype=bool)
+                                  for x in triggers], dtype=int)
             nonword_pos = np.array([(x & (2 ** 3 + 2 ** 2)) >> 2
                                     for x in triggers])
             current_pos = np.array([(x & (2 ** 1 + 2 ** 0)) >> 0
                                     for x in triggers])
 
             # defining word vs. nonword
-            words = np.zeros(triggers.shape[0])
+            words = np.zeros(triggers.shape[0], int)
             idx = np.where(nonword_pos - current_pos != 0)[0]
             idy = np.where(current_pos < nonword_pos)[0]
             idy2 = np.where(nonword_pos == 0)[0]
@@ -106,9 +106,5 @@ for subject in config.subjects:
         ds = [np.hstack(d) for d in ds]
         ds = np.vstack(ds).T
         ds = np.vstack((header, ds))
-
-        # # clean empty
-        # idx = np.where(times != -1)[0]
-        # ds = ds[idx]
 
         np.savetxt(file_ds, ds, fmt='%s', delimiter='\t')
