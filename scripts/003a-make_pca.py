@@ -15,6 +15,7 @@ redo = config.redo
 reject = config.reject
 baseline = (-.2, -.1)
 tmin, tmax = -.2, .6
+ylim = dict(mag=[-200, 200])
 
 
 for subject in config.subjects:
@@ -34,28 +35,17 @@ for subject in config.subjects:
         rep = Report()
         # pca input is from fixation cross to three hashes
         # no language involved
-        epochs = mne.read_epochs(fname_epo)['prime']
+        epochs = mne.read_epochs(fname_epo, baseline=baseline)['prime']
         epochs.pick_types(meg=True, exclude='bads')
         epochs.drop_bad_epochs(reject=reject)
 
-        # plot evoked
-        evoked = epochs.average()
-        p = evoked.plot(titles={'mag': 'Original Evoked'}, show=False)
-        rep.add_figs_to_section(p, 'Original Evoked Response to Prime Word',
-                                'Summary', image_format=img)
-
         # compute the SSP
-        epochs.crop(-.1, .03, copy=False)
-        ev_proj = epochs.average()
+        evoked = epochs.average()
+        ev_proj = epochs.crop(-.1, .03, copy=True).average()
         projs = mne.compute_proj_evoked(ev_proj, n_mag=3)
 
         # apply projector individually
-        evokeds = list()
-        for proj in projs:
-            ev = evoked.copy()
-            ev.add_proj(proj, remove_existing=True)
-            ev.apply_proj()
-            evokeds.append(ev)
+        evokeds = [evoked.copy().add_proj(proj).apply_proj() for proj in projs]
 
         # plot PCA topos
         p = mne.viz.plot_projs_topomap(projs, layout, show=False)
@@ -67,21 +57,30 @@ for subject in config.subjects:
             pca = 'PC %d' % i
             fig = plt.figure(figsize=(12, 6))
             gs = gridspec.GridSpec(1, 2, width_ratios=[3, 1])
-            ax0 = plt.subplot(gs[0])
-            ax1 = plt.subplot(gs[1])
-            e = ev.plot(titles={'mag': 'PC %d' % i}, show=False, axes=ax0)
+            axes = [plt.subplot(gs[0]), plt.subplot(gs[1])]
+            e = ev.plot(titles={'mag': 'PC %d' % i}, show=False, axes=axes[0])
             p = mne.viz.plot_projs_topomap(ev.info['projs'], layout,
-                                           show=False, axes=ax1)
+                                           show=False, axes=axes[1])
             rep.add_figs_to_section(fig, 'Evoked without PC %d' %i,
                                     pca, image_format=img)
 
+        # plot before and after summary
+        fig = plt.figure(figsize=(18, 6))
+        gs = gridspec.GridSpec(1, 2)
+        axes = [plt.subplot(gs[0]), plt.subplot(gs[1])]
+        # plot evoked
+        evoked.plot(titles={'mag': 'Before: Original Evoked'}, show=False,
+                    axes=axes[0], ylim=ylim)
         # remove all
-        evoked.add_proj(projs).apply_proj()
-        e  = evoked.plot(titles={'mag': 'All PCs'}, show=False)
-        rep.add_figs_to_section(e, 'Evoked without all PCs',
-                                'All PCs', image_format=img)
+        evoked_proj = evoked.copy().add_proj(projs).apply_proj()
+        evoked_proj.plot(titles={'mag': 'After: Evoked - All PCs'}, show=False,
+                    axes=axes[1], ylim=ylim)
+        rep.add_figs_to_section(fig, 'Before and After PCA: Evoked Response '
+                                'to Prime Word', 'Summary', image_format=img)
 
         rep.save(fname_rep, overwrite=True, open_browser=False)
 
         # save projs
         mne.write_proj(fname_proj, projs)
+        # cleanup
+        del epochs
