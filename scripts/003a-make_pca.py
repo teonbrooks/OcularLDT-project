@@ -65,7 +65,7 @@ for subject in config.subjects:
                                     pca, image_format=img)
 
         # plot before and after summary
-        fig = plt.figure(figsize=(18, 6))
+        fig = plt.figure(figsize=(18, 10))
         gs = gridspec.GridSpec(1, 2)
         axes = [plt.subplot(gs[0]), plt.subplot(gs[1])]
         # plot evoked
