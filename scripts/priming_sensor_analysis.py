@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 import mne
 from mne.report import Report
 from mne.decoding import ConcatenateChannels
-from mne.stats.regression import linear_regression
+from mne.stats.regression import linear_regression, linear_regression_raw
 
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler, LabelEncoder
@@ -50,6 +50,12 @@ for subject in config.subjects:
     fname_epo = op.join(path, subject, 'mne',
                         '%s_%s_priming_calm_%s_filt-epo.fif'
                         % (subject, exp, filt))
+    fname_raw = op.join(path, subject, 'mne',
+                        '%s_%s_calm_%s_filt-raw.fif' % (subject, exp, filt))
+    fname_evt = op.join(path, subject, 'mne',
+                        subject + '_%s_priming_calm_%s_filt-epo.fif'
+                        % (exp, filt))
+    event_id = {'unprimed': 3, 'primed': 4}
     rep = Report()
 
     # loading epochs
@@ -99,6 +105,12 @@ for subject in config.subjects:
         plt.close()
     rep.add_slider_to_section(figs, times, 'Regression Analysis (-log10 p-val)')
     rep.save(fname_rep, open_browser=False, overwrite=True)
+
+    #rERF
+    raw = mne.io.read_raw_fif(fname_raw)
+    evts = mne.read_events(fname_evt)
+    rerf = linear_regression_raw(raw, evts, event_id, tmin=-.2, tmax=.6,
+                                 decim=5)
 
     print 'get ready for decoding ;)'
     # time-resolve decoding
