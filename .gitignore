@@ -13,3 +13,9 @@ input/stim/free_association/fa.egg-info/dependency_links.txt
 
 output/results
 *.html
+
+*.aux
+*.fdb_latexmk
+*.fls
+*.log
+*.synctex.gz
