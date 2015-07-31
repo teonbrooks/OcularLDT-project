@@ -19,3 +19,5 @@ output/results
 *.fls
 *.log
 *.synctex.gz
+
+scripts/.Rhistory
