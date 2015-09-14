@@ -34,7 +34,8 @@ def make_events(raw, subject, exp):
         idx = np.where(nonword_pos - current_pos != 0)[0]
         idy = np.where(current_pos < nonword_pos)[0]
         idy2 = np.where(nonword_pos == 0)[0]
-        idy = np.unique(np.hstack((idy, idy2)))
+        idy3 = np.where(current_pos != 0)[0]
+        idy = np.unique(np.hstack((idy, idy2, idy3)))
         n_idx = np.where(nonword_pos - current_pos == 0)[0]
         n_idy = np.where(nonword_pos != 0)[0]
 
@@ -65,43 +66,27 @@ def make_events(raw, subject, exp):
         raise ValueError('This function only works for '
                          'OLDTX or SENTX experiments, not %s.' % exp)
 
-    if exp.startswith('OLDT'):
-        # word vs nonword
-        words = deepcopy(evts)
-        words[words_idx, 2] = 2
-        words[nonwords_idx, 2] = 1
-        idx = np.hstack((nonwords_idx, words_idx))
-        words = words[idx]
-
-
     # semantic priming condition
-    priming = deepcopy(evts)
     target_words_idx = np.intersect1d(targets_idx, words_idx)  # target words
-
     primed_idx = np.intersect1d(semantic_idx, target_words_idx)
     unprimed_idx = np.setdiff1d(target_words_idx, primed_idx)
-    # unprimed_idx = np.intersect1d(unprimed_idx, words_idx)
-    priming[primed_idx, 2] = 4
-    priming[unprimed_idx, 2] = 3
-    idx = np.hstack((unprimed_idx, primed_idx))
-    priming = priming[idx]
 
-    # prime vs target; word positions on screen
-    pos = deepcopy(evts)
-    pos[targets_idx, 2] = 6
-    pos[primes_idx, 2] = 5
-    idx = np.hstack((primes_idx, targets_idx))
-    pos = pos[idx]
 
-    # fixation
-    fix = deepcopy(evts)
-    fix[fix_idx, 2] = 99
-    fix = fix[fix_idx]
-
-    # trial alignment
-    trials = deepcopy(evts)
+    # recode
+    evts[:, 2] = 0
+    # prime vs target
+    evts[primes_idx, 2] += 1
+    evts[targets_idx, 2] += 2
+    # semantic priming
+    evts[primed_idx, 2] += 4
+    if exp.startswith('OLDT'):
+        # word vs nonword
+        evts[nonwords_idx, 2] += 8
+    # alignment
     idx = np.hstack((fix_idx, primes_idx, targets_idx))
-    trials = trials[idx]
+    evts[idx, 2] = 64
+    # fixation
+    evts[fix_idx, 2] = 128
 
     # write the co-registration event file
     idx = zip(trials[:, 0], np.arange(trials.size))
@@ -130,10 +115,6 @@ def make_events(raw, subject, exp):
                 FILE.write(trial)
 
     # write the events
-    if exp.startswith('OLDT'):
-        evts = np.vstack((words, priming, pos, fix, alignment))
-    else:
-        evts = np.vstack((priming, pos, fix, alignment))
     idx = zip(evts[:, 0], np.arange(evts.size))
     idx = list(zip(*sorted(idx))[-1])
     evts = evts[idx]
@@ -144,10 +125,6 @@ def make_events(raw, subject, exp):
     # coreg event list
     coreg_evts = np.array(coreg_evts)
     mne.write_events(coreg_fname, coreg_evts)
-
-# key
-# 1: nonword, 2: word, 3: unprimed, 4: primed, 5: prime, 6: target,
-# 50: alignment, 99: fixation
 
 
 for subject in config.subjects:
