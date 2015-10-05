@@ -16,11 +16,8 @@ event_id = {'word/prime/unprimed': 1,
             'word/target/unprimed': 2,
             'word/prime/primed': 5,
             'word/target/primed': 6,
-            'nonword/prime/unprimed': 9,
-            'nonword/prime/primed': 10,
-            'nonword/target/unprimed': 13,
-            'nonword/target/primed': 14,
-            'alignment': 64,
+            'nonword/prime': 9,
+            'nonword/target': 10,
             'fixation': 128}
 
 
@@ -50,7 +47,7 @@ for subject in config.subjects:
                                   path=path, dig=False, preload=False)
             mne.concatenate_raws([raw, raw2])
         raw.info['bads'] = config.bads[subject]
-        raw.preload_data()
+        raw.load_data()
         if filt == 'fft':
             raw.filter(.1, 40, method=filt, l_trans_bandwidth=.05)
         else:
@@ -59,5 +56,6 @@ for subject in config.subjects:
         # because of file size
         # priming epochs
         epochs = mne.Epochs(raw, evts, event_id, tmin=-.2, tmax=.6,
-                            baseline=baseline, reject=reject)
+                            baseline=baseline, reject=reject, verbose=False)
         epochs.save(fname_epo)
+        del raw, epochs

@@ -11,14 +11,8 @@ path = config.drive
 def make_events(raw, subject, exp):
     # E-MEG alignment
     evts = mne.find_stim_steps(raw, merge=-2)
-    alignment = deepcopy(evts)
-    idx = np.nonzero(alignment[:, 2])[0]
-    alignment = alignment[idx]
-    current_pos = np.array([(x & (2 ** 1 + 2 ** 0)) >> 0 for x in
-                            alignment[:, 2]])
-    idx = np.where(current_pos == 1)[0]
-    alignment[idx, 2] = 50
-    alignment = alignment[idx]
+    # trial alignment
+    trials = deepcopy(evts)
 
     if exp.startswith('OLDT'):
         expt = np.array([(x & 2 ** 5) >> 5 for x in evts[:, 2]], dtype=bool)
@@ -39,12 +33,16 @@ def make_events(raw, subject, exp):
         n_idx = np.where(nonword_pos - current_pos == 0)[0]
         n_idy = np.where(nonword_pos != 0)[0]
 
-        semantic_idx = np.where(semantic)[0]
+        # nonwords vs words
         words_idx = np.intersect1d(idx, idy)
         nonwords_idx = np.intersect1d(n_idx, n_idy)
+        # fixation
         fix_idx = np.where(current_pos == 0)[0]
+        # prime vs target
         primes_idx = np.where(current_pos == 1)[0]
         targets_idx = np.where(current_pos == 2)[0]
+        # semantic
+        semantic_idx = np.where(semantic)[0]
 
     elif exp.startswith('SENT'):
         expt = np.array([(x & 2 ** 4) >> 4 for x in evts[:, 2]], dtype=bool)
@@ -67,28 +65,59 @@ def make_events(raw, subject, exp):
                          'OLDTX or SENTX experiments, not %s.' % exp)
 
     # semantic priming condition
-    target_words_idx = np.intersect1d(targets_idx, words_idx)  # target words
-    primed_idx = np.intersect1d(semantic_idx, target_words_idx)
-    unprimed_idx = np.setdiff1d(target_words_idx, primed_idx)
+    # target_words_idx = np.intersect1d(targets_idx, words_idx)  # target words
+    # primed_idx = np.intersect1d(semantic_idx, target_words_idx)
+    # unprimed_idx = np.setdiff1d(target_words_idx, primed_idx)
 
+    """
+    Recoding Events
+    ---------------
+    To deal with the way MNE deals with events with multiple tagging, we
+    devised a way to handle this by repacking tag info in a binary fashion.
+    Maybe next time I will code my events just directly as such
+    (consult schematic in lab notebook).
 
-    # recode
+    Prime += 1
+    Target += 2
+    Priming += 4
+    Nonword += 8
+
+    This recoding efficiency allows for Hierarchial Event Descriptors
+    (HED tags).
+    """
     evts[:, 2] = 0
     # prime vs target
     evts[primes_idx, 2] += 1
     evts[targets_idx, 2] += 2
     # semantic priming
-    evts[primed_idx, 2] += 4
+    evts[semantic_idx, 2] += 4
     if exp.startswith('OLDT'):
         # word vs nonword
         evts[nonwords_idx, 2] += 8
-    # alignment
-    idx = np.hstack((fix_idx, primes_idx, targets_idx))
-    evts[idx, 2] = 64
     # fixation
     evts[fix_idx, 2] = 128
 
-    # write the co-registration event file
+    # write the events
+    idx = zip(evts[:, 0], np.arange(evts.size))
+    idx = list(zip(*sorted(idx))[-1])
+    evts = evts[idx]
+    path = op.dirname(raw.info['filename'])
+    # master event list
+    evts_fname = op.join(path, '..', 'mne', '%s_%s-eve.txt') % (subject, exp)
+    mne.write_events(evts_fname, evts)
+
+    """
+    Writing the co-registration event file
+    --------------------------------------
+    The MEG and EM files must be aligned to have a proper decoding.
+    This arranges the triggers in events of interests: fixation, prime, target.
+    These events are consistent and identifable in both data types.
+
+    They are selected and rearranged according to timestamps. This allows for
+    ease of matching later on.
+    """
+    idx = np.hstack((fix_idx, primes_idx, targets_idx))
+    trials = trials[idx]
     idx = zip(trials[:, 0], np.arange(trials.size))
     idx = list(zip(*sorted(idx))[-1])
     trials = trials[idx]
@@ -113,25 +142,16 @@ def make_events(raw, subject, exp):
                 trial = [ii] + list(trial)
                 trial = '\t'.join(map(str, trial)) + '\n'
                 FILE.write(trial)
-
-    # write the events
-    idx = zip(evts[:, 0], np.arange(evts.size))
-    idx = list(zip(*sorted(idx))[-1])
-    evts = evts[idx]
-    path = op.dirname(raw.info['filename'])
-    # master event list
-    evts_fname = op.join(path, '..', 'mne', '%s_%s-eve.txt') % (subject, exp)
-    mne.write_events(evts_fname, evts)
     # coreg event list
     coreg_evts = np.array(coreg_evts)
     mne.write_events(coreg_fname, coreg_evts)
-
 
 for subject in config.subjects:
     print config.banner % subject
 
     exps = [config.subjects[subject][0], config.subjects[subject][2]]
     evt_file = op.join(path, subject, 'mne', subject + '_OLDT-eve.txt')
+
     if not op.exists(evt_file) or redo:
         if 'n/a' in exps:
             exps.pop(exps.index('n/a'))
