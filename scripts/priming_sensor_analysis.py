@@ -48,7 +48,7 @@ for subject in config.subjects:
     fname_proj = op.join(path, subject, 'mne', '%s_%s_calm_%s_filt-proj.fif'
                          % (subject, exp, filt))
     fname_epo = op.join(path, subject, 'mne',
-                        '%s_%s_priming_calm_%s_filt-epo.fif'
+                        '%s_%s_calm_%s_filt-epo.fif'
                         % (subject, exp, filt))
     fname_raw = op.join(path, subject, 'mne',
                         '%s_%s_calm_%s_filt-raw.fif' % (subject, exp, filt))
@@ -60,9 +60,9 @@ for subject in config.subjects:
 
     # loading epochs
     epochs = mne.read_epochs(fname_epo)
+    epochs.crop(-.1, .7)
     epochs.drop_bad_epochs(reject=config.reject)
     epochs.decimate(decim)
-    epochs.pick_types(meg=True, exclude='bads')
     epochs.info['bads'] = config.bads[subject]
 
     # add/apply proj
@@ -70,7 +70,11 @@ for subject in config.subjects:
     epochs.add_proj(proj)
     epochs.apply_proj()
 
-    epochs.equalize_event_counts(['unprimed', 'primed'], copy=False)
+    # limit channels to good
+    epochs.pick_types(meg=True, exclude='bads')
+
+    # # currently disabled because of the HED
+    # epochs.equalize_event_counts(['unprimed', 'primed'], copy=False)
     # plotting grand average
     p = epochs.average().plot(show=False)
     comment = ("This is a grand average over all the target epochs after "
@@ -99,18 +103,18 @@ for subject in config.subjects:
     interval = int(plt_interval * 1e3 / decim)   # plot every 5ms
     times = evoked.times[::interval]
     figs = list()
-    for time in times:
-        figs.append(s.plot_topomap(time, vmin=0, vmax=3, unit='',
-                                   scale=1, cmap='Reds', show=False))
-        plt.close()
-    rep.add_slider_to_section(figs, times, 'Regression Analysis (-log10 p-val)')
-    rep.save(fname_rep, open_browser=False, overwrite=True)
+    # for time in times:
+    #     figs.append(s.plot_topomap(time, vmin=0, vmax=3, unit='',
+    #                                scale=1, cmap='Reds', show=False))
+    #     plt.close()
+    # rep.add_slider_to_section(figs, times, 'Regression Analysis (-log10 p-val)')
+    # rep.save(fname_rep, open_browser=False, overwrite=True)
 
-    #rERF
-    raw = mne.io.read_raw_fif(fname_raw)
-    evts = mne.read_events(fname_evt)
-    rerf = linear_regression_raw(raw, evts, event_id, tmin=-.2, tmax=.6,
-                                 decim=5)
+    # #rERF
+    # raw = mne.io.read_raw_fif(fname_raw)
+    # evts = mne.read_events(fname_evt)
+    # rerf = linear_regression_raw(raw, evts, event_id, tmin=-.2, tmax=.6,
+    #                              decim=5)
 
     print 'get ready for decoding ;)'
     # time-resolve decoding
@@ -150,21 +154,21 @@ for subject in config.subjects:
         scores_t = cross_val_score(clf, Xt, y, cv=cv, n_jobs=-1)
         scores[t] = scores_t.mean()
         std_scores[t] = scores_t.std()
-        # Run ROC/AUC calculation
-        auc_scores_t = []
-
-        for i, (train, test) in enumerate(cv):
-            probas_ = clf.fit(Xt[train], y[train]).predict_proba(Xt[test])
-            auc_scores_t.append(roc_auc_score(y[test], probas_[:, 1]))
-        auc_scores[t] = np.array(auc_scores_t).mean()
+        # # Run ROC/AUC calculation
+        # auc_scores_t = []
+        #
+        # for i, (train, test) in enumerate(cv):
+        #     probas_ = clf.fit(Xt[train], y[train]).predict_proba(Xt[test])
+        #     auc_scores_t.append(roc_auc_score(y[test], probas_[:, 1]))
+        # auc_scores[t] = np.array(auc_scores_t).mean()
 
     scores *= 100  # make it percentage
     std_scores *= 100
-    auc_scores *= 100
+    # auc_scores *= 100
 
     # for group average
     group_scores.append(scores)
-    group_auc_scores.append(auc_scores)
+    # group_auc_scores.append(auc_scores)
 
     # CV classification score
     plt.close('all')
@@ -178,18 +182,18 @@ for subject in config.subjects:
                      color='b', alpha=0.5)
     plt.xlabel('Times (ms)')
     plt.ylabel('CV classification score (% correct)')
-    plt.ylim([30, 100])
+    plt.ylim([30, 80])
     plt.title('Sensor space decoding')
-    # AUC score
-    plt.close('all')
-    auc_fig = plt.figure()
-    plt.plot(times, auc_scores, label="Classif. score")
-    plt.axhline(50, color='k', linestyle='--', label="Chance level")
-    plt.axvline(0, color='r', label='stim onset')
-    plt.xlabel('Times (ms)')
-    plt.ylabel('AUC')
-    plt.ylim([30, 100])
-    plt.title('Sensor space Area Under ROC')
+    # # AUC score
+    # plt.close('all')
+    # auc_fig = plt.figure()
+    # plt.plot(times, auc_scores, label="Classif. score")
+    # plt.axhline(50, color='k', linestyle='--', label="Chance level")
+    # plt.axvline(0, color='r', label='stim onset')
+    # plt.xlabel('Times (ms)')
+    # plt.ylabel('AUC')
+    # plt.ylim([30, 100])
+    # plt.title('Sensor space Area Under ROC')
 
     # decoding fig
     rep.add_figs_to_section(fig, 'Decoding Score on Priming',
@@ -197,12 +201,12 @@ for subject in config.subjects:
     group_rep.add_figs_to_section(fig, '%s: Decoding Score on Priming'
                                 % subject, 'Subject Summary',
                                 image_format=img)
-    # auc fig
-    rep.add_figs_to_section(auc_fig, 'AUC Score on Priming',
-                          'Subject Summary', image_format=img)
-    group_rep.add_figs_to_section(auc_fig, '%s: AUC Score on Priming'
-                                % subject, 'Subject Summary',
-                                image_format=img)
+    # # auc fig
+    # rep.add_figs_to_section(auc_fig, 'AUC Score on Priming',
+    #                       'Subject Summary', image_format=img)
+    # group_rep.add_figs_to_section(auc_fig, '%s: AUC Score on Priming'
+    #                             % subject, 'Subject Summary',
+    #                             image_format=img)
     rep.save(fname_rep, open_browser=False, overwrite=True)
 
 # group average classification score
@@ -220,29 +224,29 @@ plt.fill_between(times, hyp_limits[0], y2=hyp_limits[1],
                  color='b', alpha=0.5)
 plt.xlabel('Times (ms)')
 plt.ylabel('CV classification score (% correct)')
-plt.ylim([30, 100])
+plt.ylim([30, 80])
 plt.title('Group Average Sensor space decoding')
 group_rep.add_figs_to_section(fig, 'Group Average Decoding Score on Priming',
                             'Group Summary', image_format=img)
 
-# group average AUC score
-group_auc_scores = np.asarray(group_auc_scores).mean(axis=0)
-group_std_auc_scores = np.asarray(group_auc_scores).std(axis=0)
-plt.close('all')
-fig = plt.figure()
-plt.plot(times, group_auc_scores, label="Area Under Curve")
-plt.axhline(50, color='k', linestyle='--', label="Chance level")
-plt.axvline(0, color='r', label='stim onset')
-plt.legend()
-hyp_limits = (group_auc_scores - group_std_auc_scores,
-              group_auc_scores + group_std_auc_scores)
-plt.fill_between(times, hyp_limits[0], y2=hyp_limits[1],
-                 color='b', alpha=0.5)
-plt.xlabel('Times (ms)')
-plt.ylabel('AUC')
-plt.ylim([30, 100])
-plt.title('Group Average Sensor space AUC')
-group_rep.add_figs_to_section(fig, 'Group Average AUC on Priming',
-                            'Group Summary', image_format=img)
+# # group average AUC score
+# group_auc_scores = np.asarray(group_auc_scores).mean(axis=0)
+# group_std_auc_scores = np.asarray(group_auc_scores).std(axis=0)
+# plt.close('all')
+# fig = plt.figure()
+# plt.plot(times, group_auc_scores, label="Area Under Curve")
+# plt.axhline(50, color='k', linestyle='--', label="Chance level")
+# plt.axvline(0, color='r', label='stim onset')
+# plt.legend()
+# hyp_limits = (group_auc_scores - group_std_auc_scores,
+#               group_auc_scores + group_std_auc_scores)
+# plt.fill_between(times, hyp_limits[0], y2=hyp_limits[1],
+#                  color='b', alpha=0.5)
+# plt.xlabel('Times (ms)')
+# plt.ylabel('AUC')
+# plt.ylim([30, 100])
+# plt.title('Group Average Sensor space AUC')
+# group_rep.add_figs_to_section(fig, 'Group Average AUC on Priming',
+#                             'Group Summary', image_format=img)
 
 group_rep.save(fname_group, open_browser=False, overwrite=True)

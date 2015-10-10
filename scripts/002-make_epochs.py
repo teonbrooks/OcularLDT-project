@@ -55,7 +55,7 @@ for subject in config.subjects:
 
         # because of file size
         # priming epochs
-        epochs = mne.Epochs(raw, evts, event_id, tmin=-.2, tmax=.6,
+        epochs = mne.Epochs(raw, evts, event_id, tmin=-.5, tmax=1,
                             baseline=baseline, reject=reject, verbose=False)
         epochs.save(fname_epo)
         del raw, epochs
