@@ -11,6 +11,23 @@ exp = 'OLDT'
 redo = config.redo
 baseline = None
 
+"""
+Recoding Events
+---------------
+To deal with the way MNE deals with events with multiple tagging, we
+devised a way to handle this by repacking tag info in a binary fashion.
+Maybe next time I will code my events just directly as such
+(consult schematic in lab notebook).
+
+Prime += 1
+Target += 2
+Priming += 4
+Nonword += 8
+
+This recoding efficiency allows for Hierarchial Event Descriptors
+(HED tags).
+"""
+
 
 event_id = {'word/prime/unprimed': 1,
             'word/target/unprimed': 2,
@@ -53,8 +70,6 @@ for subject in config.subjects:
         else:
             raw.filter(1, 40, method=filt)
 
-        # because of file size
-        # priming epochs
         epochs = mne.Epochs(raw, evts, event_id, tmin=-.5, tmax=1,
                             baseline=baseline, reject=reject, verbose=False)
         epochs.save(fname_epo)
