@@ -28,7 +28,7 @@ img = 'png'
 filt = 'iir'
 banner = ('#' * 9 + '\n# %s #\n' + '#' * 9)
 # running from NY
-drive = 'google_drive'
+drive = 'office'
 
 
 # Bad Channels

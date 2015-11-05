@@ -45,11 +45,8 @@ for subject in config.subjects:
 
             # extracting fixation times from the edf file.
             raw = pp.RawEDF(file_raw)
-            ias = interest_areas.InterestAreas(raw, ia_coords, ia_words)
-            times = list()
-            triggers = list()
-            trialids = list()
-            prime_times = interest_areas.get_gaze_duration(ias['prime'])
+            ias = interest_areas.Reading(raw, ia_coords, ia_words)
+            prime_times = ias.get_first_fix(ia=1)
             prime_times = interest_areas.get_gaze_duration(ias['target'])
             # first for the primes
             pat = '!V TRIAL_VAR TIME_PRIME'
