@@ -1,6 +1,6 @@
 import os.path as op
 import numpy as np
-import pandas
+from pandas import read_table
 import config
 
 
@@ -19,16 +19,17 @@ for subject in config.subjects:
                        % (subject, exp))
 
     if not op.exists(fname_dm) or redo:
-        meg_ds = pandas.read_table(fname_meg, sep='\t')
-        em_ds = pandas.read_table(fname_em, sep='\t')
+        meg_ds = read_table(fname_meg, sep='\t')
+        em_ds = read_table(fname_em, sep=',')
+        em_ds = em_ds[em_ds['ia'] == 'target']
 
-        lookup = {key: idx for key, idx in zip(zip(em_ds['trialid'],
+        lookup = {key: idx for key, idx in zip(zip(em_ds['trial'],
                   em_ds['trigger']), range(len(em_ds['trigger'])))}
-        # coreg = em_ds.loc[meg_ds['trialid']]
-        interest = zip(meg_ds['trialid'], meg_ds['trigger'])
+
+        interest = zip(meg_ds['trialid'] - 1, meg_ds['trigger'])
         durations = list()
         for ii in interest:
-            durations.append(em_ds.irow(lookup[ii])['duration'])
+            durations.append(em_ds.irow(lookup[ii])['ffd'])
         intercepts = np.ones(len(durations))
 
         design_matrix = np.vstack((intercepts, durations)).T

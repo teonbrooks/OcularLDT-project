@@ -132,16 +132,18 @@ def make_events(raw, subject, exp):
                           % (subject, exp))
     coreg_evts = []
     with open(trial_fname, 'w') as FILE:
-        FILE.write('trialid\ti_start\tprev_trigger\ttrigger\n')
-        ii = 0
+        FILE.write('trial\ti_start\tprev_trigger\ttrigger\n')
+        ii = -1
         for trial in trials:
-            if trial[1] == 0:
+            # at the start of the Experiment, the trigger reset to zero.
+            if trial[1] == 255:
+                continue
+            elif trial[1] == 0:
                 ii += 1
-            else:
-                coreg_evts.append(trial)
-                trial = [ii] + list(trial)
-                trial = '\t'.join(map(str, trial)) + '\n'
-                FILE.write(trial)
+            coreg_evts.append(trial)
+            trial = [ii] + list(trial)
+            trial = '\t'.join(map(str, trial)) + '\n'
+            FILE.write(trial)
     # coreg event list
     coreg_evts = np.array(coreg_evts)
     mne.write_events(coreg_fname, coreg_evts)
