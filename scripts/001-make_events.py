@@ -142,7 +142,7 @@ def make_events(raw, subject, exp):
                 ii += 1
             coreg_evts.append(trial)
             trial = [ii] + list(trial)
-            trial = '\t'.join(map(str, trial)) + '\n'
+            trial = ','.join(map(str, trial)) + '\n'
             FILE.write(trial)
     # coreg event list
     coreg_evts = np.array(coreg_evts)

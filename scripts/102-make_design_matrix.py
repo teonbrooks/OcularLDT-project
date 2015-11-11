@@ -26,7 +26,7 @@ for subject in config.subjects:
         lookup = {key: idx for key, idx in zip(zip(em_ds['trial'],
                   em_ds['trigger']), range(len(em_ds['trigger'])))}
 
-        interest = zip(meg_ds['trialid'] - 1, meg_ds['trigger'])
+        interest = zip(meg_ds['trial'], meg_ds['trigger'])
         durations = list()
         for ii in interest:
             durations.append(em_ds.irow(lookup[ii])['ffd'])

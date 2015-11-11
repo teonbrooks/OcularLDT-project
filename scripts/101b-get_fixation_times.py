@@ -42,18 +42,18 @@ for subject in config.subjects:
         trials = range(data.shape[0])
         semantics = data[:, 3] == '1'
         semantics = dict(zip(trials, semantics))
-        words_idx = data[:, 4].astype(int) > 2
-        words_idy = data[:, 4].astype(int) == 0
-        words = words_idx + words_idy
-        words = dict(zip(trials, words))
+        # words_idx = data[:, 4].astype(int) > 2
+        # words_idy = data[:, 4].astype(int) == 0
+        # words = words_idx + words_idy
+        words = dict(zip(trials, data[:, 4].astype(int)))
 
-        for ia, ii in [('prime', 1), ('target', 2)]:
+        for ia, ii in [('prime', 1), ('target', 2), ('post', 3)]:
             times = ias.get_gaze_duration(ia=ii)
 
             # coding semantic priming
             sem_dict = [semantics[x] for x in times['trial']]
             # defining word vs. nonword
-            word_dict = [words[x] for x in times['trial']]
+            word_dict = [words[x] != ii for x in times['trial']]
             # extracting triggering info from datasource file.
             # prime trigger is index 8, target trigger is index 10
             triggers = list()
@@ -61,8 +61,10 @@ for subject in config.subjects:
                 trial = time['trial'].astype(int)
                 if ia == 'prime':
                     triggers.append(data[trial, 8])
-                else:
+                elif ia == 'target':
                     triggers.append(data[trial, 10])
+                else:
+                    triggers.append(data[trial, 12])
 
             # dummy label
             ia_label = [ia] * len(times)

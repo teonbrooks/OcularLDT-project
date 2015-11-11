@@ -28,7 +28,7 @@ img = 'png'
 filt = 'iir'
 banner = ('#' * 9 + '\n# %s #\n' + '#' * 9)
 # running from NY
-drive = 'office'
+drive = 'home'
 
 
 # Bad Channels
@@ -53,7 +53,7 @@ subjects = {'A0023': ['OLDT2', 'SENT2', 'OLDT1'],
             'A0130': ['OLDT2', 'SENT2', 'OLDT1'],
             'A0134': ['OLDT2', 'SENT2', 'OLDT1'],
             'A0136': ['OLDT1', 'SENT1', 'OLDT2'],
-            # 'A0148': ['OLDT1', 'SENT1', 'n/a'], # OLDT1 problem
+            'A0148': ['OLDT1', 'SENT1', 'n/a'],
             'A0150': ['OLDT2', 'SENT2', 'OLDT1'],
             'A0155': ['OLDT2', 'SENT2', 'OLDT1'],
             'A0159': ['OLDT1', 'SENT1', 'OLDT2'],
