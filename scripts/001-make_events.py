@@ -1,3 +1,15 @@
+"""
+Creating Event files
+
+EM data are in a trial structure while MEG data are continuous. In order to
+begin looking at these two data streams, we need to co-register in a common
+reference frame.
+Here, we're creating two files for all of the MEG analyses:
+
+01. An event file with all the fixation crosses, primes, and targets.
+02. A co-registering event file to match EM data for fix, prime, target regions.
+"""
+
 import os.path as op
 from copy import deepcopy
 import numpy as np
@@ -64,11 +76,6 @@ def make_events(raw, subject, exp):
         raise ValueError('This function only works for '
                          'OLDTX or SENTX experiments, not %s.' % exp)
 
-    # semantic priming condition
-    # target_words_idx = np.intersect1d(targets_idx, words_idx)  # target words
-    # primed_idx = np.intersect1d(semantic_idx, target_words_idx)
-    # unprimed_idx = np.setdiff1d(target_words_idx, primed_idx)
-
     """
     Recoding Events
     ---------------
@@ -85,68 +92,66 @@ def make_events(raw, subject, exp):
     This recoding efficiency allows for Hierarchial Event Descriptors
     (HED tags).
     """
-    evts[:, 2] = 0
+    recodeds = np.zeros((evts.shape[0], 1), int)
+    evts = np.hstack((evts, recodeds))
     # prime vs target
-    evts[primes_idx, 2] += 1
-    evts[targets_idx, 2] += 2
+    evts[primes_idx, -1] += 1
+    evts[targets_idx, -1] += 2
     # semantic priming
-    evts[semantic_idx, 2] += 4
+    evts[semantic_idx, -1] += 4
     if exp.startswith('OLDT'):
         # word vs nonword
-        evts[nonwords_idx, 2] += 8
+        evts[nonwords_idx, -1] += 8
     # fixation
-    evts[fix_idx, 2] = 128
-
-    # write the events
-    idx = zip(evts[:, 0], np.arange(evts.size))
-    idx = list(zip(*sorted(idx))[-1])
-    evts = evts[idx]
-    path = op.dirname(raw.info['filename'])
-    # master event list
-    evts_fname = op.join(path, '..', 'mne', '%s_%s-eve.txt') % (subject, exp)
-    mne.write_events(evts_fname, evts)
+    evts[fix_idx, -1] = 128
 
     """
     Writing the co-registration event file
     --------------------------------------
     The MEG and EM files must be aligned to have a proper decoding.
-    This arranges the triggers in events of interests: fixation, prime, target.
+    This arranges the triggers in events of interests: prime, target.
     These events are consistent and identifable in both data types.
 
     They are selected and rearranged according to timestamps. This allows for
     ease of matching later on.
+
     """
+
     idx = np.hstack((fix_idx, primes_idx, targets_idx))
-    trials = trials[idx]
-    idx = zip(trials[:, 0], np.arange(trials.size))
+    evts = evts[idx]
+    idx = zip(evts[:, 0], np.arange(evts.size))
     idx = list(zip(*sorted(idx))[-1])
-    trials = trials[idx]
+    evts = evts[idx]
     path = op.dirname(raw.info['filename'])
-    mne.write_events(op.join(path, '..', 'mne', '%s_%s_trials-eve.txt')
-                     % (subject, exp), trials)
 
     # write the co-registration file
-    trial_fname = op.join(path, '..', 'mne', '%s_%s_trials.txt'
+    fname_trial = op.join(path, '..', 'mne', '%s_%s_meg_trial_struct.txt'
                           % (subject, exp))
-    coreg_fname = op.join(path, '..', 'mne', '%s_%s_coreg-eve.txt'
+    fname_coreg = op.join(path, '..', 'mne', '%s_%s-eve.txt'
                           % (subject, exp))
-    coreg_evts = []
-    with open(trial_fname, 'w') as FILE:
-        FILE.write('trial\ti_start\tprev_trigger\ttrigger\n')
+    coreg_evts = list()
+
+    with open(fname_trial, 'w') as FILE:
+        header = ['trial', 'i_start', 'trigger', 'recoded_trigger']
+        FILE.write(','.join(header) + '\n')
         ii = -1
-        for trial in trials:
+        for evt in evts:
+            i_start, _, trig, new = evt
             # at the start of the Experiment, the trigger reset to zero.
-            if trial[1] == 255:
+            if evt[1] == 255:
                 continue
-            elif trial[1] == 0:
+            elif evt[1] == 0:
                 ii += 1
-            coreg_evts.append(trial)
-            trial = [ii] + list(trial)
+            coreg_evts.append(evt)
+            trial = [ii, i_start, trig, new]
             trial = ','.join(map(str, trial)) + '\n'
             FILE.write(trial)
     # coreg event list
     coreg_evts = np.array(coreg_evts)
-    mne.write_events(coreg_fname, coreg_evts)
+    evts = coreg_evts[:, [0, -1]]
+    starts = np.zeros(len(evts), int)
+    evts = np.vstack((evts[:, 0], starts, evts[:, -1])).T
+    mne.write_events(fname_coreg, evts)
 
 for subject in config.subjects:
     print config.banner % subject
