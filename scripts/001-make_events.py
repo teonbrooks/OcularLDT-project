@@ -27,8 +27,8 @@ def make_events(raw, subject, exp):
     trials = deepcopy(evts)
 
     if exp.startswith('OLDT'):
-        expt = np.array([(x & 2 ** 5) >> 5 for x in evts[:, 2]], dtype=bool)
-        evts = evts[expt]
+        # expt = np.array([(x & 2 ** 5) >> 5 for x in evts[:, 2]], dtype=bool)
+        # evts = evts[expt]
         idx = np.nonzero(evts[:, 2])[0]
         evts = evts[idx]
         triggers = evts[:, 2]

@@ -25,6 +25,7 @@ for subject in config.subjects:
     if 'n/a' in exps:
         exps.pop(exps.index('n/a'))
     subject_ds = list()
+    n_trials = 0
     for exp in exps:
         # Define filenames
         fname_trial = glob(op.join(path, subject, 'edf',
@@ -39,7 +40,7 @@ for subject in config.subjects:
         ias = reading.Reading(fname_raw, fname_ia, ia_words)
 
         # trial properties
-        trials = range(data.shape[0])
+        trials = np.arange(data.shape[0])
         semantics = data[:, 3] == '1'
         semantics = dict(zip(trials, semantics))
         # words_idx = data[:, 4].astype(int) > 2
@@ -77,7 +78,10 @@ for subject in config.subjects:
             ds.insert(0, times)
             ds = concat(ds, axis=1)
             ds.columns = columns
+            # for concatenation to work properly
+            ds.trial += n_trials
             subject_ds.append(ds)
+        n_trials = len(data)
 
     subject_ds = concat(subject_ds)
     subject_ds.to_csv(fname_ds)

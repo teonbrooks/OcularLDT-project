@@ -31,7 +31,7 @@ for subject in config.subjects:
                                   path=path, dig=False, preload=False)
             mne.concatenate_raws([raw, raw2])
         raw.info['bads'] = config.bads[subject]
-        raw.preload_data()
+        raw.load_data()
         if filt == 'fft':
             raw.filter(.1, 40, method=filt, l_trans_bandwidth=.05)
         else:
