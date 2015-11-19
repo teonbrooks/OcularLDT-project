@@ -20,15 +20,22 @@ drives = {'local': op.join(op.expanduser('~'), 'Experiments', 'E-MEG', 'data'),
                              'Experiments', 'E-MEG', 'output'),
          }
 # Parameters:
-redo = True
+redo = False
 results_dir = '/Users/teon/Dropbox/academic/Experiments/E-MEG/output/results/'
 reject = dict(mag=3e-12)
 baseline = (None, -.1)
 img = 'png'
 filt = 'iir'
 banner = ('#' * 9 + '\n# %s #\n' + '#' * 9)
-# running from NY
+# determine which drive you're working from
 drive = 'home'
+event_id = {'word/prime/unprimed': 1,
+            'word/target/unprimed': 2,
+            'word/prime/primed': 5,
+            'word/target/primed': 6,
+            'nonword/prime': 9,
+            'nonword/target': 10,
+            'fixation': 128}
 
 
 # Bad Channels
@@ -58,7 +65,7 @@ subjects = {'A0023': ['OLDT2', 'SENT2', 'OLDT1'],
             'A0155': ['OLDT2', 'SENT2', 'OLDT1'],
             'A0159': ['OLDT1', 'SENT1', 'OLDT2'],
             'A0161': ['n/a', 'SENT1', 'OLDT2'],
-            # 'A0163': ['OLDT2', 'SENT2', 'OLDT1'],
+            'A0163': ['OLDT2', 'SENT2', 'OLDT1'],
             'A0164': ['OLDT2', 'SENT2', 'OLDT1'],
             }
 

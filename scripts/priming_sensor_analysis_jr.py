@@ -28,7 +28,7 @@ analysis = 'priming_sensor_analysis'
 random_state = 42
 decim = 5
 # decoding parameters
-tstart, tstop = -.2, .7
+tstart, tstop = -.2, 1
 # smoothing window
 # length = 5. * decim * 1e-3
 # step = 5. * decim * 1e-3
