@@ -32,9 +32,10 @@ for subject in config.subjects:
             mne.concatenate_raws([raw, raw2])
         raw.info['bads'] = config.bads[subject]
         raw.load_data()
+        raw.interpolate_bads()
         if filt == 'fft':
             raw.filter(.1, 40, method=filt, l_trans_bandwidth=.05)
         else:
             raw.filter(1, 40, method=filt)
 
-        raw.save(fname_raw)
+        raw.save(fname_raw, overwrite=redo)

@@ -13,11 +13,15 @@ img = config.img
 drive = config.drive
 exp = 'OLDT'
 filt = config.filt
-redo = config.redo
+redo = True
 reject = config.reject
 baseline = (-.2, -.1)
 tmin, tmax = -.5, 1
 ylim = dict(mag=[-200, 200])
+event_id = {'word/prime/unprimed': 1,
+            'word/prime/primed': 5,
+            'nonword/prime': 9,
+           }
 
 fname_rep_group = op.join(config.results_dir, 'group',
                           'group_%s_%s_filt_pca-report.html' % (exp, filt))
@@ -30,8 +34,9 @@ for subject in config.subjects:
     fname_rep = op.join(config.results_dir, subject,
                         subject + '_%s_calm_%s_filt_pca-report.html'
                         % (exp, filt))
-    fname_epo = op.join(path, subject + '_%s_calm_%s_filt-epo.fif'
+    fname_raw = op.join(path, subject + '_%s_calm_%s_filt-raw.fif'
                         % (exp, filt))
+    fname_evts = op.join(path, subject + '_{}-eve.txt'.format(exp))
     fname_proj = op.join(path, subject + '_%s_calm_%s_filt-proj.fif'
                          % (exp, filt))
 
@@ -39,14 +44,14 @@ for subject in config.subjects:
         rep = Report()
         # pca input is from fixation cross to three hashes
         # no language involved
-        epochs = mne.read_epochs(fname_epo)['prime']
-        epochs.apply_baseline(baseline=baseline)
-        epochs.pick_types(meg=True, exclude='bads')
-        epochs.drop_bad_epochs(reject=reject)
+        raw = mne.io.read_raw_fif(fname_raw)
+        events = mne.read_events(fname_evts)
+        epochs = mne.Epochs(raw, events, event_id, tmin=-.2, tmax=1,
+                            baseline=baseline, reject=reject, verbose=False)
 
         # compute the SSP
         evoked = epochs.average()
-        ev_proj = epochs.crop(-.1, .03, copy=True).average()
+        ev_proj = evoked.crop(-.1, .03, copy=True)
         projs = mne.compute_proj_evoked(ev_proj, n_mag=3)
 
         # apply projector individually
@@ -90,16 +95,18 @@ for subject in config.subjects:
 
         # 4. plot evoked - each proj
         for i, ev in enumerate(evokeds):
-            pca = 'PC %d' % i
+            exp_var = ev.info['projs'][0]['explained_var'] * 100
+            title = 'PC %d: %2.2f%% Explained Variance' % (i, exp_var)
+            tab = 'PC %d' % i
             fig = plt.figure(figsize=(12, 6))
             gs = gridspec.GridSpec(1, 2, width_ratios=[3, 1])
             axes = [plt.subplot(gs[0]), plt.subplot(gs[1])]
-            e = ev.plot(titles={'mag': 'PC %d' % i}, ylim=ylim,
+            e = ev.plot(titles={'mag': title}, ylim=ylim,
                         show=False, axes=axes[0])
             p = mne.viz.plot_projs_topomap(ev.info['projs'], layout,
                                            show=False, axes=axes[1])
             rep.add_figs_to_section(fig, 'Evoked without PC %d' %i,
-                                    pca, image_format=img)
+                                    tab, image_format=img)
 
         rep.save(fname_rep, overwrite=True, open_browser=False)
 

@@ -32,13 +32,13 @@ analysis = 'priming_sensor_analysis'
 random_state = 42
 decim = 5
 # decoding parameters
-tstart, tstop = -.2, 1
+tmin, tmax = -.2, 1
 # smoothing window
 # length = 5. * decim * 1e-3
 # step = 5. * decim * 1e-3
 length = decim * 1e-3
 step = decim * 1e-3
-event_id = config.event_id
+event_id = {'word/target/unprimed': 2, 'word/target/primed': 6,}
 reject = config.reject
 
 
@@ -63,78 +63,87 @@ for subject in config.subjects:
                          subject + '_{}-eve.txt'.format(exp))
     rep = Report()
 
-    # loading epochs
+    # loading events and raw
     evts = mne.read_events(fname_evts)
-    raw = mne.io.read_raw_fif(fname_raw)
-    epochs = mne.Epochs(raw, evts, event_id, tmin=-.2, tmax=1, baseline=None,
-                        decim=decim, preload=True, verbose=False)
-    # interpolate bads and select meg
-    epochs.interpolate_bads()
-    epochs.pick_types(meg=True)
-
+    raw = mne.io.read_raw_fif(fname_raw, preload=True, verbose=False)
     # add/apply proj
     proj = mne.read_proj(fname_proj)
-    epochs.add_proj(proj)
-    epochs.apply_proj()
+    raw.add_proj(proj)
+    raw.apply_proj()
+    # select only meg channels
+    raw.pick_types(meg=True)
+    # run a rERF
+    rerf = linear_regression_raw(raw, evts, event_id, tmin=tmin, tmax=tmax,
+                                 decim=decim, reject=reject)
+    rerf = rerf['word/target/primed'] - rerf['word/target/unprimed']
+    group_reg.extend(rerf.data.T)
 
-    # drop bad epochs
-    epochs.drop_bad_epochs(reject=reject)
-
-    # # currently disabled because of the HED
-    # epochs.equalize_event_counts(['unprimed', 'primed'], copy=False)
-    # plotting grand average
-    p = epochs.average().plot(show=False)
-    comment = ("This is a grand average over all the target epochs after "
-               "equalizing the numbers in the priming condition.<br>"
-               'unprimed: %d, and primed: %d, out of 96 possible events.'
-               % (len(epochs['unprimed']), len(epochs['primed'])))
-    rep.add_figs_to_section(p, '%s: Grand Average on Target' % subject,
-                          'Summary', image_format=img, comments=comment)
-    # compute/plot difference
-    ep = epochs.copy()
-    ep.apply_baseline((-.2, .1))
-    primed = ep['primed'].average()
-    unprimed = ep['unprimed'].average()
-    evoked = unprimed - primed
-    p = evoked.plot(show=False)
+    # plot difference waves
+    p = rerf.plot(show=False)
     rep.add_figs_to_section(p, 'Difference Butterfly',
                             'Evoked Difference Comparison',
                             image_format=img)
+    # create epochs for gat
+    epochs = mne.Epochs(raw, evts, event_id, tmin=tmin, tmax=tmax, baseline=None,
+                        decim=decim, reject=reject, preload=True, verbose=False)
 
-    # # run a rERF
-    # rerf = linear_regression_raw(raw, evts, event_id, tmin=tstart, tmax=tstop,
-    #                              decim=decim)
-    # rerf = [rerf['word/target/primed'], rerf['word/target/unprimed']]
-    # rerf = [x.add_proj(proj).apply_proj() for x in rerf]
-    # rerf = [x.data.T for x in rerf]
-    # group_reg.extend(rerf)
+    # # # currently disabled because of the HED
+    # # epochs.equalize_event_counts(['unprimed', 'primed'], copy=False)
+    # # plotting grand average
+    # p = epochs.average().plot(show=False)
+    # comment = ("This is a grand average over all the target epochs after "
+    #            "equalizing the numbers in the priming condition.<br>"
+    #            'unprimed: %d, and primed: %d, out of 96 possible events.'
+    #            % (len(epochs['unprimed']), len(epochs['primed'])))
+    # rep.add_figs_to_section(p, '%s: Grand Average on Target' % subject,
+    #                       'Summary', image_format=img, comments=comment)
 
-    # run a linear regression
-    design_matrix = np.ones((len(epochs), 2))
-    lbl = LabelEncoder()
     # Convert the labels of the data to binary descriptors
+    lbl = LabelEncoder()
     y = lbl.fit_transform(epochs.events[:,-1])
-    design_matrix[:, -1] = y
-    names = ['intercept', 'priming']
-    stats = linear_regression(epochs, design_matrix, names)
-    s = stats['priming'].mlog10_p_val
-    t_val = stats['priming'].t_val.data.T
-    group_reg.append(t_val)
 
-    # plot p-values
-    # interval = int(plt_interval * 1e3 / decim)   # plot every 5ms
-    # times = evoked.times[::interval]
-    # figs = list()
-    # times = evoked.times
-    # for time in times:
-    #     figs.append(s.plot_topomap(time, vmin=0, vmax=3, unit='',
-    #                                scale=1, cmap='Reds', show=False))
-    #     plt.close()
-    # rep.add_slider_to_section(figs, times, 'Uncorrected Regression Analysis '
-    #                           '(-log10 p-val)')
-    # rep.save(fname_rep, open_browser=False, overwrite=True)
+    print 'get ready for decoding ;)'
+    train_times = {'start': tmin,
+                   'stop': tmax,
+                   'length': length,
+                   'step': step
+                   }
 
-# run a spatio-temporal linear regression
+    # Generalization Across Time
+    # default GAT: LogisticRegression with KFold (n=5)
+    gat = GeneralizationAcrossTime(predict_mode='cross-validation', n_jobs=1,
+                                   train_times=train_times)
+    gat.fit(epochs, y=y)
+    group_scores.append(gat.score(epochs, y=y))
+    fig = gat.plot(title='GAT Decoding Score on Semantic Priming: '
+                   'Unprimed vs. Primed')
+    rep.add_figs_to_section(fig, 'GAT Decoding Score on Priming',
+                          'Decoding', image_format=img)
+    fig = gat.plot_diagonal(title='Time Decoding Score on Semantic Priming: '
+                            'Unprimed vs. Primed')
+    rep.add_figs_to_section(fig, 'Time Decoding Score on Priming',
+                          'Decoding', image_format=img)
+
+    rep.save(fname_rep, open_browser=False, overwrite=True)
+
+# temp hack
+group_gat = gat
+group_gat.scores_ = np.mean(group_scores, axis=0)
+
+fig = gat.plot(title='GAT Decoding Score on Semantic Priming: '
+               'Unprimed vs. Primed')
+group_rep.add_figs_to_section(fig, 'GAT Decoding Score on Priming',
+                              'Decoding', image_format=img)
+fig = gat.plot_diagonal(title='Time Decoding Score on Semantic Priming: '
+                        'Unprimed vs. Primed')
+group_rep.add_figs_to_section(fig, 'Time Decoding Score on Priming',
+                              'Decoding', image_format=img)
+group_rep.save(fname_group, open_browser=False, overwrite=True)
+
+
+###########################################
+# run a spatio-temporal linear regression #
+###########################################
 group_reg = np.array(group_reg)
 connectivity, ch_names = read_ch_connectivity('KIT-208')
 
@@ -225,49 +234,3 @@ for i_clu, clu_idx in enumerate(good_cluster_inds):
 
 group_rep.add_figs_to_section(figs, captions, 'Spatio-temporal tests')
 group_rep.save('/Users/teon/Desktop/test-st.html')
-
-
-#     print 'get ready for decoding ;)'
-#     train_times = {'start': tstart,
-#                    'stop': tstop,
-#                    'length': length,
-#                    'step': step
-#                    }
-#
-#     # Generalization Across Time
-#     # # default GAT
-#     # clf = LogisticRegression()
-#     # cv = KFold(n_folds=5)
-#     clf = SVC(kernel='linear', probability=False, random_state=random_state)
-#     # Define a monte-carlo cross-validation generator (reduce variance):
-#     cv = ShuffleSplit(len(y), 10, test_size=0.2, random_state=random_state)
-#
-#     gat = GeneralizationAcrossTime(predict_mode='cross-validation', n_jobs=1,
-#                                    train_times=train_times, clf=clf, cv=cv)
-#     gat.fit(epochs, y=y)
-#     gat.score(epochs, y=y)
-#     fig = gat.plot(title='GAT Decoding Score on Semantic Priming: '
-#                    'Unprimed vs. Primed')
-#     rep.add_figs_to_section(fig, 'GAT Decoding Score on Priming',
-#                           'Decoding', image_format=img)
-#     fig = gat.plot_diagonal(title='Time Decoding Score on Semantic Priming: '
-#                             'Unprimed vs. Primed')
-#     rep.add_figs_to_section(fig, 'Time Decoding Score on Priming',
-#                           'Decoding', image_format=img)
-#
-#     rep.save(fname_rep, open_browser=False, overwrite=True)
-#     group_scores.append(gat.scores_)
-#
-# # temp hack
-# group_gat = gat
-# group_gat.scores_ = np.mean(group_scores, axis=0)
-#
-# fig = gat.plot(title='GAT Decoding Score on Semantic Priming: '
-#                'Unprimed vs. Primed')
-# group_rep.add_figs_to_section(fig, 'GAT Decoding Score on Priming',
-#                               'Decoding', image_format=img)
-# fig = gat.plot_diagonal(title='Time Decoding Score on Semantic Priming: '
-#                         'Unprimed vs. Primed')
-# group_rep.add_figs_to_section(fig, 'Time Decoding Score on Priming',
-#                               'Decoding', image_format=img)
-# group_rep.save(fname_group, open_browser=False, overwrite=True)

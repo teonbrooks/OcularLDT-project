@@ -42,19 +42,19 @@ for subject in config.subjects:
         # trial properties
         trials = np.arange(data.shape[0])
         semantics = data[:, 3] == '1'
-        semantics = dict(zip(trials, semantics))
+        sem_dict = dict(zip(trials, semantics))
         # words_idx = data[:, 4].astype(int) > 2
         # words_idy = data[:, 4].astype(int) == 0
         # words = words_idx + words_idy
-        words = dict(zip(trials, data[:, 4].astype(int)))
+        word_dict = dict(zip(trials, data[:, 4].astype(int)))
 
         for ia, ii in [('prime', 1), ('target', 2), ('post', 3)]:
             times = ias.get_gaze_duration(ia=ii)
 
             # coding semantic priming
-            sem_dict = [semantics[x] for x in times['trial']]
+            semantics = [sem_dict[x] for x in times['trial']]
             # defining word vs. nonword
-            word_dict = [words[x] != ii for x in times['trial']]
+            words = [word_dict[x] != ii for x in times['trial']]
             # extracting triggering info from datasource file.
             # prime trigger is index 8, target trigger is index 10
             triggers = list()
@@ -73,7 +73,7 @@ for subject in config.subjects:
 
             columns = list(times.columns)
             columns.extend(['priming', 'word', 'ia', 'trigger', 'subject'])
-            ds = map(DataFrame, [sem_dict, word_dict, ia_label,
+            ds = map(DataFrame, [semantics, words, ia_label,
                                  triggers, subject_label])
             ds.insert(0, times)
             ds = concat(ds, axis=1)

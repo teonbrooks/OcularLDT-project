@@ -20,7 +20,7 @@ drives = {'local': op.join(op.expanduser('~'), 'Experiments', 'E-MEG', 'data'),
                              'Experiments', 'E-MEG', 'output'),
          }
 # Parameters:
-redo = False
+redo = True
 results_dir = '/Users/teon/Dropbox/academic/Experiments/E-MEG/output/results/'
 reject = dict(mag=3e-12)
 baseline = (None, -.1)
@@ -44,6 +44,7 @@ bads['A0148'] += ['MEG 130', 'MEG 084', 'MEG 072']
 bads['A0023'] += ['MEG 059']
 bads['A0023'] += ['MEG 049', 'MEG 054']
 bads['A0136'] += ['MEG 057', 'MEG 128', 'MEG 179']
+bads['A0106'] += ['MEG 160', 'MEG 072']
 
 
 # arrange the OLDT in the presentation order
