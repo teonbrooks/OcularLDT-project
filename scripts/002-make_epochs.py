@@ -28,15 +28,7 @@ This recoding efficiency allows for Hierarchial Event Descriptors
 (HED tags).
 """
 
-
-event_id = {'word/prime/unprimed': 1,
-            'word/target/unprimed': 2,
-            'word/prime/primed': 5,
-            'word/target/primed': 6,
-            'nonword/prime': 9,
-            'nonword/target': 10,
-            'fixation': 128}
-
+event_id = config.event_id
 
 for subject in config.subjects:
     print config.banner % subject

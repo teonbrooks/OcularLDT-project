@@ -72,21 +72,14 @@ for subject in config.subjects:
     raw.apply_proj()
     # select only meg channels
     raw.pick_types(meg=True)
-    # run a rERF
-    rerf = linear_regression_raw(raw, evts, event_id, tmin=tmin, tmax=tmax,
-                                 decim=decim, reject=reject)
-    rerf = rerf['word/target/primed'] - rerf['word/target/unprimed']
-    group_reg.extend(rerf.data.T)
 
-    # plot difference waves
-    p = rerf.plot(show=False)
-    rep.add_figs_to_section(p, 'Difference Butterfly',
-                            'Evoked Difference Comparison',
-                            image_format=img)
     # create epochs for gat
     epochs = mne.Epochs(raw, evts, event_id, tmin=tmin, tmax=tmax, baseline=None,
                         decim=decim, reject=reject, preload=True, verbose=False)
-
+    freqs = np.arange(1, 20, 2)
+    cycles = freqs / 2.
+    tfr = mne.time_frequency.tfr_morlet(epochs, freqs, cycles)
+    asdf
     # # # currently disabled because of the HED
     # # epochs.equalize_event_counts(['unprimed', 'primed'], copy=False)
     # # plotting grand average
