@@ -1,25 +1,17 @@
-import sys
-import os
+import pickle
 import os.path as op
-import warnings
 import numpy as np
-from scipy import interp
-import matplotlib.pyplot as plt
+
+from sklearn.preprocessing import LabelEncoder
+from sklearn.cross_validation import cross_val_score, ShuffleSplit
 
 import mne
-from mne.report import Report
 from mne.decoding import GeneralizationAcrossTime
-from mne.stats import (linear_regression, linear_regression_raw,
-                       spatio_temporal_cluster_test as stc_test,
-                       spatio_temporal_cluster_1samp_test as stc_1samp_test)
+from mne.stats import (linear_regression_raw,
+                       spatio_temporal_cluster_1samp_test as stc_1samp_test,
+                       spatio_temporal_cluster_test as stc_test)
 from mne.channels import read_ch_connectivity
-from mne.viz import plot_topomap
-from mpl_toolkits.axes_grid1 import make_axes_locatable
-
-from sklearn.pipeline import Pipeline
-from sklearn.preprocessing import StandardScaler, LabelEncoder
-from sklearn.svm import SVC
-from sklearn.cross_validation import cross_val_score, ShuffleSplit
+# import h5io
 
 import config
 
@@ -28,209 +20,139 @@ path = config.drive
 filt = config.filt
 img = config.img
 exp = 'OLDT'
-analysis = 'priming_sensor_analysis'
+analysis = 'word-nonword_sensor_analysis'
 random_state = 42
-decim = 5
+decim = 4
 # decoding parameters
 tmin, tmax = -.2, 1
 # smoothing window
-# length = 5. * decim * 1e-3
-# step = 5. * decim * 1e-3
 length = decim * 1e-3
 step = decim * 1e-3
-event_id = {'word/target/unprimed': 2, 'word/target/primed': 6,}
+event_id = config.event_id
 reject = config.reject
 
 
 # setup group
-fname_group = op.join(config.results_dir, 'group', 'group_OLDT_%s_filt_%s.html'
-                      % (filt, analysis))
-group_rep = Report()
-group_scores = list()
-# group priming t-vals
-group_reg = list()
+group_template = op.join(config.results_dir, 'group',
+                         'group_OLDT_%s_filt_%s_%s.%s')
+fname_group_rerf = group_template % (filt, analysis, 'rerf', 'mne')
+fname_group_gat = group_template % (filt, analysis, 'gat', 'mne')
+
+group_gat = dict()
+group_rerf = dict()
+group_rerf_diff = list()
 
 for subject in config.subjects:
     print config.banner % subject
     # define filenames
-    fname_rep = op.join(config.results_dir, subject,
-                        '%s_%s_%s.html' % (subject, exp, analysis))
-    fname_proj = op.join(path, subject, 'mne', '%s_%s_calm_%s_filt-proj.fif'
-                         % (subject, exp, filt))
-    fname_raw = op.join(path, subject, 'mne',
-                        '{}_{}_calm_{}_filt-raw.fif'.format(subject, exp, filt))
-    fname_evts = op.join(path, subject, 'mne',
-                         subject + '_{}-eve.txt'.format(exp))
-    rep = Report()
+    subject_template = op.join(path, subject, 'mne', subject + '_%s%s.%s')
+    fname_proj = subject_template % (exp, '_calm_' + filt + '_filt-proj', 'fif')
+    fname_raw = subject_template % (exp, '_calm_' + filt + '_filt-raw', 'fif')
+    fname_evts = subject_template % (exp, '-eve', 'txt')
 
     # loading events and raw
     evts = mne.read_events(fname_evts)
+    # reduce to word/nonword contrast
+    evts = mne.event.merge_events(evts, [9, 10], 99)
+    evts = mne.event.merge_events(evts, [1, 2, 5, 6], 100)
+    event_id = {'nonword': 99, 'word': 100}
     raw = mne.io.read_raw_fif(fname_raw, preload=True, verbose=False)
+    c_names = ['word', 'nonword']
+
     # add/apply proj
-    proj = mne.read_proj(fname_proj)
-    raw.add_proj(proj)
-    raw.apply_proj()
+    proj = [mne.read_proj(fname_proj)[0]]
+    raw.add_proj(proj).apply_proj()
     # select only meg channels
     raw.pick_types(meg=True)
+
+    # TO DO: make an issue about equalize events from just the event matrix
+    # and event_id. this is needed for linear_regression_raw
+
     # run a rERF
     rerf = linear_regression_raw(raw, evts, event_id, tmin=tmin, tmax=tmax,
                                  decim=decim, reject=reject)
-    rerf = rerf['word/target/primed'] - rerf['word/target/unprimed']
-    group_reg.extend(rerf.data.T)
+    rerf_diff = mne.evoked.combine_evoked([rerf[c_names[0]], rerf[c_names[1]]],
+                                          weights=[1, -1])
+    # take the magnitude of the difference so that the t-val is interpretable
+    group_rerf_diff.append(np.abs(rerf_diff.data.T))
+    group_rerf[subject] = rerf
 
-    # plot difference waves
-    p = rerf.plot(show=False)
-    rep.add_figs_to_section(p, 'Difference Butterfly',
-                            'Evoked Difference Comparison',
-                            image_format=img)
     # create epochs for gat
-    epochs = mne.Epochs(raw, evts, event_id, tmin=tmin, tmax=tmax, baseline=None,
-                        decim=decim, reject=reject, preload=True, verbose=False)
-
-    # # # currently disabled because of the HED
-    # # epochs.equalize_event_counts(['unprimed', 'primed'], copy=False)
-    # # plotting grand average
-    # p = epochs.average().plot(show=False)
-    # comment = ("This is a grand average over all the target epochs after "
-    #            "equalizing the numbers in the priming condition.<br>"
-    #            'unprimed: %d, and primed: %d, out of 96 possible events.'
-    #            % (len(epochs['unprimed']), len(epochs['primed'])))
-    # rep.add_figs_to_section(p, '%s: Grand Average on Target' % subject,
-    #                       'Summary', image_format=img, comments=comment)
-
+    epochs = mne.Epochs(raw, evts, event_id, tmin=tmin, tmax=tmax,
+                        baseline=None, decim=decim, reject=reject,
+                        preload=True, verbose=False)
+    # eps = epochs[c_names[0]], epochs[c_names[1]]
+    # mne.epochs.equalize_epoch_counts(eps)
+    # epochs = mne.epochs.concatenate_epochs(eps)
+    epochs.equalize_event_counts([c_names[0], c_names[1]], copy=False)
     # Convert the labels of the data to binary descriptors
     lbl = LabelEncoder()
     y = lbl.fit_transform(epochs.events[:,-1])
 
     print 'get ready for decoding ;)'
+
+    # Generalization Across Time
+    # default GAT: LogisticRegression with KFold (n=5)
     train_times = {'start': tmin,
                    'stop': tmax,
                    'length': length,
                    'step': step
                    }
-
-    # Generalization Across Time
-    # default GAT: LogisticRegression with KFold (n=5)
     gat = GeneralizationAcrossTime(predict_mode='cross-validation', n_jobs=1,
                                    train_times=train_times)
     gat.fit(epochs, y=y)
-    group_scores.append(gat.score(epochs, y=y))
-    fig = gat.plot(title='GAT Decoding Score on Semantic Priming: '
-                   'Unprimed vs. Primed')
-    rep.add_figs_to_section(fig, 'GAT Decoding Score on Priming',
-                          'Decoding', image_format=img)
-    fig = gat.plot_diagonal(title='Time Decoding Score on Semantic Priming: '
-                            'Unprimed vs. Primed')
-    rep.add_figs_to_section(fig, 'Time Decoding Score on Priming',
-                          'Decoding', image_format=img)
+    gat.score(epochs, y=y)
+    group_gat[subject] = np.array(gat.scores_)
 
-    rep.save(fname_rep, open_browser=False, overwrite=True)
+# define a layout
+layout = mne.find_layout(epochs.info)
+# additional properties
+group_gat['layout'] = group_rerf['layout'] = layout
+group_gat['times'] = group_gat['times'] = epochs.times
+group_gat['sfreq'] = group_gat['sfreq'] = epochs.info['sfreq']
 
 # temp hack
-group_gat = gat
-group_gat.scores_ = np.mean(group_scores, axis=0)
+gat.scores_ = np.array([group_gat[subject] for subject
+                        in config.subjects]).mean(axis=0)
+group_gat['group'] = gat
 
-fig = gat.plot(title='GAT Decoding Score on Semantic Priming: '
-               'Unprimed vs. Primed')
-group_rep.add_figs_to_section(fig, 'GAT Decoding Score on Priming',
-                              'Decoding', image_format=img)
-fig = gat.plot_diagonal(title='Time Decoding Score on Semantic Priming: '
-                        'Unprimed vs. Primed')
-group_rep.add_figs_to_section(fig, 'Time Decoding Score on Priming',
-                              'Decoding', image_format=img)
-group_rep.save(fname_group, open_browser=False, overwrite=True)
+##############
+# Statistics #
+##############
 
-
-###########################################
-# run a spatio-temporal linear regression #
-###########################################
-group_reg = np.array(group_reg)
+##############################
+# run a spatio-temporal RERF #
+##############################
+group_rerf_diff = np.array(group_rerf_diff)
+n_subjects = len(config.subjects)
+n_chan = raw.info['nchan']
 connectivity, ch_names = read_ch_connectivity('KIT-208')
 
 threshold = 1.96
 p_accept = 0.05
-cluster_stats = stc_1samp_test(group_reg, n_permutations=10000,
-                               threshold=threshold, tail=0,
-                               connectivity=connectivity)
-T_obs, clusters, p_values, _ = cluster_stats
-good_cluster_inds = np.where(p_values < p_accept)[0]
+group_rerf['stats'] = stc_1samp_test(group_rerf_diff, n_permutations=1000,
+                                     threshold=threshold, tail=0,
+                                     connectivity=connectivity,
+                                     seed=random_state)
 
-#################
-# Visualization #
-#################
-# configure variables for visualization
-condition_names = ['primed', 'unprimed']
-times = epochs.times * 1e3
-colors = 'r', 'steelblue'
-linestyles = '-', '-'
+# h5io.write_hdf5(fname_group_rerf, group_rerf)
+pickle.dump(group_rerf, open(fname_group_rerf, 'w'))
 
 
-# get sensor positions via layout
-pos = mne.find_layout(epochs.info).pos
+#########################
+# run a GAT clustering  #
+#########################
+group_gat_diff = np.array([group_gat[subject] for subject
+                           in config.subjects]) - .5
+n_subjects = len(config.subjects)
+n_chan = raw.info['nchan']
+connectivity, ch_names = read_ch_connectivity('KIT-208')
 
-captions = list()
-figs = list()
-# loop over significant clusters
-for i_clu, clu_idx in enumerate(good_cluster_inds):
-    # unpack cluster infomation, get unique indices
-    time_inds, space_inds = np.squeeze(clusters[clu_idx])
-    ch_inds = np.unique(space_inds)
-    time_inds = np.unique(time_inds)
+threshold = 1.96
+p_accept = 0.05
+group_gat['stats'] = stc_1samp_test(group_gat_diff, n_permutations=1000,
+                                    threshold=threshold, tail=0,
+                                    seed=random_state)
 
-    # get topography for T stat
-    t_map = T_obs[time_inds, ...].mean(axis=0)
-
-    # get signals at significant sensors
-    signals = [primed.data[ch_inds, ...].mean(axis=0),
-               unprimed.data[ch_inds, ...].mean(axis=0)]
-    sig_times = times[time_inds]
-
-    # create spatial mask
-    mask = np.zeros((t_map.shape[0], 1), dtype=bool)
-    mask[ch_inds, :] = True
-
-    # initialize figure
-    fig, ax_topo = plt.subplots(1, 1, figsize=(16, 3))
-    title = 'Cluster #{0}'.format(i_clu + 1)
-    fig.suptitle(title, fontsize=14)
-
-    # plot average test statistic and mark significant sensors
-    image, _ = plot_topomap(t_map, pos, mask=mask, axis=ax_topo,
-                            cmap='Reds', vmin=np.min, vmax=np.max)
-
-    # advanced matplotlib for showing image with figure and colorbar
-    # in one plot
-    divider = make_axes_locatable(ax_topo)
-
-    # add axes for colorbar
-    ax_colorbar = divider.append_axes('right', size='5%', pad=0.05)
-    plt.colorbar(image, cax=ax_colorbar)
-    ax_topo.set_xlabel('Averaged T-map ({:0.1f} - {:0.1f} ms)'.format(
-        *sig_times[[0, -1]]))
-
-    # add new axis for time courses and plot time courses
-    ax_signals = divider.append_axes('right', size='300%', pad=1.2)
-    for signal, name, ls, color in zip(signals, condition_names, linestyles, colors):
-        ax_signals.plot(times, signal, label=name, linestyle=ls, color=color)
-
-    # add information
-    ax_signals.axvline(0, color='k', linestyle=':', label='stimulus onset')
-    ax_signals.set_xlim([times[0], times[-1]])
-    ax_signals.set_xlabel('time [ms]')
-    ax_signals.set_ylabel('evoked magnetic fields [fT]')
-
-    # plot significant time range
-    ymin, ymax = ax_signals.get_ylim()
-    ax_signals.fill_betweenx((ymin, ymax), sig_times[0], sig_times[-1],
-                             color='orange', alpha=0.3)
-    ax_signals.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
-    ax_signals.set_ylim(ymin, ymax)
-
-    # clean up viz
-    mne.viz.tight_layout(fig=fig)
-    fig.subplots_adjust(bottom=.05)
-    figs.append(fig)
-    captions.append(title)
-
-group_rep.add_figs_to_section(figs, captions, 'Spatio-temporal tests')
-group_rep.save('/Users/teon/Desktop/test-st.html')
+# h5io.write_hdf5(fname_group_gat, group_gat)
+pickle.dump(group_gat, open(fname_group_gat, 'w'))
