@@ -52,10 +52,6 @@ for subject in config.subjects:
 
     # loading events and raw
     evts = mne.read_events(fname_evts)
-    # reduce to word/nonword contrast
-    evts = mne.event.merge_events(evts, [9, 10], 99)
-    evts = mne.event.merge_events(evts, [1, 2, 5, 6], 100)
-    event_id = {'nonword': 99, 'word': 100}
     raw = mne.io.read_raw_fif(fname_raw, preload=True, verbose=False)
     c_names = ['word', 'nonword']
 
@@ -81,9 +77,6 @@ for subject in config.subjects:
     epochs = mne.Epochs(raw, evts, event_id, tmin=tmin, tmax=tmax,
                         baseline=None, decim=decim, reject=reject,
                         preload=True, verbose=False)
-    # eps = epochs[c_names[0]], epochs[c_names[1]]
-    # mne.epochs.equalize_epoch_counts(eps)
-    # epochs = mne.epochs.concatenate_epochs(eps)
     epochs.equalize_event_counts([c_names[0], c_names[1]], copy=False)
     # Convert the labels of the data to binary descriptors
     lbl = LabelEncoder()
