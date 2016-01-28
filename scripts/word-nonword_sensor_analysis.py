@@ -33,10 +33,9 @@ reject = config.reject
 
 
 # setup group
-group_template = op.join(config.results_dir, 'group',
-                         'group_OLDT_%s_filt_%s_%s.%s')
-fname_group_rerf = group_template % (filt, analysis, 'rerf', 'mne')
-fname_group_gat = group_template % (filt, analysis, 'gat', 'mne')
+group_template = op.join(path, 'group', 'group_%s_%s_filt_%s_%s.%s')
+fname_group_rerf = group_template % (exp, filt, analysis, 'rerf', 'mne')
+fname_group_gat = group_template % (exp, filt, analysis, 'gat', 'mne')
 
 group_gat = dict()
 group_rerf = dict()
@@ -77,6 +76,7 @@ for subject in config.subjects:
     epochs = mne.Epochs(raw, evts, event_id, tmin=tmin, tmax=tmax,
                         baseline=None, decim=decim, reject=reject,
                         preload=True, verbose=False)
+    epochs = epochs[[c_names[0], c_names[1]]]
     epochs.equalize_event_counts([c_names[0], c_names[1]], copy=False)
     # Convert the labels of the data to binary descriptors
     lbl = LabelEncoder()

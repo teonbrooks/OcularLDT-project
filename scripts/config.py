@@ -35,8 +35,9 @@ event_id = {'word/prime/unprimed': 1,
             'word/target/primed': 6,
             'nonword/prime': 9,
             'nonword/target': 10,
-            'fixation': 128}
-
+            # for the co-registration, there are no fixations in the evts
+            # 'fixation': 128
+            }
 
 # Bad Channels
 bads = defaultdict(lambda: ['MEG 130'])
@@ -77,14 +78,6 @@ for subject, _ in subjects.items():
         del subjects[subject]
 
 drive = drives[drive]
-
-event_id = {'word/prime/unprimed': 1,
-            'word/target/unprimed': 2,
-            'word/prime/primed': 5,
-            'word/target/primed': 6,
-            'nonword/prime': 9,
-            'nonword/target': 10,
-            'fixation': 128}
 
 def kit2fiff(subject, exp, path, dig=True, preload=False):
     from mne.io import read_raw_kit

@@ -1,24 +1,21 @@
-import os
-import sys
-import os.path as op
-import warnings
-import numpy as np
-from scipy import interp
-import matplotlib.pyplot as plt
+import pickle
 import itertools
+import os.path as op
+import numpy as np
+import scipy as sp
+
+from sklearn.preprocessing import LabelEncoder
+from sklearn.linear_model import Ridge
+from sklearn.cross_validation import ShuffleSplit
 
 import mne
-from mne.report import Report
-from mne.decoding import ConcatenateChannels
-from mne.stats import linear_regression, spatio_temporal_cluster_1samp_test
-
-from sklearn.pipeline import Pipeline
-from sklearn.preprocessing import StandardScaler
-from sklearn.linear_model import Ridge
-from sklearn.cross_validation import cross_val_score, ShuffleSplit
+from mne.decoding import GeneralizationAcrossTime, TimeDecoding
+from mne.stats import (linear_regression, linear_regression_raw,
+                       spatio_temporal_cluster_1samp_test as stc_1samp_test,
+                       spatio_temporal_cluster_test as stc_test)
+from mne.channels import read_ch_connectivity
 
 import config
-
 
 # parameters
 path = config.drive
@@ -26,205 +23,168 @@ filt = config.filt
 img = config.img
 exp = 'OLDT'
 analysis = 'reading_regression_sensor_analysis'
-decim = 5
 random_state = 42
-
-win = 25e-3  # smoothing window in seconds
-plt_interval = 5e-3  # plotting interval
+decim = 4
+# decoding parameters
+tmin, tmax = -.2, 1
+# smoothing window
+length = decim * 1e-3
+step = decim * 1e-3
+event_id = config.event_id
 reject = config.reject
+# clustering
+connectivity, ch_names = read_ch_connectivity('KIT-208')
+threshold = 1.96
+p_accept = 0.05
 
 # setup group
-fname_group = op.join(config.results_dir, 'group', 'group_OLDT_%s_filt_%s.html'
-                      % (filt, analysis))
-group_rep = Report()
-group_scores = []
-group_std_scores = []
-group_auc_scores = []
+group_template = op.join(path, 'group', 'group_%s_%s_filt_%s_%s.%s')
+fname_group_gat = group_template % (exp, filt, analysis, 'gat', 'mne')
 
+group_gat = dict()
+group_rerf = dict()
+group_rerf_diff = list()
+group_ols = dict()
 
-# Ranker
-def rank_scorer(reg, X, y):
-    y_pred = reg.predict(X)
-    comb = itertools.combinations(range(len(y)), 2)
-    score = 0.
-    for k, pair in enumerate(comb):
-        i, j = pair
-        if y[i] == y[j]:
-            continue
-        score += np.sign((y[i] - y[j]) * (y_pred[i] - y_pred[j])) > 0.
+# # Ranker, not optimized
+# # y_true, y_pred
+# def rank_scorer_old(y, y_pred):
+#     comb = itertools.combinations(range(len(y)), 2)
+#     score = 0.
+#     for k, pair in enumerate(comb):
+#         i, j = pair
+#         if y[i] == y[j]:
+#             continue
+#         score += np.sign((y[i] - y[j]) * (y_pred[i] - y_pred[j])) > 0.
+#
+#     return score / float(k)
 
-    return score / float(k)
+# Ranker function
+def rank_scorer(y, y_pred):
+    n = y.size
+    n_comb = sp.misc.comb(n, 2)
+
+    y_compare = np.tile(y, (n, 1))
+    y_compare = y_compare - y_compare.T
+
+    y_pred_compare = np.tile(y_pred, (n, 1))
+    y_pred_compare = y_pred_compare - y_pred_compare.T
+
+    # positive = correct prediction, negative = incorrect prediction
+    score = y_compare * y_pred_compare
+    # we need to remove the diagonal from the combinations
+    score = score[score > 0].sum()/ (2 * n_comb)
+
+    asdf
+    return score
 
 
 for subject in config.subjects:
     print config.banner % subject
-
     # define filenames
-    fname_rep = op.join(config.results_dir, subject,
-                        subject + '_%s_%s.html' % (exp, analysis))
-    fname_proj = op.join(path, subject, 'mne',
-                         subject + '_%s_calm_%s_filt-proj.fif' % (exp, filt))
-    fname_epo = op.join(path, subject, 'mne',
-                        subject + '_%s_coreg_calm_%s_filt-epo.fif' % (exp, filt))
-    fname_dm = op.join(path, subject, 'mne',
-                       subject + '_%s_design_matrix.txt' % exp)
-    rep = Report()
+    subject_template = op.join(path, subject, 'mne', subject + '_%s%s.%s')
+    fname_proj = subject_template % (exp, '_calm_' + filt + '_filt-proj', 'fif')
+    fname_raw = subject_template % (exp, '_calm_' + filt + '_filt-raw', 'fif')
+    fname_evts = subject_template % (exp, '_coreg-eve', 'txt')
+    fname_dm = subject_template % (exp, '_fixation_design_matrix', 'txt')
+    # loading events and raw
+    evts = mne.read_events(fname_evts)
 
     # loading design matrix, epochs, proj
     design_matrix = np.loadtxt(fname_dm)
-    epochs = mne.read_epochs(fname_epo)
-    epochs.decimate(decim)
-    epochs.info['bads'] = config.bads[subject]
-    epochs.pick_types(meg=True, exclude='bads')
 
-    # add and apply proj
-    proj = mne.read_proj(fname_proj)
-    # proj = [proj[0]]
-    epochs.add_proj(proj)
-    epochs.apply_proj()
+    # # let's look at the time around the fixation
+    # durs = np.asarray(design_matrix[:, -1] * 1000, int)
+    # evts[:, 0] = evts[:, 0] + durs
+
+    raw = mne.io.read_raw_fif(fname_raw, preload=True, verbose=False)
+
+    # add/apply proj
+    proj = [mne.read_proj(fname_proj)[0]]
+    raw.add_proj(proj).apply_proj()
+    # select only meg channels
+    raw.pick_types(meg=True)
+
+    epochs = mne.Epochs(raw, evts, event_id, tmin=tmin, tmax=tmax,
+                        baseline=None, decim=decim, reject=reject,
+                        preload=True, verbose=False)
 
     # epochs rejection: filtering
     # drop based on MEG rejection, must happen first
     epochs.drop_bad_epochs(reject=reject)
     design_matrix = design_matrix[epochs.selection]
+    # epochs = epochs['word/target']
+    design_matrix = design_matrix[epochs.selection]
     # remove zeros
     idx = design_matrix[:, -1] > 0
     epochs = epochs[idx]
     design_matrix = design_matrix[idx]
-    # and outliers
     durs = design_matrix[:, -1]
+    # and outliers
     mean, std = durs.mean(), durs.std()
     devs = np.abs(durs - mean)
     criterion = 3 * std
     idx = devs < criterion
     epochs = epochs[idx]
     design_matrix = design_matrix[idx]
+    durs = design_matrix[:, -1]
 
     assert len(design_matrix) == len(epochs)
+    group_ols[subject] = epochs.average()
 
-    # plotting grand average
-    p = epochs.average().plot(show=False)
-    comment = ("This is a grand average over all the target epochs after "
-               "equalizing the numbers in the priming condition.<br>"
-               'Number of epochs: %d.' % (len(epochs)))
-    rep.add_figs_to_section(p, '%s: Grand Average on Target' % subject,
-                            'Summary', image_format=img, comments=comment)
+    # #############################
+    # # run a spatio-temporal OLS #
+    # #############################
+    # names = ['intercept', 'fixation']
+    # stats = linear_regression(epochs, design_matrix, names)
+    #
+    # # can you do this at the group level?
+    # # run a spatio-temporal linear regression
+    # X = stats['fixation'].t_val.data.swapaxes(1, 2)
+    # cluster_stats = spatio_temporal_cluster_1samp_test(X, n_permutations=1000,
+    #                     threshold=threshold, tail=0, connectivity=connectivity)
 
-    names = ['intercept', 'fixation']
-    stats = linear_regression(epochs, design_matrix, names)
+    print 'get ready for decoding ;)'
 
-    # run a spatio-temporal linear regression
-    X = stats['fixation'].beta.data.swapaxes(1, 2)
-    connectivity, ch_names = read_ch_connectivity('KIT-208')
-    threshold = 2
-    p_accept = 0.05
-    cluster_stats = spatio_temporal_cluster_1samp_test(X, n_permutations=1000,
-                        threshold=threshold, tail=0, connectivity=connectivity)
-    asdf
-    # s = stats[names[-1]].mlog10_p_val
-    s = stats[names[-1]].t_val
-    # plot p-values
-    interval = int(plt_interval * 1e3 / decim)   # plot every 5ms
-    times = epochs.times[::interval]
-    figs = list()
-    for time in times:
-        # figs.append(s.plot_topomap(time, vmin=0, vmax=3, unit='',
-        #                            scale=1, cmap='Reds', show=False))
-        figs.append(s.plot_topomap(time, vmin=1, vmax=4, unit='',
-                                   scale=1, cmap='Reds', show=False))
-        plt.close()
-    # rep.add_slider_to_section(figs, times, 'Regression Analysis (-log10 p-val)')
-    rep.add_slider_to_section(figs, times, 'Regression Analysis (t-val)')
-    rep.save(fname_rep, open_browser=False, overwrite=True)
-
-    print "get ready for decoding ;)"
-    # handle the window at the end
-    first_samp = int(win * 1e3 / decim)
-    last_samp = -first_samp
-    times = epochs.times[first_samp:last_samp]
-    n_times = len(times)
-
-    scores = np.empty(n_times, np.float32)
-    std_scores = np.empty(n_times, np.float32)
-
-    # sklearn pipeline
-    scaler = StandardScaler()
-    concat = ConcatenateChannels()
-    regression = Ridge(alpha=1e-3)  # Ridge Regression
-
+    train_times = {'start': .2,
+                   'stop': .25,
+                   'length': length,
+                   'step': step
+                   }
     # Define 'y': what you're predicting
     y = design_matrix[:, -1]
-    # Define a monte-carlo cross-validation generator (reduce variance):
+    y = np.ones(len(y))
+    y[(len(y)/2):] = 0
+    # classifier
+    clf = Ridge(alpha=1e-3)  # Ridge Regression
     cv = ShuffleSplit(len(y), 10, test_size=0.2, random_state=random_state)
+    decod = TimeDecoding(clf=clf, times=train_times, scorer=rank_scorer,
+                         cv=cv, predict_mode='mean-prediction')
+    decod.fit(epochs, y=y)
+    decod.score(epochs, y=y)
+    asdf
+    gat = GeneralizationAcrossTime(predict_mode='mean-prediction', n_jobs=1,
+                                   train_times=train_times, scorer=rank_scorer,
+                                   clf=clf)
+    gat.fit(epochs, y=y)
+    gat.score(epochs, y=y)
+    group_gat[subject] = np.array(gat.scores_)
 
-    for t, time in enumerate(times):
-        # add progress indicator
-        progress = (t + 1.) * 100 / len(times)
-        sys.stdout.write("\r%f%%" % progress)
-        sys.stdout.flush()
-        # smoothing window
-        ep = epochs.crop(time - win, time + win, copy=True)
-        # Pipeline:
-        # Concatenate features, shape: (epochs, sensor * time window)
-        # Standardize features: mean-centered, normalized by std
-        # Run an Regression
-        reg = Pipeline([('concat', concat), ('scaler', scaler),
-                        ('regression', regression)])
-        Xt = ep.get_data()
 
-        # Run cross-validation
-        scores_t = cross_val_score(reg, Xt, y, cv=cv, scoring=rank_scorer,
-                                   n_jobs=1)
-        scores[t] = scores_t.mean(axis=0)
-        std_scores[t] = scores_t.std(axis=0)
+#########################
+# run a GAT clustering  #
+#########################
+group_gat_diff = np.array([group_gat[subject] for subject
+                           in config.subjects]) - .5
+n_subjects = len(config.subjects)
+n_chan = raw.info['nchan']
+connectivity, ch_names = read_ch_connectivity('KIT-208')
 
-    scores *= 100  # make it percentage
-    std_scores *= 100
-    group_scores.append(scores)
-    group_std_scores.append(std_scores)
+threshold = 1.96
+p_accept = 0.05
+group_gat['stats'] = stc_1samp_test(group_gat_diff, n_permutations=1000,
+                                    threshold=threshold, tail=0,
+                                    seed=random_state)
 
-    # Regression Rank CV score
-    plt.close('all')
-    fig = plt.figure()
-    plt.plot(times, scores, label="CV score")
-    plt.axhline(50, color='k', linestyle='--', label="Chance level")
-    plt.axvline(0, color='r', label='stim onset')
-    plt.legend()
-    hyp_limits = (scores - std_scores, scores + std_scores)
-    plt.fill_between(times, hyp_limits[0], y2=hyp_limits[1],
-                     color='b', alpha=0.5)
-    plt.xlabel('Times (ms)')
-    plt.ylabel('CV classification score (% correct)')
-    plt.ylim([30, 100])
-    plt.title('Sensor space decoding using Rank Scorer')
-
-    # decoding fig
-    rep.add_figs_to_section(fig, 'Decoding Score on Priming',
-                            'Decoding', image_format=img)
-    group_rep.add_figs_to_section(fig, '%s: Decoding Score on Priming'
-                                % subject, 'Subject Summary',
-                                image_format=img)
-    rep.save(fname_rep, open_browser=False, overwrite=True)
-
-# group average classification score
-first_samp = int(win * 1e3 / decim)
-last_samp = -first_samp
-times = epochs.times[first_samp:last_samp]
-scores = np.array(group_scores).mean(axis=0)
-std_scores = np.array(group_scores).std(axis=0)
-plt.close('all')
-fig = plt.figure()
-plt.plot(times, scores, label="Classif. score")
-plt.axhline(50, color='k', linestyle='--', label="Chance level")
-plt.axvline(0, color='r', label='stim onset')
-plt.legend()
-hyp_limits = (scores - std_scores, scores + std_scores)
-plt.fill_between(times, hyp_limits[0], y2=hyp_limits[1],
-                 color='b', alpha=0.5)
-plt.xlabel('Times (ms)')
-plt.ylabel('CV classification score (% correct)')
-plt.ylim([30, 100])
-plt.title('Group Average Sensor space decoding')
-group_rep.add_figs_to_section(fig, 'Group Average Decoding Score on Priming',
-                            'Group Summary', image_format=img)
-group_rep.save(fname_group % exp, open_browser=False, overwrite=True)
+# h5io.write_hdf5(fname_group_gat, group_gat)
+pickle.dump(group_gat, open(fname_group_gat, 'w'))

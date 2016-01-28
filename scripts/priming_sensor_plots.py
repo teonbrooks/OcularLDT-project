@@ -16,17 +16,17 @@ path = config.drive
 filt = config.filt
 img = config.img
 exp = 'OLDT'
-analysis = 'word-nonword_sensor_analysis'
+analysis = 'priming_sensor_analysis'
 results_dir = config.results_dir
 threshold = 1.96
 p_accept = 0.05
-
+c_names = ['word/target/primed', 'word/target/unprimed']
 
 # setup group
 group_template = op.join('%s', 'group', 'group_%s_%s_filt_%s.%s')
 fname_group_rep = group_template % (results_dir, exp, filt, analysis, 'html')
-fname_group_rerf = group_template % (path, exp, filt, 'rerf', 'mne')
-fname_group_gat = group_template % (path, exp, filt, 'gat', 'mne')
+fname_group_rerf = group_template % (path, exp, filt, analysis + '_rerf', 'mne')
+fname_group_gat = group_template % (path, exp, filt, analysis + '_gat', 'mne')
 
 subjects = config.subjects
 group_gat = pickle.load(open(fname_group_gat))
@@ -37,7 +37,7 @@ group_rep = Report()
 sfreq, times = group_gat['sfreq'], group_gat['times']
 
 #####################
-Individual Reports #
+#Individual Reports #
 #####################
 for subject in subjects:
     rep = Report()
@@ -45,7 +45,7 @@ for subject in subjects:
     fname_rep = subject_template % (exp, analysis, 'html')
     # plot individual difference waves
     rerf = group_rerf[subject]
-    rerf_diff = mne.evoked.combine_evoked([rerf['word'], rerf['nonword']],
+    rerf_diff = mne.evoked.combine_evoked([rerf[c_names[0]], rerf[c_names[1]]],
                                           weights=[1, -1])
     p = rerf_diff.plot(show=False)
     rep.add_figs_to_section(p, 'Difference Butterfly',
@@ -71,13 +71,12 @@ for subject in subjects:
 ################
 # Group Evoked #
 ################
-c_names = ['word', 'nonword']
-group_word = mne.grand_average([group_rerf[subject][c_names[0]] for subject
+group_c0 = mne.grand_average([group_rerf[subject][c_names[0]] for subject
                                 in subjects])
-group_nonword = mne.grand_average([group_rerf[subject][c_names[1]] for subject
+group_c1 = mne.grand_average([group_rerf[subject][c_names[1]] for subject
                                    in subjects])
 
-grand_averages = [group_word, group_nonword]
+grand_averages = [group_c0, group_c1]
 
 rerf_diff = mne.evoked.combine_evoked([grand_averages[0], grand_averages[1]],
                                       weights=[1, -1])
@@ -140,7 +139,7 @@ for i_clu, clu_idx in enumerate(good_cluster_inds):
 
     # add new axis for time courses and plot time courses
     ax_signals = divider.append_axes('right', size='300%', pad=1.2)
-    for signal, name, ls, color in zip(signals, condition_names, linestyles, colors):
+    for signal, name, ls, color in zip(signals, c_names, linestyles, colors):
         ax_signals.plot(times, signal, label=name, linestyle=ls, color=color)
 
     # add information
