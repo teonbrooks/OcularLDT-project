@@ -49,7 +49,7 @@ for subject in config.subjects:
         word_dict = dict(zip(trials, data[:, 4].astype(int)))
 
         for ia, ii in [('prime', 1), ('target', 2), ('post', 3)]:
-            times = ias.get_gaze_duration(ia=ii)
+            times = ias.get_gaze_duration(ia=ii, first_fix=True)
 
             # coding semantic priming
             semantics = [sem_dict[x] for x in times['trial']]

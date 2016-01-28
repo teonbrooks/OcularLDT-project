@@ -16,16 +16,16 @@ for subject in config.subjects:
                         % (subject, exp))
     fname_em = op.join(path, subject, 'edf', '%s_%s_fixation_times.txt'
                        % (subject, exp))
-    fname_dm = op.join(path, subject, 'mne', '%s_%s_design_matrix.txt'
+    fname_dm = op.join(path, subject, 'mne', '%s_%s_fixation_design_matrix.txt'
                        % (subject, exp))
-    fname_eve = op.join(path, subject, 'mne', '%s_%s_target_coreg-eve.txt'
+    fname_eve = op.join(path, subject, 'mne', '%s_%s_coreg-eve.txt'
                         % (subject, exp))
 
     if not op.exists(fname_dm) or redo:
         meg_ds = read_table(fname_meg, sep=',')
         meg_ds = meg_ds[meg_ds['recoded_trigger'] != 128]
         em_ds = read_table(fname_em, sep=',')
-        em_ds = em_ds[em_ds['ia'] == 'target']
+        # em_ds = em_ds[em_ds['ia'] == 'target']
 
         lookup = {key: idx for key, idx in zip(zip(meg_ds['trial'],
                   meg_ds['trigger']), range(len(meg_ds['trigger'])))}
@@ -36,9 +36,9 @@ for subject in config.subjects:
         triggers = list()
         for ii, dur in zip(interest, em_ds['ffd']):
             try:
-                i_starts.append(meg_ds.irow(lookup[ii])['i_start'])
+                i_starts.append(meg_ds.iloc[lookup[ii]]['i_start'])
                 durations.append(dur)
-                triggers.append(meg_ds.irow(lookup[ii])['recoded_trigger'])
+                triggers.append(meg_ds.iloc[lookup[ii]]['recoded_trigger'])
             except KeyError:
                 pass
         intercepts = np.ones(len(durations))
