@@ -56,7 +56,7 @@ def rank_scorer(y, y_pred):
     # because of dimensionality issues with the output of sklearn regression
     # one needs to ravel
     y = np.ravel(y)
-    y_pred = np.ravel(y)
+    y_pred = np.ravel(y_pred)
     n = y.size
     n_comb = sp.misc.comb(n, 2)
 
@@ -69,7 +69,7 @@ def rank_scorer(y, y_pred):
     # positive = correct prediction, negative = incorrect prediction
     score = y_compare * y_pred_compare
     # we need to remove the diagonal from the combinations
-    score = score[score > 0].sum()/ (2 * n_comb)
+    score = (score > 0).sum()/ (2 * n_comb)
 
     return score
 
@@ -139,8 +139,8 @@ for subject in config.subjects:
 
     print 'get ready for decoding ;)'
 
-    train_times = {'start': .2,
-                   'stop': .25,
+    train_times = {'start': tmin,
+                   'stop': tmax,
                    'length': length,
                    'step': step
                    }
