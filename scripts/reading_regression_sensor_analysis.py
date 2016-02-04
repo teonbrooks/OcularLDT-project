@@ -6,7 +6,7 @@ import scipy as sp
 
 from sklearn.preprocessing import LabelEncoder
 from sklearn.linear_model import Ridge
-from sklearn.cross_validation import ShuffleSplit
+from sklearn.cross_validation import ShuffleSplit, KFold
 
 import mne
 from mne.decoding import GeneralizationAcrossTime, TimeDecoding
@@ -30,7 +30,11 @@ tmin, tmax = -.2, 1
 # smoothing window
 length = decim * 1e-3
 step = decim * 1e-3
-event_id = config.event_id
+event_id = {'word/prime/unprimed': 1,
+            'word/target/unprimed': 2,
+            'word/prime/primed': 5,
+            'word/target/primed': 6,
+            }
 reject = config.reject
 # clustering
 connectivity, ch_names = read_ch_connectivity('KIT-208')
@@ -46,21 +50,13 @@ group_rerf = dict()
 group_rerf_diff = list()
 group_ols = dict()
 
-# # Ranker, not optimized
-# # y_true, y_pred
-# def rank_scorer_old(y, y_pred):
-#     comb = itertools.combinations(range(len(y)), 2)
-#     score = 0.
-#     for k, pair in enumerate(comb):
-#         i, j = pair
-#         if y[i] == y[j]:
-#             continue
-#         score += np.sign((y[i] - y[j]) * (y_pred[i] - y_pred[j])) > 0.
-#
-#     return score / float(k)
 
 # Ranker function
 def rank_scorer(y, y_pred):
+    # because of dimensionality issues with the output of sklearn regression
+    # one needs to ravel
+    y = np.ravel(y)
+    y_pred = np.ravel(y)
     n = y.size
     n_comb = sp.misc.comb(n, 2)
 
@@ -75,7 +71,6 @@ def rank_scorer(y, y_pred):
     # we need to remove the diagonal from the combinations
     score = score[score > 0].sum()/ (2 * n_comb)
 
-    asdf
     return score
 
 
@@ -85,7 +80,7 @@ for subject in config.subjects:
     subject_template = op.join(path, subject, 'mne', subject + '_%s%s.%s')
     fname_proj = subject_template % (exp, '_calm_' + filt + '_filt-proj', 'fif')
     fname_raw = subject_template % (exp, '_calm_' + filt + '_filt-raw', 'fif')
-    fname_evts = subject_template % (exp, '_coreg-eve', 'txt')
+    fname_evts = subject_template % (exp, '_fixation_coreg-eve', 'txt')
     fname_dm = subject_template % (exp, '_fixation_design_matrix', 'txt')
     # loading events and raw
     evts = mne.read_events(fname_evts)
@@ -112,8 +107,6 @@ for subject in config.subjects:
     # epochs rejection: filtering
     # drop based on MEG rejection, must happen first
     epochs.drop_bad_epochs(reject=reject)
-    design_matrix = design_matrix[epochs.selection]
-    # epochs = epochs['word/target']
     design_matrix = design_matrix[epochs.selection]
     # remove zeros
     idx = design_matrix[:, -1] > 0
@@ -153,19 +146,12 @@ for subject in config.subjects:
                    }
     # Define 'y': what you're predicting
     y = design_matrix[:, -1]
-    y = np.ones(len(y))
-    y[(len(y)/2):] = 0
     # classifier
     clf = Ridge(alpha=1e-3)  # Ridge Regression
-    cv = ShuffleSplit(len(y), 10, test_size=0.2, random_state=random_state)
-    decod = TimeDecoding(clf=clf, times=train_times, scorer=rank_scorer,
-                         cv=cv, predict_mode='mean-prediction')
-    decod.fit(epochs, y=y)
-    decod.score(epochs, y=y)
-    asdf
-    gat = GeneralizationAcrossTime(predict_mode='mean-prediction', n_jobs=1,
+    cv = KFold(n=len(y), n_folds=5, random_state=random_state)
+    gat = GeneralizationAcrossTime(predict_mode='cross-validation', n_jobs=1,
                                    train_times=train_times, scorer=rank_scorer,
-                                   clf=clf)
+                                   clf=clf, cv=cv)
     gat.fit(epochs, y=y)
     gat.score(epochs, y=y)
     group_gat[subject] = np.array(gat.scores_)
