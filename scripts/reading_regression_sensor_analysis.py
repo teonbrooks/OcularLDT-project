@@ -1,21 +1,21 @@
 import pickle
-import itertools
 import os.path as op
 import numpy as np
 import scipy as sp
 
-from sklearn.preprocessing import LabelEncoder
+from sklearn.preprocessing import LabelEncoder, StandardScaler
 from sklearn.linear_model import Ridge
-from sklearn.cross_validation import ShuffleSplit, KFold
+from sklearn.pipeline import Pipeline
+from sklearn.cross_validation import KFold
 
 import mne
-from mne.decoding import GeneralizationAcrossTime, TimeDecoding
-from mne.stats import (linear_regression, linear_regression_raw,
-                       spatio_temporal_cluster_1samp_test as stc_1samp_test,
-                       spatio_temporal_cluster_test as stc_test)
+from mne.decoding import GeneralizationAcrossTime
+from mne.stats import (linear_regression_raw,
+                       spatio_temporal_cluster_1samp_test as stc_1samp_test)
 from mne.channels import read_ch_connectivity
 
 import config
+
 
 # parameters
 path = config.drive
@@ -147,7 +147,8 @@ for subject in config.subjects:
     # Define 'y': what you're predicting
     y = design_matrix[:, -1]
     # classifier
-    clf = Ridge(alpha=1e-3)  # Ridge Regression
+    reg = Ridge(alpha=1e-3)  # Ridge Regression
+    clf = Pipeline([('scaler', StandardScaler()), ('ridge', reg)])
     cv = KFold(n=len(y), n_folds=5, random_state=random_state)
     gat = GeneralizationAcrossTime(predict_mode='cross-validation', n_jobs=1,
                                    train_times=train_times, scorer=rank_scorer,

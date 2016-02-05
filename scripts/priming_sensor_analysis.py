@@ -10,16 +10,18 @@ from mne.decoding import GeneralizationAcrossTime
 from mne.stats import (linear_regression_raw,
                        spatio_temporal_cluster_1samp_test as stc_1samp_test)
 from mne.channels import read_ch_connectivity
-# import h5io
 
 import config
+
 
 # parameters
 path = config.drive
 filt = config.filt
 img = config.img
 exp = 'OLDT'
-analysis = 'priming_sensor_analysis'
+clf_name = 'svc'
+analysis = 'priming_%s_sensor_analysis' % clf_name
+clf = make_pipeline(StandardScaler(), SVC())
 random_state = 42
 decim = 4
 # decoding parameters
@@ -73,7 +75,7 @@ for subject in config.subjects:
 
     # create epochs for gat
     epochs = mne.Epochs(raw, evts, event_id, tmin=tmin, tmax=tmax,
-                        baseline=None, reject=reject,
+                        baseline=None, reject=reject, decim=decim,
                         preload=True, verbose=False)
     epochs = epochs[[c_names[0], c_names[1]]]
     epochs.equalize_event_counts([c_names[0], c_names[1]], copy=False)
@@ -91,7 +93,7 @@ for subject in config.subjects:
                    'step': step
                    }
     gat = GeneralizationAcrossTime(predict_mode='cross-validation', n_jobs=1,
-                                   train_times=train_times)
+                                   train_times=train_times, clf=clf)
     gat.fit(epochs, y=y)
     gat.score(epochs, y=y)
     group_gat[subject] = np.array(gat.scores_)

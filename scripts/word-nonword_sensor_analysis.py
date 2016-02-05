@@ -2,8 +2,10 @@ import pickle
 import os.path as op
 import numpy as np
 
-from sklearn.preprocessing import LabelEncoder
+from sklearn.preprocessing import LabelEncoder, StandardScaler
 from sklearn.cross_validation import cross_val_score, ShuffleSplit
+from sklearn.svm import SVC
+from sklearn.pipeline import make_pipeline
 
 import mne
 from mne.decoding import GeneralizationAcrossTime
@@ -20,7 +22,9 @@ path = config.drive
 filt = config.filt
 img = config.img
 exp = 'OLDT'
-analysis = 'word-nonword_sensor_analysis'
+clf_name = 'svc'
+analysis = 'word-nonword_%s_sensor_analysis' % clf_name
+clf = make_pipeline(StandardScaler(), SVC())
 random_state = 42
 decim = 4
 # decoding parameters
@@ -51,6 +55,10 @@ for subject in config.subjects:
 
     # loading events and raw
     evts = mne.read_events(fname_evts)
+    # map word, then nonword
+    mne.event.merge_events(evts, [1, 2, 5, 6], 99)
+    mne.event.merge_events(evts, [9, 10], 100)
+    event_id = {'word': 99, 'nonword': 100}
     raw = mne.io.read_raw_fif(fname_raw, preload=True, verbose=False)
     c_names = ['word', 'nonword']
 
@@ -92,7 +100,7 @@ for subject in config.subjects:
                    'step': step
                    }
     gat = GeneralizationAcrossTime(predict_mode='cross-validation', n_jobs=1,
-                                   train_times=train_times)
+                                   train_times=train_times, clf=clf)
     gat.fit(epochs, y=y)
     gat.score(epochs, y=y)
     group_gat[subject] = np.array(gat.scores_)

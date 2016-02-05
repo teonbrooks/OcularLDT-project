@@ -21,9 +21,9 @@ drives = {'local': op.join(op.expanduser('~'), 'Experiments', 'E-MEG', 'data'),
          }
 # Parameters:
 redo = True
-results_dir = '/Users/teon/Dropbox/academic/Experiments/E-MEG/output/results/'
+results_dir = op.join(drives['dropbox'], 'results')
 reject = dict(mag=3e-12)
-baseline = (None, -.1)
+baseline = (-.2, -.1)
 img = 'png'
 filt = 'iir'
 banner = ('#' * 9 + '\n# %s #\n' + '#' * 9)
