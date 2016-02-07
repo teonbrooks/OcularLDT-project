@@ -16,7 +16,8 @@ path = config.drive
 filt = config.filt
 img = config.img
 exp = 'OLDT'
-analysis = 'priming_sensor_analysis'
+clf_name = 'svc'
+analysis = 'priming_%s_sensor_analysis' % clf_name
 results_dir = config.results_dir
 threshold = 1.96
 p_accept = 0.05
@@ -57,15 +58,15 @@ for subject in subjects:
     ax = pretty_gat(scores=scores, chance=.5, sfreq=sfreq, times=times)
     fig = ax.get_figure()
     # fig = gat.plot(title='GAT Decoding Score on Processing Word vs. Nonword')
-    rep.add_figs_to_section(fig, 'GAT Decoding Score on Word vs. Nonword',
+    rep.add_figs_to_section(fig, 'GAT Decoding Score on Primed vs. Unprimed',
                           'Decoding', image_format=img)
     scores = np.diag(scores)
     ax = pretty_decod(scores, chance=.5, sfreq=sfreq, times=times)
     fig = ax.get_figure()
     # fig = gat.plot_diagonal(title='Time Decoding on Processing Word '
     #                         'vs. Nonword')
-    rep.add_figs_to_section(fig, 'Time Decoding Score on Processing Word '
-                            'vs. Nonword', image_format=img)
+    rep.add_figs_to_section(fig, 'Time Decoding Score on Processing Primed '
+                            'vs. Unprimed', image_format=img)
     rep.save(fname_rep, open_browser=False, overwrite=True)
 
 ################

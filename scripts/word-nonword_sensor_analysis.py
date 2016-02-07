@@ -4,7 +4,8 @@ import numpy as np
 
 from sklearn.preprocessing import LabelEncoder, StandardScaler
 from sklearn.cross_validation import cross_val_score, ShuffleSplit
-from sklearn.svm import SVC
+from sklearn.svm import LinearSVC
+from sklearn.linear_model import LogisticRegression
 from sklearn.pipeline import make_pipeline
 
 import mne
@@ -13,7 +14,6 @@ from mne.stats import (linear_regression_raw,
                        spatio_temporal_cluster_1samp_test as stc_1samp_test,
                        spatio_temporal_cluster_test as stc_test)
 from mne.channels import read_ch_connectivity
-# import h5io
 
 import config
 
@@ -24,7 +24,7 @@ img = config.img
 exp = 'OLDT'
 clf_name = 'svc'
 analysis = 'word-nonword_%s_sensor_analysis' % clf_name
-clf = make_pipeline(StandardScaler(), SVC())
+clf = make_pipeline(StandardScaler(), LinearSVC())
 random_state = 42
 decim = 4
 # decoding parameters
@@ -56,8 +56,8 @@ for subject in config.subjects:
     # loading events and raw
     evts = mne.read_events(fname_evts)
     # map word, then nonword
-    mne.event.merge_events(evts, [1, 2, 5, 6], 99)
-    mne.event.merge_events(evts, [9, 10], 100)
+    evts = mne.event.merge_events(evts, [1, 2, 5, 6], 99)
+    evts = mne.event.merge_events(evts, [9, 10], 100)
     event_id = {'word': 99, 'nonword': 100}
     raw = mne.io.read_raw_fif(fname_raw, preload=True, verbose=False)
     c_names = ['word', 'nonword']
@@ -76,8 +76,7 @@ for subject in config.subjects:
                                  decim=decim, reject=reject)
     rerf_diff = mne.evoked.combine_evoked([rerf[c_names[0]], rerf[c_names[1]]],
                                           weights=[1, -1])
-    # take the magnitude of the difference so that the t-val is interpretable
-    group_rerf_diff.append(np.abs(rerf_diff.data.T))
+    group_rerf_diff.append(rerf_diff.data.T)
     group_rerf[subject] = rerf
 
     # create epochs for gat
@@ -93,13 +92,13 @@ for subject in config.subjects:
     print 'get ready for decoding ;)'
 
     # Generalization Across Time
-    # default GAT: LogisticRegression with KFold (n=5)
+    # default GAT: LogisticRegression with StratifiedKFold (n=5)
     train_times = {'start': tmin,
                    'stop': tmax,
                    'length': length,
                    'step': step
                    }
-    gat = GeneralizationAcrossTime(predict_mode='cross-validation', n_jobs=1,
+    gat = GeneralizationAcrossTime(predict_mode='cross-validation', n_jobs=-1,
                                    train_times=train_times, clf=clf)
     gat.fit(epochs, y=y)
     gat.score(epochs, y=y)
@@ -109,8 +108,8 @@ for subject in config.subjects:
 layout = mne.find_layout(epochs.info)
 # additional properties
 group_gat['layout'] = group_rerf['layout'] = layout
-group_gat['times'] = group_gat['times'] = epochs.times
-group_gat['sfreq'] = group_gat['sfreq'] = epochs.info['sfreq']
+group_gat['times'] = group_rerf['times'] = epochs.times
+group_gat['sfreq'] = group_rerf['sfreq'] = epochs.info['sfreq']
 
 # temp hack
 gat.scores_ = np.array([group_gat[subject] for subject
@@ -136,7 +135,6 @@ group_rerf['stats'] = stc_1samp_test(group_rerf_diff, n_permutations=1000,
                                      connectivity=connectivity,
                                      seed=random_state)
 
-# h5io.write_hdf5(fname_group_rerf, group_rerf)
 pickle.dump(group_rerf, open(fname_group_rerf, 'w'))
 
 

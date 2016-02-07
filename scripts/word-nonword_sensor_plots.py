@@ -16,7 +16,8 @@ path = config.drive
 filt = config.filt
 img = config.img
 exp = 'OLDT'
-analysis = 'word-nonword_sensor_analysis'
+clf_name = 'svc'
+analysis = 'word-nonword_%s_sensor_analysis' % clf_name
 results_dir = config.results_dir
 threshold = 1.96
 p_accept = 0.05
@@ -25,8 +26,8 @@ p_accept = 0.05
 # setup group
 group_template = op.join('%s', 'group', 'group_%s_%s_filt_%s.%s')
 fname_group_rep = group_template % (results_dir, exp, filt, analysis, 'html')
-fname_group_rerf = group_template % (path, exp, filt, 'rerf', 'mne')
-fname_group_gat = group_template % (path, exp, filt, 'gat', 'mne')
+fname_group_rerf = group_template % (path, exp, filt, analysis + '_rerf', 'mne')
+fname_group_gat = group_template % (path, exp, filt, analysis + '_gat', 'mne')
 
 subjects = config.subjects
 group_gat = pickle.load(open(fname_group_gat))
@@ -36,9 +37,9 @@ group_rep = Report()
 # add'l info
 sfreq, times = group_gat['sfreq'], group_gat['times']
 
-#####################
-Individual Reports #
-#####################
+######################
+# Individual Reports #
+######################
 for subject in subjects:
     rep = Report()
     subject_template = op.join(results_dir, subject, subject + '_%s_%s.%s')
@@ -140,7 +141,7 @@ for i_clu, clu_idx in enumerate(good_cluster_inds):
 
     # add new axis for time courses and plot time courses
     ax_signals = divider.append_axes('right', size='300%', pad=1.2)
-    for signal, name, ls, color in zip(signals, condition_names, linestyles, colors):
+    for signal, name, ls, color in zip(signals, c_names, linestyles, colors):
         ax_signals.plot(times, signal, label=name, linestyle=ls, color=color)
 
     # add information

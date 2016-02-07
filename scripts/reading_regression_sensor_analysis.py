@@ -22,7 +22,8 @@ path = config.drive
 filt = config.filt
 img = config.img
 exp = 'OLDT'
-analysis = 'reading_regression_sensor_analysis'
+clf_name = 'ridge'
+analysis = 'reading_%s_regression_sensor_analysis'
 random_state = 42
 decim = 4
 # decoding parameters
@@ -36,6 +37,9 @@ event_id = {'word/prime/unprimed': 1,
             'word/target/primed': 6,
             }
 reject = config.reject
+# classifier
+reg = Ridge(alpha=1e-3)  # Ridge Regression
+clf = Pipeline([('scaler', StandardScaler()), ('ridge', reg)])
 # clustering
 connectivity, ch_names = read_ch_connectivity('KIT-208')
 threshold = 1.96
@@ -85,6 +89,10 @@ for subject in config.subjects:
     # loading events and raw
     evts = mne.read_events(fname_evts)
 
+    # map word, then nonword
+    evts = mne.event.merge_events(evts, [1, 2, 5, 6], 99)
+    event_id = {'word': 99}
+
     # loading design matrix, epochs, proj
     design_matrix = np.loadtxt(fname_dm)
 
@@ -104,26 +112,44 @@ for subject in config.subjects:
                         baseline=None, decim=decim, reject=reject,
                         preload=True, verbose=False)
 
+    dm_keys = evts[:, 0]
     # epochs rejection: filtering
     # drop based on MEG rejection, must happen first
     epochs.drop_bad_epochs(reject=reject)
     design_matrix = design_matrix[epochs.selection]
+    dm_keys = dm_keys[epochs.selection]
     # remove zeros
     idx = design_matrix[:, -1] > 0
     epochs = epochs[idx]
     design_matrix = design_matrix[idx]
+    dm_keys = dm_keys[idx]
+    # define outliers
     durs = design_matrix[:, -1]
-    # and outliers
     mean, std = durs.mean(), durs.std()
     devs = np.abs(durs - mean)
     criterion = 3 * std
+    # remove outliers
     idx = devs < criterion
     epochs = epochs[idx]
     design_matrix = design_matrix[idx]
-    durs = design_matrix[:, -1]
+    dm_keys = dm_keys[idx]
 
-    assert len(design_matrix) == len(epochs)
-    group_ols[subject] = epochs.average()
+    assert len(design_matrix) == len(epochs) == len(dm_keys)
+    # group_ols[subject] = epochs.average()
+    # Define 'y': what you're predicting
+    y = design_matrix[:, -1]
+
+    # run a rERF
+    covariates = dict(zip(dm_keys, y))
+    rerf = linear_regression_raw(raw, evts, event_id, tmin=tmin, tmax=tmax,
+                                 decim=decim, reject=reject,
+                                 covariates=covariates)
+    rerf_diff = mne.evoked.combine_evoked([rerf[c_names[0]], rerf[c_names[1]]],
+                                          weights=[1, -1])
+    # take the magnitude of the difference so that the t-val is interpretable
+    group_rerf_diff.append(np.abs(rerf_diff.data.T))
+    group_rerf[subject] = rerf
+
 
     # #############################
     # # run a spatio-temporal OLS #
@@ -144,19 +170,25 @@ for subject in config.subjects:
                    'length': length,
                    'step': step
                    }
-    # Define 'y': what you're predicting
-    y = design_matrix[:, -1]
-    # classifier
-    reg = Ridge(alpha=1e-3)  # Ridge Regression
-    clf = Pipeline([('scaler', StandardScaler()), ('ridge', reg)])
     cv = KFold(n=len(y), n_folds=5, random_state=random_state)
-    gat = GeneralizationAcrossTime(predict_mode='cross-validation', n_jobs=1,
+    gat = GeneralizationAcrossTime(predict_mode='cross-validation', n_jobs=-1,
                                    train_times=train_times, scorer=rank_scorer,
                                    clf=clf, cv=cv)
     gat.fit(epochs, y=y)
     gat.score(epochs, y=y)
     group_gat[subject] = np.array(gat.scores_)
 
+# define a layout
+layout = mne.find_layout(epochs.info)
+# additional properties
+group_gat['layout'] = group_rerf['layout'] = layout
+group_gat['times'] = group_rerf['times'] = epochs.times
+group_gat['sfreq'] = group_rerf['sfreq'] = epochs.info['sfreq']
+
+# temp hack
+gat.scores_ = np.array([group_gat[subject] for subject
+                        in config.subjects]).mean(axis=0)
+group_gat['group'] = gat
 
 #########################
 # run a GAT clustering  #

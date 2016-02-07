@@ -2,8 +2,11 @@ import pickle
 import os.path as op
 import numpy as np
 
-from sklearn.preprocessing import LabelEncoder
+from sklearn.preprocessing import LabelEncoder, StandardScaler
 from sklearn.cross_validation import cross_val_score, ShuffleSplit
+from sklearn.svm import LinearSVC
+from sklearn.linear_model import LogisticRegression
+from sklearn.pipeline import make_pipeline
 
 import mne
 from mne.decoding import GeneralizationAcrossTime
@@ -21,7 +24,7 @@ img = config.img
 exp = 'OLDT'
 clf_name = 'svc'
 analysis = 'priming_%s_sensor_analysis' % clf_name
-clf = make_pipeline(StandardScaler(), SVC())
+clf = make_pipeline(StandardScaler(), LinearSVC())
 random_state = 42
 decim = 4
 # decoding parameters
@@ -69,8 +72,7 @@ for subject in config.subjects:
                                  decim=decim, reject=reject)
     rerf_diff = mne.evoked.combine_evoked([rerf[c_names[0]], rerf[c_names[1]]],
                                           weights=[1, -1])
-    # take the magnitude of the difference so that the t-val is interpretable
-    group_rerf_diff.append(np.abs(rerf_diff.data.T))
+    group_rerf_diff.append(rerf_diff.data.T)
     group_rerf[subject] = rerf
 
     # create epochs for gat
@@ -92,7 +94,7 @@ for subject in config.subjects:
                    'length': length,
                    'step': step
                    }
-    gat = GeneralizationAcrossTime(predict_mode='cross-validation', n_jobs=1,
+    gat = GeneralizationAcrossTime(predict_mode='cross-validation', n_jobs=-1,
                                    train_times=train_times, clf=clf)
     gat.fit(epochs, y=y)
     gat.score(epochs, y=y)
@@ -129,7 +131,6 @@ group_rerf['stats'] = stc_1samp_test(group_rerf_diff, n_permutations=1000,
                                      connectivity=connectivity,
                                      seed=random_state)
 
-# h5io.write_hdf5(fname_group_rerf, group_rerf)
 pickle.dump(group_rerf, open(fname_group_rerf, 'w'))
 
 
@@ -148,5 +149,4 @@ group_gat['stats'] = stc_1samp_test(group_gat_diff, n_permutations=1000,
                                     threshold=threshold, tail=0,
                                     seed=random_state)
 
-# h5io.write_hdf5(fname_group_gat, group_gat)
 pickle.dump(group_gat, open(fname_group_gat, 'w'))
