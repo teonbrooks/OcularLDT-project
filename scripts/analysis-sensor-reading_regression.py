@@ -10,7 +10,7 @@ from sklearn.cross_validation import KFold
 
 import mne
 from mne.decoding import GeneralizationAcrossTime
-from mne.stats import (linear_regression_raw,
+from mne.stats import (linear_regression_raw, linear_regression,
                        spatio_temporal_cluster_1samp_test as stc_1samp_test)
 from mne.channels import read_ch_connectivity
 
@@ -23,14 +23,14 @@ filt = config.filt
 img = config.img
 exp = 'OLDT'
 clf_name = 'ridge'
-analysis = 'reading_%s_regression_sensor_analysis'
+analysis = 'reading_%s_regression_10ms_sensor_analysis' % clf_name
 random_state = 42
-decim = 4
+decim = 2
 # decoding parameters
 tmin, tmax = -.2, 1
 # smoothing window
-length = decim * 1e-3
-step = decim * 1e-3
+length = 10 * 1e-3
+step = 10 * 1e-3
 event_id = {'word/prime/unprimed': 1,
             'word/target/unprimed': 2,
             'word/prime/primed': 5,
@@ -50,8 +50,8 @@ group_template = op.join(path, 'group', 'group_%s_%s_filt_%s_%s.%s')
 fname_group_gat = group_template % (exp, filt, analysis, 'gat', 'mne')
 
 group_gat = dict()
-group_rerf = dict()
-group_rerf_diff = list()
+group_reg = dict()
+group_reg_stats = list()
 group_ols = dict()
 
 
@@ -62,11 +62,22 @@ def rank_scorer(y, y_pred):
     y = np.ravel(y)
     y_pred = np.ravel(y_pred)
     n = y.size
+    # get the total number of combinations
     n_comb = sp.misc.comb(n, 2)
 
+    """
+    Comparisons
+    -----------
+    - You tile the `y` so you can have make all possible comparisons.
+    - When you transpose a copy of `y` and then subtract it,
+      you are now doing pairwise comparisons if each combination.
+    - The diagonal is a comparison with itself (remove), and above and below
+      are mirror of combinations, so you only need half of them.
+    """
     y_compare = np.tile(y, (n, 1))
     y_compare = y_compare - y_compare.T
 
+    # do the exact same thing for the y_pred
     y_pred_compare = np.tile(y_pred, (n, 1))
     y_pred_compare = y_pred_compare - y_pred_compare.T
 
@@ -95,6 +106,7 @@ for subject in config.subjects:
 
     # loading design matrix, epochs, proj
     design_matrix = np.loadtxt(fname_dm)
+    reg_names = ('intecept', 'ffd')
 
     # # let's look at the time around the fixation
     # durs = np.asarray(design_matrix[:, -1] * 1000, int)
@@ -112,17 +124,16 @@ for subject in config.subjects:
                         baseline=None, decim=decim, reject=reject,
                         preload=True, verbose=False)
 
-    dm_keys = evts[:, 0]
     # epochs rejection: filtering
     # drop based on MEG rejection, must happen first
     epochs.drop_bad_epochs(reject=reject)
     design_matrix = design_matrix[epochs.selection]
-    dm_keys = dm_keys[epochs.selection]
+    evts = evts[epochs.selection]
     # remove zeros
     idx = design_matrix[:, -1] > 0
     epochs = epochs[idx]
     design_matrix = design_matrix[idx]
-    dm_keys = dm_keys[idx]
+    evts = evts[idx]
     # define outliers
     durs = design_matrix[:, -1]
     mean, std = durs.mean(), durs.std()
@@ -132,7 +143,10 @@ for subject in config.subjects:
     idx = devs < criterion
     epochs = epochs[idx]
     design_matrix = design_matrix[idx]
-    dm_keys = dm_keys[idx]
+    evts = evts[idx]
+
+    # rerf keys
+    dm_keys = evts[:, 0]
 
     assert len(design_matrix) == len(epochs) == len(dm_keys)
     # group_ols[subject] = epochs.average()
@@ -141,27 +155,10 @@ for subject in config.subjects:
 
     # run a rERF
     covariates = dict(zip(dm_keys, y))
-    rerf = linear_regression_raw(raw, evts, event_id, tmin=tmin, tmax=tmax,
-                                 decim=decim, reject=reject,
-                                 covariates=covariates)
-    rerf_diff = mne.evoked.combine_evoked([rerf[c_names[0]], rerf[c_names[1]]],
-                                          weights=[1, -1])
-    # take the magnitude of the difference so that the t-val is interpretable
-    group_rerf_diff.append(np.abs(rerf_diff.data.T))
-    group_rerf[subject] = rerf
-
-
-    # #############################
-    # # run a spatio-temporal OLS #
-    # #############################
-    # names = ['intercept', 'fixation']
-    # stats = linear_regression(epochs, design_matrix, names)
-    #
-    # # can you do this at the group level?
-    # # run a spatio-temporal linear regression
-    # X = stats['fixation'].t_val.data.swapaxes(1, 2)
-    # cluster_stats = spatio_temporal_cluster_1samp_test(X, n_permutations=1000,
-    #                     threshold=threshold, tail=0, connectivity=connectivity)
+    # linear regression
+    reg = linear_regression(epochs, design_matrix, reg_names)
+    group_reg_stats.append(np.abs(reg['ffd'].t_val.data.T))
+    group_reg[subject] = reg['ffd']
 
     print 'get ready for decoding ;)'
 
@@ -181,9 +178,9 @@ for subject in config.subjects:
 # define a layout
 layout = mne.find_layout(epochs.info)
 # additional properties
-group_gat['layout'] = group_rerf['layout'] = layout
-group_gat['times'] = group_rerf['times'] = epochs.times
-group_gat['sfreq'] = group_rerf['sfreq'] = epochs.info['sfreq']
+group_gat['layout'] = group_reg['layout'] = layout
+group_gat['times'] = group_reg['times'] = epochs.times
+group_gat['sfreq'] = group_reg['sfreq'] = epochs.info['sfreq']
 
 # temp hack
 gat.scores_ = np.array([group_gat[subject] for subject

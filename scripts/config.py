@@ -40,8 +40,7 @@ event_id = {'word/prime/unprimed': 1,
             }
 
 # Bad Channels
-bads = defaultdict(lambda: ['MEG 130'])
-bads['A0148'] += ['MEG 130', 'MEG 084', 'MEG 072']
+bads = defaultdict(lambda: [])
 bads['A0023'] += ['MEG 059']
 bads['A0023'] += ['MEG 049', 'MEG 054']
 bads['A0136'] += ['MEG 057', 'MEG 128', 'MEG 179']
@@ -58,15 +57,18 @@ subjects = {'A0023': ['OLDT2', 'SENT2', 'OLDT1'],
             'A0123': ['OLDT1', 'SENT1', 'OLDT2'],
             'A0125': ['OLDT1', 'SENT2', 'OLDT2'],
             'A0127': ['OLDT2', 'SENT1', 'OLDT1'],
-            'A0129': ['OLDT1', 'SENT1', 'n/a'],
+            # 'A0129': ['OLDT1', 'SENT1', 'n/a'],
+            'A0129': ['OLDT1', 'SENT1', 'OLDT2'],
             'A0130': ['OLDT2', 'SENT2', 'OLDT1'],
             'A0134': ['OLDT2', 'SENT2', 'OLDT1'],
             'A0136': ['OLDT1', 'SENT1', 'OLDT2'],
-            'A0148': ['OLDT1', 'SENT1', 'n/a'],
+            # 'A0148': ['OLDT1', 'SENT1', 'n/a'],
+            'A0148': ['OLDT1', 'SENT1', 'OLDT2'],
             'A0150': ['OLDT2', 'SENT2', 'OLDT1'],
             'A0155': ['OLDT2', 'SENT2', 'OLDT1'],
             'A0159': ['OLDT1', 'SENT1', 'OLDT2'],
-            'A0161': ['n/a', 'SENT1', 'OLDT2'],
+            # 'A0161': ['n/a', 'SENT1', 'OLDT2'],
+            'A0161': ['OLDT1', 'SENT1', 'OLDT2'],
             'A0163': ['OLDT2', 'SENT2', 'OLDT1'],
             'A0164': ['OLDT2', 'SENT2', 'OLDT1'],
             }

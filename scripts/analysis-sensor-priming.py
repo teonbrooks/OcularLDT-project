@@ -22,9 +22,9 @@ path = config.drive
 filt = config.filt
 img = config.img
 exp = 'OLDT'
-clf_name = 'svc'
+clf_name = 'logit'
 analysis = 'priming_%s_sensor_analysis' % clf_name
-clf = make_pipeline(StandardScaler(), LinearSVC())
+clf = make_pipeline(StandardScaler(), LogisticRegression())
 random_state = 42
 decim = 4
 # decoding parameters

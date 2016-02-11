@@ -5,18 +5,17 @@ library("ggplot2")
 control = lmerControl(optimizer='bobyqa')
 
 
-data = read.table("/Volumes/GLYPH-1 TB/Experiments/E-MEG/data/group/group_OLDT_target_times.txt", quote="\"",
-                  col.names=c('subject', 'trigger', 'word','prime',
-                              'duration', 'mean', 'std'))
-data = data[data$word == 1,]
+data <- read.csv("/Volumes/teon-backup/Experiments/E-MEG/data/group/group_OLDT_fixation_times.txt")
+data = data[!is.na(data$ffd),]
+data = data[data$word == 'True',]
 data$subject = factor(data$subject)
 
 # remove outliers
-data[data$duration > data$mean + 3*data$std | 
-       data$duration < data$mean - 3*data$std,] = NA
+ffd.mean = mean(data$ffd, na.rm=TRUE)
+ffd.std = sd(data$ffd, na.rm=TRUE)
+data[data$ffd > ffd.mean + 3*ffd.std | data$ffd < ffd.mean - 3*ffd.std,] = NA
 
 # MLM
-model <- lmer(duration~prime + (1+prime|subject), data = data)
-means = aggregate(duration ~ prime, data = data, FUN = mean)
-std = aggregate(duration ~ prime, data = data, FUN = sd)
-
+model <- lmer(ffd~priming + (1+priming|subject), data = data)
+means = aggregate(ffd ~ priming, data = data, FUN = mean)
+std = aggregate(ffd ~ priming, data = data, FUN = sd)

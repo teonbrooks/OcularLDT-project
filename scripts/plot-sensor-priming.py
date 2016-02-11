@@ -16,7 +16,7 @@ path = config.drive
 filt = config.filt
 img = config.img
 exp = 'OLDT'
-clf_name = 'svc'
+clf_name = 'logit'
 analysis = 'priming_%s_sensor_analysis' % clf_name
 results_dir = config.results_dir
 threshold = 1.96
@@ -37,37 +37,6 @@ group_rep = Report()
 # add'l info
 sfreq, times = group_gat['sfreq'], group_gat['times']
 
-#####################
-#Individual Reports #
-#####################
-for subject in subjects:
-    rep = Report()
-    subject_template = op.join(results_dir, subject, subject + '_%s_%s.%s')
-    fname_rep = subject_template % (exp, analysis, 'html')
-    # plot individual difference waves
-    rerf = group_rerf[subject]
-    rerf_diff = mne.evoked.combine_evoked([rerf[c_names[0]], rerf[c_names[1]]],
-                                          weights=[1, -1])
-    p = rerf_diff.plot(show=False)
-    rep.add_figs_to_section(p, 'Difference Butterfly',
-                            'Evoked Difference Comparison',
-                            image_format=img)
-
-    # plot individual gat matrix
-    scores = group_gat[subject]
-    ax = pretty_gat(scores=scores, chance=.5, sfreq=sfreq, times=times)
-    fig = ax.get_figure()
-    # fig = gat.plot(title='GAT Decoding Score on Processing Word vs. Nonword')
-    rep.add_figs_to_section(fig, 'GAT Decoding Score on Primed vs. Unprimed',
-                          'Decoding', image_format=img)
-    scores = np.diag(scores)
-    ax = pretty_decod(scores, chance=.5, sfreq=sfreq, times=times)
-    fig = ax.get_figure()
-    # fig = gat.plot_diagonal(title='Time Decoding on Processing Word '
-    #                         'vs. Nonword')
-    rep.add_figs_to_section(fig, 'Time Decoding Score on Processing Primed '
-                            'vs. Unprimed', image_format=img)
-    rep.save(fname_rep, open_browser=False, overwrite=True)
 
 ################
 # Group Evoked #
@@ -82,7 +51,7 @@ grand_averages = [group_c0, group_c1]
 rerf_diff = mne.evoked.combine_evoked([grand_averages[0], grand_averages[1]],
                                       weights=[1, -1])
 fig = rerf_diff.plot()
-group_rep.add_figs_to_section(fig, 'Grand Average Difference', 'Evoked')
+group_rep.add_figs_to_section(fig, 'Grand Average Difference', 'Group Plots')
 
 ##############
 # Group RERF #
@@ -121,7 +90,7 @@ for i_clu, clu_idx in enumerate(good_cluster_inds):
 
     # initialize figure
     fig, ax_topo = plt.subplots(1, 1, figsize=(16, 3))
-    title = 'Cluster #{0}'.format(i_clu + 1)
+    title = 'rERF Cluster #{0}'.format(i_clu + 1)
     fig.suptitle(title, fontsize=14)
 
     # plot average test statistic and mark significant sensors
@@ -162,7 +131,7 @@ for i_clu, clu_idx in enumerate(good_cluster_inds):
     figs.append(fig)
     captions.append(title)
 
-group_rep.add_figs_to_section(figs, captions, 'Spatio-temporal tests')
+group_rep.add_figs_to_section(figs, captions, 'Group Plots')
 
 #############
 # Group GAT #
@@ -181,7 +150,7 @@ for subject, ax in zip(subjects, axes):
     # gat.scores_ = np.array(score)
     # gat.plot(ax=ax, show=False, xlabel=False, ylabel=False)
 fig.tight_layout()
-group_rep.add_figs_to_section(fig, 'Individual GATs', 'GAT',
+group_rep.add_figs_to_section(fig, 'Individual GATs', 'Individual Plots',
                               image_format=img)
 
 # group gat plot
@@ -189,8 +158,8 @@ T_obs, clusters, p_values, _ = group_gat['stats']
 sig = p_values < .05
 ax = pretty_gat(gat.scores_, chance=.5, sfreq=200, times=times)#, sig=sig)
 fig = ax.get_figure()
-# fig = gat.plot(title='Group GAT Decoding Score on Processing Word vs. Nonword')
-group_rep.add_figs_to_section(fig, 'Group GAT', 'GAT', image_format=img)
+ax.set_title('Group GAT scores on Processing Primed vs. Unprimed')
+group_rep.add_figs_to_section(fig, 'Group GAT', 'Group Plots', image_format=img)
 
 
 #######################
@@ -205,19 +174,16 @@ fig, axes = plt.subplots(5, 4, figsize=(20, 10))
 axes = [ax for axis in axes for ax in axis]
 for diag, ax in zip(group_diags, axes):
     pretty_decod(scores=diag, chance=.5, sfreq=sfreq, ax=ax, times=times)
-    # gat.scores_ = np.array(score)
-    # gat.plot(ax=ax, show=False, xlabel=False, ylabel=False)
 fig.tight_layout()
-group_rep.add_figs_to_section(fig, 'Individual TDs', 'Time Decoding',
+group_rep.add_figs_to_section(fig, 'Individual TDs', 'Individual Plots',
                               image_format=img)
 
 # group time decoding
 group_diags = np.array([np.diag(scores) for scores in group_scores])
 ax = pretty_decod(group_diags, chance=.5, sfreq=sfreq, times=times)
 fig = ax.get_figure()
-# fig = gat.plot_diagonal(title='Time Decoding on Processing Word vs. Nonword',
-#                         chance=.5)
-group_rep.add_figs_to_section(fig, 'Group Time Decoding', 'Time Decoding',
+ax.set_title('Group TD scores on Processing Primed vs. Unprimed')
+group_rep.add_figs_to_section(fig, 'Group Time Decoding', 'Group Plots',
                               image_format=img)
 
 group_rep.save(fname_group_rep, open_browser=False, overwrite=True)

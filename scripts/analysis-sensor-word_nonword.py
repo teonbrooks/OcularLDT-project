@@ -22,9 +22,9 @@ path = config.drive
 filt = config.filt
 img = config.img
 exp = 'OLDT'
-clf_name = 'svc'
+clf_name = 'logit'
 analysis = 'word-nonword_%s_sensor_analysis' % clf_name
-clf = make_pipeline(StandardScaler(), LinearSVC())
+clf = make_pipeline(StandardScaler(), LogisticRegression())
 random_state = 42
 decim = 4
 # decoding parameters
@@ -151,7 +151,7 @@ threshold = 1.96
 p_accept = 0.05
 group_gat['stats'] = stc_1samp_test(group_gat_diff, n_permutations=1000,
                                     threshold=threshold, tail=0,
-                                    seed=random_state)
+                                    seed=random_state, out_type='mask')
 
 # h5io.write_hdf5(fname_group_gat, group_gat)
 pickle.dump(group_gat, open(fname_group_gat, 'w'))

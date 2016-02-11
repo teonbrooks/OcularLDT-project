@@ -17,7 +17,7 @@ filt = config.filt
 img = config.img
 exp = 'OLDT'
 clf_name = 'ridge'
-analysis = 'reading_%s_regression_sensor_analysis' % clf_name
+analysis = 'reading_%s_regression_10ms_sensor_analysis' % clf_name
 results_dir = config.results_dir
 threshold = 1.96
 p_accept = 0.05
@@ -30,7 +30,7 @@ fname_group_rep = group_template % (results_dir, exp, filt, analysis, 'html')
 fname_group_gat = group_template % (path, exp, filt, analysis + '_gat', 'mne')
 
 subjects = config.subjects
-# group_gat = pickle.load(open(fname_group_gat))
+group_gat = pickle.load(open(fname_group_gat))
 # group_rerf = pickle.load(open(fname_group_rerf))
 group_rep = Report()
 
@@ -61,6 +61,7 @@ for subject in subjects:
     rep.add_figs_to_section(fig, 'GAT Decoding Score on Ranked Reading Times',
                           'Decoding', image_format=img)
     scores = np.diag(scores)
+    times = times[::2]
     ax = pretty_decod(scores, chance=.5, sfreq=sfreq, times=times)
     fig = ax.get_figure()
     # fig = gat.plot_diagonal(title='Time Decoding on Processing Word '
@@ -191,7 +192,7 @@ sig = p_values < .05
 ax = pretty_gat(gat.scores_, chance=.5, sfreq=200, times=times)#, sig=sig)
 fig = ax.get_figure()
 # fig = gat.plot(title='Group GAT Decoding Score on Processing Word vs. Nonword')
-group_rep.add_figs_to_section(fig, 'Group GAT', 'GAT', image_format=img)
+group_rep.add_figs_to_section(fig, 'Group GAT', 'Group Plots', image_format=img)
 
 
 #######################
