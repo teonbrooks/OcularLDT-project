@@ -3,6 +3,7 @@ import os.path as op
 import numpy as np
 from pandas import concat, DataFrame
 import config
+import config_raw
 from pyeparse import reading
 from _recode_events import _recode_events
 
@@ -17,17 +18,17 @@ fname_group = op.join(path, 'group', 'group_OLDT_fixation_times.txt')
 fname_ia = op.join(path, 'group', 'OLDT_IAs.txt')
 ia_words = ['fixation', 'prime', 'target', 'post']
 
-for subject in config.subjects:
+for subject, experiments in config_raw.subjects.items():
     print config.banner % subject
     # Define output
     fname_ds = op.join(path, subject, 'edf',
                        subject + '_OLDT_fixation_times.txt')
-    exps = [config.subjects[subject][0], config.subjects[subject][2]]
+    exps = [experiments[0], experiments[2]]
     if 'n/a' in exps:
         exps.pop(exps.index('n/a'))
     subject_ds = list()
     n_trials = 0
-    for exp in exps:
+    for ii, exp in enumerate(exps):
         # Define filenames
         fname_trial = glob(op.join(path, subject, 'edf',
                            '*_{}_*BLOCKTRIAL.dat'.format(exp)))[0]
@@ -48,7 +49,7 @@ for subject in config.subjects:
 
         # trial properties
         trials = np.arange(data.shape[0])
-        semantics = data[:, 3] == '1'
+        semantics = np.asarray(data[:, 3] == '1', int)
         sem_dict = dict(zip(trials, semantics))
         word_dict = dict(zip(trials, data[:, 4].astype(int)))
 
@@ -61,7 +62,7 @@ for subject in config.subjects:
             # coding semantic priming
             semantics = [sem_dict[x] for x in times['trial']]
             # defining word vs. nonword
-            words = [word_dict[x] != ii for x in times['trial']]
+            words = [int(word_dict[x] != ii) for x in times['trial']]
             # extracting triggering info from datasource file.
             # prime trigger is index 8, target trigger is index 10
             triggers = list()
@@ -76,7 +77,7 @@ for subject in config.subjects:
 
             # coding trigger events
             evts = np.zeros((len(triggers), 3))
-            evts[:, 2] = triggers
+            triggers_old = evts[:, 2] = triggers
             evts, fix_idx, primes_idx, targets_idx, \
                 semantic_idx, nonwords_idx = _recode_events(exp, evts)
             triggers = evts[:, -1]
@@ -84,11 +85,14 @@ for subject in config.subjects:
             # dummy label
             ia_label = [ia] * len(times)
             subject_label = [subject] * len(times)
+            block = np.ones(len(times), int) * ii
 
             columns = list(times.columns)
-            columns.extend(['priming', 'word', 'ia', 'trigger', 'subject'])
+            columns.extend(['priming', 'word', 'ia', 'trigger',
+                            'trigger_old', 'block', 'subject'])
             ds = map(DataFrame, [semantics, words, ia_label,
-                                 triggers, subject_label])
+                                 triggers, triggers_old,
+                                 block, subject_label])
             ds.insert(0, times.reset_index(drop=True))
             ds = concat(ds, axis=1)
             ds.columns = columns

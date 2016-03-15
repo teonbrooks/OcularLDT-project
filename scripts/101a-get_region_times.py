@@ -4,6 +4,7 @@ import numpy as np
 
 import pyeparse as pp
 import config
+import config_raw
 from _recode_events import _recode_events
 
 
@@ -13,15 +14,15 @@ redo = config.redo
 group_ds = list()
 fname_group = op.join(path, 'group', 'group_OLDT_region_times.txt')
 
-for subject in config.subjects:
+for subject, experiments in config_raw.subjects.items():
     print config.banner % subject
 
     # Define output
-    file_ds = op.join(path, subject, 'edf',
-                      subject + '_OLDT_region_times.txt')
+    fname = op.join(path, subject, 'edf', subject + '_OLDT_region_times.txt')
 
-    ds = [list(), list(), list(), list(), list(), list(), list()]
-    exps = [config.subjects[subject][0], config.subjects[subject][2]]
+    ds = [list(), list(), list(), list(),
+          list(), list(), list(), list(), list()]
+    exps = [experiments[0], experiments[2]]
     if 'n/a' in exps:
         exps.pop(exps.index('n/a'))
     for ii, exp in enumerate(exps):
@@ -72,7 +73,7 @@ for subject in config.subjects:
 
         # let's do some re-arranging
         times = np.hstack(times)
-        triggers = np.hstack(triggers)
+        triggers = triggers_old = np.hstack(triggers)
         trialids = np.hstack(trialids)
         ias = np.hstack(ias)
         # coding trigger events
@@ -82,30 +83,33 @@ for subject in config.subjects:
             semantic_idx, nonwords_idx = _recode_events(exp, evts)
         triggers = evts[:, -1]
 
-        semantics = np.zeros(len(triggers), bool)
+        semantics = np.zeros(len(triggers), int)
         semantics[semantic_idx] = 1
-        words = np.ones(len(triggers), bool)
+        words = np.ones(len(triggers), int)
         words[nonwords_idx] = 0
 
         # dummy label
         labels = [subject] * triggers.shape[0]
+        blocks = np.ones(triggers.shape[0], int) * ii
 
         ds[0].append(labels)
-        ds[1].append(trialids)
-        ds[2].append(triggers)
-        ds[3].append(words)
-        ds[4].append(semantics)
-        ds[5].append(times)
-        ds[6].append(ias)
+        ds[1].append(blocks)
+        ds[2].append(trialids)
+        ds[3].append(triggers)
+        ds[4].append(triggers_old)
+        ds[5].append(words)
+        ds[6].append(semantics)
+        ds[7].append(times)
+        ds[8].append(ias)
 
-    header = ['subject', 'trial', 'trigger', 'word', 'priming',
-              'dur', 'ia']
+    header = ['subject', 'block', 'trial', 'trigger', 'trigger_old',
+              'word', 'priming', 'dur', 'ia']
     ds = [np.hstack(d) for d in ds]
     ds = np.vstack(ds).T
     ds = np.vstack((header, ds))
 
-    np.savetxt(file_ds, ds, fmt='%s', delimiter=',')
+    np.savetxt(fname, ds, fmt='%s', delimiter=',')
     group_ds.append(ds)
 
 group_ds = np.vstack(group_ds)
-np.savetxt(file_ds, ds, fmt='%s', delimiter=',')
+np.savetxt(fname_group, group_ds, fmt='%s', delimiter=',')

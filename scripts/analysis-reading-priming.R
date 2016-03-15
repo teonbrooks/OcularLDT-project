@@ -7,15 +7,59 @@ control = lmerControl(optimizer='bobyqa')
 
 data <- read.csv("/Volumes/teon-backup/Experiments/E-MEG/data/group/group_OLDT_fixation_times.txt")
 data = data[!is.na(data$ffd),]
-data = data[data$word == 'True',]
+data = data[data$word == 1,]
 data$subject = factor(data$subject)
 
+# remove implausible fixations
+data = data[data$dur > .080,]
+
 # remove outliers
-ffd.mean = mean(data$ffd, na.rm=TRUE)
-ffd.std = sd(data$ffd, na.rm=TRUE)
-data[data$ffd > ffd.mean + 3*ffd.std | data$ffd < ffd.mean - 3*ffd.std,] = NA
+ffd = data
+ffd.mean = mean(ffd$ffd, na.rm=TRUE)
+ffd.std = sd(ffd$ffd, na.rm=TRUE)
+ffd[ffd$ffd > ffd.mean + 3*ffd.std | ffd$ffd < ffd.mean - 3*ffd.std,] = NA
+ffd = ffd[ffd$ia == 'target',]
 
 # MLM
-model <- lmer(ffd~priming + (1+priming|subject), data = data)
-means = aggregate(ffd ~ priming, data = data, FUN = mean)
-std = aggregate(ffd ~ priming, data = data, FUN = sd)
+model.ffd <- lmer(ffd~priming + trial + (1+priming|subject), data = ffd)
+means = aggregate(ffd ~ priming, data = ffd, FUN = mean)
+std = aggregate(ffd ~ priming, data = ffd, FUN = sd)
+
+
+# remove outliers
+data.mean = mean(data$dur, na.rm=TRUE)
+dur.std = sd(data$dur, na.rm=TRUE)
+data[data$dur > dur.mean + 3*dur.std | data$ffd < dur.mean - 3*dur.std,] = NA
+data = data[data$ia == 'target',]
+
+
+# MLM
+model.dur <- lmer(dur~priming + trial + (1+priming|subject), data = data)
+means = aggregate(dur ~ priming, data = data, FUN = mean)
+std = aggregate(dur ~ priming, data = data, FUN = sd)
+
+
+
+
+data <- read.csv("/Volumes/teon-backup/Experiments/E-MEG/data/group/group_OLDT_region_times.txt")
+data = data[!is.na(data$dur),]
+data = data[data$word == 1,]
+data$subject = factor(data$subject)
+data$dur = as.numeric(data$dur)
+data$trial = as.numeric(data$trial)
+
+
+# remove outliers
+data = data[data$dur > 80,]
+dur.mean = mean(data$dur, na.rm=TRUE)
+dur.std = sd(data$dur, na.rm=TRUE)
+data[data$dur > dur.mean + 3*dur.std | data$dur < dur.mean - 3*dur.std,] = NA
+
+# select target region
+data = data[data$ia == 'target',]
+
+# MLM
+model <- lmer(dur~priming + trial + (1+priming|subject), data = data)
+means = aggregate(dur ~ priming, data = data, FUN = mean)
+std = aggregate(dur ~ priming, data = data, FUN = sd)
+

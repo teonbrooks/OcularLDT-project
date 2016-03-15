@@ -26,16 +26,26 @@ c_names = ['word/target/primed', 'word/target/unprimed']
 # setup group
 group_template = op.join('%s', 'group', 'group_%s_%s_filt_%s.%s')
 fname_group_rep = group_template % (results_dir, exp, filt, analysis, 'html')
-fname_group_rerf = group_template % (path, exp, filt, analysis + '_rerf', 'mne')
-fname_group_gat = group_template % (path, exp, filt, analysis + '_gat', 'mne')
+fname_group = group_template % (path, exp, filt, analysis, 'mne')
 
 subjects = config.subjects
-group_gat = pickle.load(open(fname_group_gat))
-group_rerf = pickle.load(open(fname_group_rerf))
+group_dict = pickle.load(open(fname_group))
+group_gat = dict()
+group_rerf = dict()
+
+for subject in subjects:
+    subject_template = op.join(path, subject, 'mne', subject + '_%s%s.%s')
+    fname_gat = subject_template % (exp, '_calm_' + filt + '_filt_' + analysis
+                                    + '_gat.mne', 'npy')
+    fname_rerf = subject_template % (exp, '_calm_' + filt + '_filt_' + analysis
+                                     + '_rerf', 'mne')
+    group_gat[subject] = np.load(fname_gat)
+    group_rerf[subject] = pickle.load(open(fname_rerf))
+
 group_rep = Report()
 
 # add'l info
-sfreq, times = group_gat['sfreq'], group_gat['times']
+sfreq, times = group_dict['sfreq'], group_dict['times']
 
 
 ################
@@ -56,7 +66,7 @@ group_rep.add_figs_to_section(fig, 'Grand Average Difference', 'Group Plots')
 ##############
 # Group RERF #
 ##############
-T_obs, clusters, p_values, _ = group_rerf['stats']
+T_obs, clusters, p_values, _ = group_dict['rerf_stats']
 good_cluster_inds = np.where(p_values < p_accept)[0]
 
 
@@ -65,7 +75,7 @@ colors = 'r', 'steelblue'
 linestyles = '-', '-'
 
 # get sensor positions via layout
-pos = group_rerf['layout'].pos
+pos = group_dict['layout'].pos
 
 captions = list()
 figs = list()
@@ -136,8 +146,7 @@ group_rep.add_figs_to_section(figs, captions, 'Group Plots')
 #############
 # Group GAT #
 #############
-gat = group_gat['group']
-group_scores = np.array([group_gat[subject] for subject in subjects])
+sig = group_dict['gat_sig']
 
 # individual gat plots
 # dim = np.ceil(np.sqrt(len(group_scores))).astype(int)
@@ -147,16 +156,14 @@ axes = [ax for axis in axes for ax in axis]
 for subject, ax in zip(subjects, axes):
     pretty_gat(scores=group_gat[subject], chance=.5, sfreq=sfreq,
                ax=ax, times=times)
-    # gat.scores_ = np.array(score)
-    # gat.plot(ax=ax, show=False, xlabel=False, ylabel=False)
+    ax.set_title(subject)
 fig.tight_layout()
 group_rep.add_figs_to_section(fig, 'Individual GATs', 'Individual Plots',
                               image_format=img)
 
 # group gat plot
-T_obs, clusters, p_values, _ = group_gat['stats']
-sig = p_values < .05
-ax = pretty_gat(gat.scores_, chance=.5, sfreq=200, times=times)#, sig=sig)
+gg = np.mean(group_gat.values(), axis=0)
+ax = pretty_gat(scores=gg, chance=.5, sfreq=sfreq, times=times, sig=sig)
 fig = ax.get_figure()
 ax.set_title('Group GAT scores on Processing Primed vs. Unprimed')
 group_rep.add_figs_to_section(fig, 'Group GAT', 'Group Plots', image_format=img)
@@ -172,14 +179,14 @@ group_diags = np.array([np.diag(scores) for scores in group_scores])
 # fig, axes = plt.subplots(dim, dim, figsize=(20,10))
 fig, axes = plt.subplots(5, 4, figsize=(20, 10))
 axes = [ax for axis in axes for ax in axis]
-for diag, ax in zip(group_diags, axes):
+for subject, diag, ax in zip(subjects, group_diags, axes):
     pretty_decod(scores=diag, chance=.5, sfreq=sfreq, ax=ax, times=times)
+    ax.set_title(subject)
 fig.tight_layout()
 group_rep.add_figs_to_section(fig, 'Individual TDs', 'Individual Plots',
                               image_format=img)
 
 # group time decoding
-group_diags = np.array([np.diag(scores) for scores in group_scores])
 ax = pretty_decod(group_diags, chance=.5, sfreq=sfreq, times=times)
 fig = ax.get_figure()
 ax.set_title('Group TD scores on Processing Primed vs. Unprimed')
