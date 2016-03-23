@@ -26,7 +26,7 @@ c_names = ['word', 'nonword']
 # setup group
 group_template = op.join('%s', 'group', 'group_%s_%s_filt_%s.%s')
 fname_group_rep = group_template % (results_dir, exp, filt, analysis, 'html')
-fname_group = group_template % (path, exp, filt, analysis, 'mne')
+fname_group = group_template % (path, exp, filt, analysis + '_dict', 'mne')
 
 subjects = config.subjects
 group_dict = pickle.load(open(fname_group))
@@ -36,7 +36,7 @@ group_rerf = dict()
 for subject in subjects:
     subject_template = op.join(path, subject, 'mne', subject + '_%s%s.%s')
     fname_gat = subject_template % (exp, '_calm_' + filt + '_filt_' + analysis
-                                    + '_gat.mne', 'npy')
+                                    + '_gat', 'npy')
     fname_rerf = subject_template % (exp, '_calm_' + filt + '_filt_' + analysis
                                      + '_rerf', 'mne')
     group_gat[subject] = np.load(fname_gat)
@@ -56,7 +56,7 @@ group_c0 = mne.grand_average([group_rerf[subject][c_names[0]] for subject
 group_c1 = mne.grand_average([group_rerf[subject][c_names[1]] for subject
                                    in subjects])
 
-grand_averages = [group_c0 group_c1]
+grand_averages = [group_c0, group_c1]
 
 rerf_diff = mne.evoked.combine_evoked([grand_averages[0], grand_averages[1]],
                                       weights=[1, -1])
@@ -66,7 +66,7 @@ group_rep.add_figs_to_section(fig, 'Grand Average Difference', 'Group Plots')
 ##############
 # Group RERF #
 ##############
-T_obs, clusters, p_values, _ = group_rerf['stats']
+T_obs, clusters, p_values, _ = group_dict['rerf_stats']
 good_cluster_inds = np.where(p_values < p_accept)[0]
 
 
@@ -75,7 +75,7 @@ colors = 'r', 'steelblue'
 linestyles = '-', '-'
 
 # get sensor positions via layout
-pos = group_rerf['layout'].pos
+pos = group_dict['layout'].pos
 
 captions = list()
 figs = list()
@@ -172,7 +172,7 @@ group_rep.add_figs_to_section(fig, 'Group GAT', 'Group Plots', image_format=img)
 #######################
 # Group Time Decoding #
 #######################
-group_diags = np.array([np.diag(scores) for scores in group_scores])
+group_diags = np.array([np.diag(group_gat[subject]) for subject in subjects])
 
 # individual gat plots
 # dim = np.ceil(np.sqrt(len(group_scores))).astype(int)

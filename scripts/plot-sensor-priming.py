@@ -26,7 +26,7 @@ c_names = ['word/target/primed', 'word/target/unprimed']
 # setup group
 group_template = op.join('%s', 'group', 'group_%s_%s_filt_%s.%s')
 fname_group_rep = group_template % (results_dir, exp, filt, analysis, 'html')
-fname_group = group_template % (path, exp, filt, analysis, 'mne')
+fname_group = group_template % (path, exp, filt, analysis + '_dict', 'mne')
 
 subjects = config.subjects
 group_dict = pickle.load(open(fname_group))
@@ -36,7 +36,7 @@ group_rerf = dict()
 for subject in subjects:
     subject_template = op.join(path, subject, 'mne', subject + '_%s%s.%s')
     fname_gat = subject_template % (exp, '_calm_' + filt + '_filt_' + analysis
-                                    + '_gat.mne', 'npy')
+                                    + '_gat', 'npy')
     fname_rerf = subject_template % (exp, '_calm_' + filt + '_filt_' + analysis
                                      + '_rerf', 'mne')
     group_gat[subject] = np.load(fname_gat)
@@ -172,7 +172,7 @@ group_rep.add_figs_to_section(fig, 'Group GAT', 'Group Plots', image_format=img)
 #######################
 # Group Time Decoding #
 #######################
-group_diags = np.array([np.diag(scores) for scores in group_scores])
+group_diags = np.array([np.diag(group_gat[subject]) for subject in subjects])
 
 # individual gat plots
 # dim = np.ceil(np.sqrt(len(group_scores))).astype(int)

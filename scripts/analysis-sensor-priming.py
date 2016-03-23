@@ -43,10 +43,9 @@ c_names = ['word/target/primed', 'word/target/unprimed']
 group_template = op.join(path, 'group', 'group_%s_%s_filt_%s.%s')
 fname_group = group_template % (exp, filt, analysis + '_dict', 'mne')
 
-group_dict = dict()
-group_rerf = list()
 subjects = config.subjects
 
+print fname_group
 if redo:
     for subject in subjects:
         print config.banner % subject
@@ -58,7 +57,7 @@ if redo:
         fname_gat = subject_template % (exp, '_calm_' + filt + '_filt_' + analysis
                                         + '_gat', 'npy')
         fname_rerf = subject_template % (exp, '_calm_' + filt + '_filt_' + analysis
-                                         + '_rerf', 'mne')
+                                         + '_rerf-ave', 'fif')
 
 
         # loading events and raw
@@ -77,12 +76,11 @@ if redo:
         # run a rERF
         rerf = linear_regression_raw(raw, evts, event_id, tmin=tmin, tmax=tmax,
                                      decim=decim, reject=reject)
-        group_rerf.append(rerf)
         pickle.dump(rerf, open(fname_rerf, 'w'))
 
         # create epochs for gat
         epochs = mne.Epochs(raw, evts, event_id, tmin=tmin, tmax=tmax,
-                            baseline=(bmin, bmax), reject=reject, decim=decim,
+                            baseline=None, reject=reject, decim=decim,
                             preload=True, verbose=False)
         epochs = epochs[[c_names[0], c_names[1]]]
         epochs.equalize_event_counts([c_names[0], c_names[1]], copy=False)
@@ -103,7 +101,7 @@ if redo:
                                        train_times=train_times, clf=clf)
         gat.fit(epochs, y=y)
         gat.score(epochs, y=y)
-        np.save(fname_gat, np.array(gat.scores_))
+        np.save(fname_gat, gat.scores_)
 
     ##################
     # Auxiliary info #
@@ -111,6 +109,7 @@ if redo:
     # define a layout
     layout = mne.find_layout(epochs.info)
     # additional properties
+    group_dict = dict()
     group_dict['layout'] = layout
     group_dict['times'] = epochs.times
     group_dict['sfreq'] = epochs.info['sfreq']
@@ -120,9 +119,9 @@ else:
     group_dict = pickle.load(open(fname_group))
     subjects = group_dict['subjects']
 
-##############
-# Statistics #
-##############
+####################
+# Group Statistics #
+####################
 # Load the subject gats
 group_gat = list()
 group_rerf = list()
@@ -131,9 +130,9 @@ for subject in subjects:
     fname_gat = subject_template % (exp, '_calm_' + filt + '_filt_' + analysis
                                     + '_gat', 'npy')
     fname_rerf = subject_template % (exp, '_calm_' + filt + '_filt_' + analysis
-                                     + '_rerf', 'mne')
+                                     + '_rerf-ave', 'fif')
     group_gat.append(np.load(fname_gat))
-    rerf = pickle.load(open(fname_rerf))
+    rerf = mne.read_evoked(fname_rerf)
     # compute the diff
     rerf_diff = mne.evoked.combine_evoked([rerf[c_names[0]], rerf[c_names[1]]],
                                           weights=[1, -1])
@@ -160,11 +159,11 @@ group_dict['rerf_stats'] = stc_1samp_test(group_rerf, n_permutations=1000,
 # run a GAT clustering  #
 #########################
 # remove chance from the gats
-group_gat_diff = np.array(group_gat) - chance
-_, clusters, p_values, _ = stc_1samp_test(group_gat_diff, n_permutations=1000,
+group_gat = np.array(group_gat) - chance
+_, clusters, p_values, _ = stc_1samp_test(group_gat, n_permutations=1000,
                                           threshold=threshold, tail=0,
                                           seed=random_state, out_type='mask')
-p_values_ = np.ones_like(gat.scores_).T
+p_values_ = np.ones_like(group_gat[0]).T
 for cluster, pval in zip(clusters, p_values):
     p_values_[cluster.T] = pval
 group_dict['gat_sig'] = p_values_ < p_accept

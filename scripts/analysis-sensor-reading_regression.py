@@ -20,6 +20,7 @@ import config
 # parameters
 path = config.drive
 filt = config.filt
+redo = True
 img = config.img
 exp = 'OLDT'
 clf_name = 'ridge'
@@ -88,119 +89,152 @@ def rank_scorer(y, y_pred):
 
     return score
 
+if redo:
+    for subject in config.subjects:
+        print config.banner % subject
+        # define filenames
+        subject_template = op.join(path, subject, 'mne', subject + '_%s%s.%s')
+        fname_proj = subject_template % (exp, '_calm_' + filt + '_filt-proj', 'fif')
+        fname_raw = subject_template % (exp, '_calm_' + filt + '_filt-raw', 'fif')
+        fname_evts = subject_template % (exp, '_fixation_coreg-eve', 'txt')
+        fname_dm = subject_template % (exp, '_fixation_design_matrix', 'txt')
+        fname_gat = subject_template % (exp, '_calm_' + filt + '_filt_' + analysis
+                                        + '_gat', 'npy')
+        fname_reg = subject_template % (exp, '_calm_' + filt + '_filt_' + analysis
+                                        + '_reg-ave', 'fif')
+        # loading events and raw
+        evts = mne.read_events(fname_evts)
 
-for subject in config.subjects:
-    print config.banner % subject
-    # define filenames
+        # map word, then nonword
+        evts = mne.event.merge_events(evts, [1, 2, 5, 6], 99)
+        event_id = {'word': 99}
+
+        # loading design matrix, epochs, proj
+        design_matrix = np.loadtxt(fname_dm)
+        reg_names = ('intecept', 'ffd')
+
+        # # let's look at the time around the fixation
+        # durs = np.asarray(design_matrix[:, -1] * 1000, int)
+        # evts[:, 0] = evts[:, 0] + durs
+
+        raw = mne.io.read_raw_fif(fname_raw, preload=True, verbose=False)
+
+        # add/apply proj
+        proj = [mne.read_proj(fname_proj)[0]]
+        raw.add_proj(proj).apply_proj()
+        # select only meg channels
+        raw.pick_types(meg=True)
+
+        epochs = mne.Epochs(raw, evts, event_id, tmin=tmin, tmax=tmax,
+                            baseline=None, decim=decim, reject=reject,
+                            preload=True, verbose=False)
+
+        # epochs rejection: filtering
+        # drop based on MEG rejection, must happen first
+        epochs.drop_bad_epochs(reject=reject)
+        design_matrix = design_matrix[epochs.selection]
+        evts = evts[epochs.selection]
+        # remove zeros
+        idx = design_matrix[:, -1] > 0
+        epochs = epochs[idx]
+        design_matrix = design_matrix[idx]
+        evts = evts[idx]
+        # define outliers
+        durs = design_matrix[:, -1]
+        mean, std = durs.mean(), durs.std()
+        devs = np.abs(durs - mean)
+        criterion = 3 * std
+        # remove outliers
+        idx = devs < criterion
+        epochs = epochs[idx]
+        design_matrix = design_matrix[idx]
+        evts = evts[idx]
+
+        # rerf keys
+        dm_keys = evts[:, 0]
+
+        assert len(design_matrix) == len(epochs) == len(dm_keys)
+        # group_ols[subject] = epochs.average()
+        # Define 'y': what you're predicting
+        y = design_matrix[:, -1]
+
+        # run a rERF
+        covariates = dict(zip(dm_keys, y))
+        # linear regression
+        reg = linear_regression(epochs, design_matrix, reg_names)
+        reg['ffd'].beta.save(fname_reg)
+
+        print 'get ready for decoding ;)'
+
+        train_times = {'start': tmin,
+                       'stop': tmax,
+                       'length': length,
+                       'step': step
+                       }
+        cv = KFold(n=len(y), n_folds=5, random_state=random_state)
+        gat = GeneralizationAcrossTime(predict_mode='cross-validation', n_jobs=-1,
+                                       train_times=train_times, scorer=rank_scorer,
+                                       clf=clf, cv=cv)
+        gat.fit(epochs, y=y)
+        gat.score(epochs, y=y)
+        np.save(fname_gat, gat.scores_)
+
+    # define a layout
+    layout = mne.find_layout(epochs.info)
+    # additional properties
+    group_dict['layout'] = layout
+    group_dict['times'] = epochs.times
+    group_dict['sfreq'] = epochs.info['sfreq']
+
+else:
+    group_dict = pickle.load(open(fname_group))
+    subjects = group_dict['subjects']
+
+####################
+# Group Statistics #
+####################
+# Load the subject gats
+group_gat = list()
+group_reg = list()
+for subject in subjects:
     subject_template = op.join(path, subject, 'mne', subject + '_%s%s.%s')
-    fname_proj = subject_template % (exp, '_calm_' + filt + '_filt-proj', 'fif')
-    fname_raw = subject_template % (exp, '_calm_' + filt + '_filt-raw', 'fif')
-    fname_evts = subject_template % (exp, '_fixation_coreg-eve', 'txt')
-    fname_dm = subject_template % (exp, '_fixation_design_matrix', 'txt')
-    # loading events and raw
-    evts = mne.read_events(fname_evts)
+    fname_gat = subject_template % (exp, '_calm_' + filt + '_filt_' + analysis
+                                    + '_gat', 'npy')
+    fname_reg = subject_template % (exp, '_calm_' + filt + '_filt_' + analysis
+                                     + '_reg-ave', 'fif')
+    group_gat.append(np.load(fname_gat))
+    reg = mne.read_evoked(fname_reg)
+    # transpose for the stats func
+    group_reg.append(reg.data.T)
 
-    # map word, then nonword
-    evts = mne.event.merge_events(evts, [1, 2, 5, 6], 99)
-    event_id = {'word': 99}
+# Parameters
+threshold = 1.96
+p_accept = 0.05
+chance = .5
+n_subjects = len(config.subjects)
+connectivity, ch_names = read_ch_connectivity('KIT-208')
 
-    # loading design matrix, epochs, proj
-    design_matrix = np.loadtxt(fname_dm)
-    reg_names = ('intecept', 'ffd')
-
-    # # let's look at the time around the fixation
-    # durs = np.asarray(design_matrix[:, -1] * 1000, int)
-    # evts[:, 0] = evts[:, 0] + durs
-
-    raw = mne.io.read_raw_fif(fname_raw, preload=True, verbose=False)
-
-    # add/apply proj
-    proj = [mne.read_proj(fname_proj)[0]]
-    raw.add_proj(proj).apply_proj()
-    # select only meg channels
-    raw.pick_types(meg=True)
-
-    epochs = mne.Epochs(raw, evts, event_id, tmin=tmin, tmax=tmax,
-                        baseline=None, decim=decim, reject=reject,
-                        preload=True, verbose=False)
-
-    # epochs rejection: filtering
-    # drop based on MEG rejection, must happen first
-    epochs.drop_bad_epochs(reject=reject)
-    design_matrix = design_matrix[epochs.selection]
-    evts = evts[epochs.selection]
-    # remove zeros
-    idx = design_matrix[:, -1] > 0
-    epochs = epochs[idx]
-    design_matrix = design_matrix[idx]
-    evts = evts[idx]
-    # define outliers
-    durs = design_matrix[:, -1]
-    mean, std = durs.mean(), durs.std()
-    devs = np.abs(durs - mean)
-    criterion = 3 * std
-    # remove outliers
-    idx = devs < criterion
-    epochs = epochs[idx]
-    design_matrix = design_matrix[idx]
-    evts = evts[idx]
-
-    # rerf keys
-    dm_keys = evts[:, 0]
-
-    assert len(design_matrix) == len(epochs) == len(dm_keys)
-    # group_ols[subject] = epochs.average()
-    # Define 'y': what you're predicting
-    y = design_matrix[:, -1]
-
-    # run a rERF
-    covariates = dict(zip(dm_keys, y))
-    # linear regression
-    reg = linear_regression(epochs, design_matrix, reg_names)
-    group_reg_stats.append(np.abs(reg['ffd'].t_val.data.T))
-    group_reg[subject] = reg['ffd']
-
-    print 'get ready for decoding ;)'
-
-    train_times = {'start': tmin,
-                   'stop': tmax,
-                   'length': length,
-                   'step': step
-                   }
-    cv = KFold(n=len(y), n_folds=5, random_state=random_state)
-    gat = GeneralizationAcrossTime(predict_mode='cross-validation', n_jobs=-1,
-                                   train_times=train_times, scorer=rank_scorer,
-                                   clf=clf, cv=cv)
-    gat.fit(epochs, y=y)
-    gat.score(epochs, y=y)
-    group_gat[subject] = np.array(gat.scores_)
-
-# define a layout
-layout = mne.find_layout(epochs.info)
-# additional properties
-group_gat['layout'] = group_reg['layout'] = layout
-group_gat['times'] = group_reg['times'] = epochs.times
-group_gat['sfreq'] = group_reg['sfreq'] = epochs.info['sfreq']
-
-# temp hack
-gat.scores_ = np.array([group_gat[subject] for subject
-                        in config.subjects]).mean(axis=0)
-group_gat['group'] = gat
+#############################
+# run a spatio-temporal REG #
+#############################
+group_reg = np.array(group_reg)
+group_dict['reg_stats'] = stc_1samp_test(group_reg, n_permutations=1000,
+                                         threshold=threshold, tail=0,
+                                         connectivity=connectivity,
+                                         seed=random_state)
 
 #########################
 # run a GAT clustering  #
 #########################
-group_gat_diff = np.array([group_gat[subject] for subject
-                           in config.subjects]) - .5
-n_subjects = len(config.subjects)
+# remove chance from the gats
+group_gat = np.array(group_gat) - chance
 n_chan = raw.info['nchan']
-connectivity, ch_names = read_ch_connectivity('KIT-208')
+_, clusters, p_values, _ = stc_1samp_test(group_gat, n_permutations=1000,
+                                          threshold=threshold, tail=0,
+                                          seed=random_state, out_type='mask')
+p_values_ = np.ones_like(group_gat[0]).T
+for cluster, pval in zip(clusters, p_values):
+    p_values_[cluster.T] = pval
+group_dict['gat_sig'] = p_values_ < p_accept
 
-threshold = 1.96
-p_accept = 0.05
-group_gat['stats'] = stc_1samp_test(group_gat_diff, n_permutations=1000,
-                                    threshold=threshold, tail=0,
-                                    seed=random_state)
-
-# h5io.write_hdf5(fname_group_gat, group_gat)
-pickle.dump(group_gat, open(fname_group_gat, 'w'))
+pickle.dump(group_dict, open(fname_group, 'w'))
