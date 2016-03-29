@@ -10,50 +10,44 @@ from sklearn.cross_validation import KFold
 
 import mne
 from mne.decoding import GeneralizationAcrossTime
-from mne.stats import (linear_regression_raw, linear_regression,
-                       spatio_temporal_cluster_1samp_test as stc_1samp_test)
-from mne.channels import read_ch_connectivity
+from mne.stats import linear_regression
 
 import config
+from analysis_func import group_stats
 
 
 # parameters
+redo = True
 path = config.drive
 filt = config.filt
-redo = True
-img = config.img
 exp = 'OLDT'
 clf_name = 'ridge'
-analysis = 'reading_%s_regression_10ms_sensor_analysis' % clf_name
+analysis = 'reading_%s_regression_sensor_analysis' % clf_name
 random_state = 42
 decim = 2
-# decoding parameters
-tmin, tmax = -.2, 1
-# smoothing window
-length = 10 * 1e-3
-step = 10 * 1e-3
 event_id = {'word/prime/unprimed': 1,
             'word/target/unprimed': 2,
             'word/prime/primed': 5,
             'word/target/primed': 6,
             }
 reject = config.reject
+c_name = 'ffd'
+
 # classifier
 reg = Ridge(alpha=1e-3)  # Ridge Regression
 clf = Pipeline([('scaler', StandardScaler()), ('ridge', reg)])
-# clustering
-connectivity, ch_names = read_ch_connectivity('KIT-208')
-threshold = 1.96
-p_accept = 0.05
+
+# decoding parameters
+tmin, tmax = -.2, 1
+# smoothing window
+length = decim * 1e-3
+step = decim * 1e-3
 
 # setup group
 group_template = op.join(path, 'group', 'group_%s_%s_filt_%s_%s.%s')
-fname_group_gat = group_template % (exp, filt, analysis, 'gat', 'mne')
-
-group_gat = dict()
-group_reg = dict()
-group_reg_stats = list()
-group_ols = dict()
+fname_group = group_template % (exp, filt, analysis, 'dict', 'mne')
+group_dict = dict()
+group_dict['subjects'] = subjects = config.subjects
 
 
 # Ranker function
@@ -162,7 +156,7 @@ if redo:
         covariates = dict(zip(dm_keys, y))
         # linear regression
         reg = linear_regression(epochs, design_matrix, reg_names)
-        reg['ffd'].beta.save(fname_reg)
+        reg[c_name].beta.save(fname_reg)
 
         print 'get ready for decoding ;)'
 
@@ -177,6 +171,7 @@ if redo:
                                        clf=clf, cv=cv)
         gat.fit(epochs, y=y)
         gat.score(epochs, y=y)
+        print gat.scores_.shape
         np.save(fname_gat, gat.scores_)
 
     # define a layout
@@ -190,51 +185,6 @@ else:
     group_dict = pickle.load(open(fname_group))
     subjects = group_dict['subjects']
 
-####################
-# Group Statistics #
-####################
-# Load the subject gats
-group_gat = list()
-group_reg = list()
-for subject in subjects:
-    subject_template = op.join(path, subject, 'mne', subject + '_%s%s.%s')
-    fname_gat = subject_template % (exp, '_calm_' + filt + '_filt_' + analysis
-                                    + '_gat', 'npy')
-    fname_reg = subject_template % (exp, '_calm_' + filt + '_filt_' + analysis
-                                     + '_reg-ave', 'fif')
-    group_gat.append(np.load(fname_gat))
-    reg = mne.read_evoked(fname_reg)
-    # transpose for the stats func
-    group_reg.append(reg.data.T)
-
-# Parameters
-threshold = 1.96
-p_accept = 0.05
-chance = .5
-n_subjects = len(config.subjects)
-connectivity, ch_names = read_ch_connectivity('KIT-208')
-
-#############################
-# run a spatio-temporal REG #
-#############################
-group_reg = np.array(group_reg)
-group_dict['reg_stats'] = stc_1samp_test(group_reg, n_permutations=1000,
-                                         threshold=threshold, tail=0,
-                                         connectivity=connectivity,
-                                         seed=random_state)
-
-#########################
-# run a GAT clustering  #
-#########################
-# remove chance from the gats
-group_gat = np.array(group_gat) - chance
-n_chan = raw.info['nchan']
-_, clusters, p_values, _ = stc_1samp_test(group_gat, n_permutations=1000,
-                                          threshold=threshold, tail=0,
-                                          seed=random_state, out_type='mask')
-p_values_ = np.ones_like(group_gat[0]).T
-for cluster, pval in zip(clusters, p_values):
-    p_values_[cluster.T] = pval
-group_dict['gat_sig'] = p_values_ < p_accept
+group_dict.update(group_stats(subjects, path, exp, filt, analysis, c_name))
 
 pickle.dump(group_dict, open(fname_group, 'w'))

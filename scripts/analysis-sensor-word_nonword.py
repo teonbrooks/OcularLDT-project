@@ -10,10 +10,7 @@ from sklearn.pipeline import make_pipeline
 
 import mne
 from mne.decoding import GeneralizationAcrossTime
-from mne.stats import (linear_regression_raw,
-                       spatio_temporal_cluster_1samp_test as stc_1samp_test,
-                       spatio_temporal_cluster_test as stc_test)
-from mne.channels import read_ch_connectivity
+from mne.stats import linear_regression_raw
 
 import config
 
@@ -25,26 +22,26 @@ img = config.img
 exp = 'OLDT'
 clf_name = 'logit'
 analysis = 'word-nonword_%s_sensor_analysis' % clf_name
+decim = 2
+event_id = config.event_id
+reject = config.reject
+c_names = ['word', 'nonword']
+subjects = config.subjects
+
+# classifier
 clf = make_pipeline(StandardScaler(), LogisticRegression())
 random_state = 42
-decim = 2
 # decoding parameters
 tmin, tmax = -.2, 1
 # smoothing window
 length = decim * 1e-3
 step = decim * 1e-3
-event_id = config.event_id
-reject = config.reject
-c_names = ['word', 'nonword']
-
 
 # setup group
 group_template = op.join(path, 'group', 'group_%s_%s_filt_%s.%s')
 fname_group = group_template % (exp, filt, analysis + '_dict', 'mne')
 
-subjects = config.subjects
 
-print fname_group
 if redo:
     for subject in subjects:
         print config.banner % subject
@@ -78,7 +75,7 @@ if redo:
         # run a rERF
         rerf = linear_regression_raw(raw, evts, event_id, tmin=tmin, tmax=tmax,
                                      decim=decim, reject=reject)
-        pickle.dump(rerf, open(fname_rerf, 'w'))
+        mne.write_evokeds(fname_rerf, list(rerf.values()))
 
         # create epochs for gat
         epochs = mne.Epochs(raw, evts, event_id, tmin=tmin, tmax=tmax,
@@ -103,8 +100,7 @@ if redo:
                                        train_times=train_times, clf=clf)
         gat.fit(epochs, y=y)
         gat.score(epochs, y=y)
-        scores = np.array(gat.scores_)
-        np.save(fname_gat, scores)
+        np.save(fname_gat, gat.scores_)
 
     ##################
     # Auxiliary info #

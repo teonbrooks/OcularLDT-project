@@ -38,9 +38,9 @@ for subject in subjects:
     fname_gat = subject_template % (exp, '_calm_' + filt + '_filt_' + analysis
                                     + '_gat', 'npy')
     fname_rerf = subject_template % (exp, '_calm_' + filt + '_filt_' + analysis
-                                     + '_rerf', 'mne')
+                                     + '_rerf-ave', 'fif')
     group_gat[subject] = np.load(fname_gat)
-    group_rerf[subject] = pickle.load(open(fname_rerf))
+    group_rerf[subject] = mne.read_evokeds(fname_rerf)
 
 group_rep = Report()
 
