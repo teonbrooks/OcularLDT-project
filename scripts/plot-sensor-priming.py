@@ -15,6 +15,7 @@ import config
 path = config.drive
 filt = config.filt
 img = config.img
+# exp = config.exp
 exp = 'OLDT'
 clf_name = 'logit'
 analysis = 'priming_%s_sensor_analysis' % clf_name
@@ -51,22 +52,27 @@ sfreq, times = group_dict['sfreq'], group_dict['times']
 ################
 # Group Evoked #
 ################
-group_c0 = mne.grand_average([group_rerf[subject][c_names[0]] for subject
-                                in subjects])
-group_c1 = mne.grand_average([group_rerf[subject][c_names[1]] for subject
-                                   in subjects])
+group_c0 = list()
+group_c1 = list()
+for subject in subjects:
+    for r in group_rerf[subject]:
+        if r.comment == c_names[0]:
+            group_c0.append(r)
+        elif r.comment == c_names[1]:
+            group_c1.append(r)
 
+group_c0 = mne.grand_average(group_c0)
+group_c1 = mne.grand_average(group_c1)
 grand_averages = [group_c0, group_c1]
 
-rerf_diff = mne.evoked.combine_evoked([grand_averages[0], grand_averages[1]],
-                                      weights=[1, -1])
+rerf_diff = mne.evoked.combine_evoked([group_c0, group_c1], weights=[1, -1])
 fig = rerf_diff.plot()
 group_rep.add_figs_to_section(fig, 'Grand Average Difference', 'Group Plots')
 
 ##############
 # Group RERF #
 ##############
-T_obs, clusters, p_values, _ = group_dict['rerf_stats']
+T_obs, clusters, p_values, _ = group_dict['reg_stats']
 good_cluster_inds = np.where(p_values < p_accept)[0]
 
 

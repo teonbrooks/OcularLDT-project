@@ -19,11 +19,11 @@ from _recode_events import _recode_events
 
 redo = config.redo
 path = config.drive
-exp = 'OLDT'
+exp = config.exp
 filt = config.filt
 
 
-for subject in config.subjects:
+for subject in config.subjects[11:]:
     print config.banner % subject
 
     fname_template = op.join(path, subject, 'mne', '_'.join((subject, exp)))
@@ -41,8 +41,13 @@ for subject in config.subjects:
         idx = np.nonzero(evts[:, 2])[0]
         evts = evts[idx]
         # recode events
-        evts, fix_idx, primes_idx, targets_idx, \
-            semantic_idx, nonwords_idx = _recode_events(exp, evts)
+        if exp == 'OLDT':
+            evts, fix_idx, primes_idx, targets_idx, \
+                semantic_idx, nonwords_idx = _recode_events(exp, evts)
+        else:
+            evts, fix_idx, primes_idx, targets_idx, \
+                semantic_idx = _recode_events(exp, evts)
+
 
         """
         Writing the co-registration event file

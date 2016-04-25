@@ -5,8 +5,7 @@ import itertools
 import numpy as np
 
 
-mne_bin = '/Applications/packages/mne-c/bin'
-# drives
+# directories
 drives = {'local': op.join(op.expanduser('~'), 'Experiments', 'E-MEG', 'data'),
           'server': op.join('/Volumes', 'server', 'MORPHLAB', 'Teon',
                             'E-MEG', 'data'),
@@ -18,28 +17,38 @@ drives = {'local': op.join(op.expanduser('~'), 'Experiments', 'E-MEG', 'data'),
                                   'E-MEG', 'data'),
           'dropbox': op.join(op.expanduser('~'), 'Dropbox', 'academic',
                              'Experiments', 'E-MEG', 'output'),
+          'mne_bin': '/Applications/packages/mne-c/bin',
          }
-# Parameters:
+
+# Experiments
+experiments = ['OLDT', 'SENT']
+exp = experiments[0]
+
+# analysis parameters
 redo = True
 results_dir = op.join(drives['dropbox'], 'results')
 reject = dict(mag=3e-12)
 baseline = (-.2, -.1)
 img = 'png'
-filts = {'no': 'iir_no', 'hp0.03': 'iir_hp0.03_lp40',
+# can't really use `hp0.03` since there filter settings varied, name not true
+filts = {'no': 'iir_no',
+         'hp0.03': 'iir_hp0.03_lp40',  # DO NOT USE!
          'hp0.51': 'iir_hp0.51_lp40', 'hp1': 'iir_hp1_lp40'}
-filt = filts['no']
+# filt = filts['hp0.03_lp200']
+filt = filts['hp0.51']
 banner = ('#' * 9 + '\n# %s #\n' + '#' * 9)
 # determine which drive you're working from
 drive = 'home'
 event_id = {'word/prime/unprimed': 1,
             'word/target/unprimed': 2,
             'word/prime/primed': 5,
-            'word/target/primed': 6,
-            'nonword/prime': 9,
-            'nonword/target': 10,
-            # for the co-registration, there are no fixations in the evts
-            # 'fixation': 128
-            }
+            'word/target/primed': 6}
+if exp == 'OLDT':
+    event_id.update({'nonword/prime': 9, 'nonword/target': 10,
+                     # for the co-registration, there are no
+                     # fixations in the evts
+                     # 'fixation': 128
+                    })
 drive = drives[drive]
 subjects = glob(op.join(drive, 'A*'))
 for ii, subject in enumerate(subjects):

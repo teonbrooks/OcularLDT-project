@@ -12,7 +12,7 @@ path = config.drive
 redo = config.redo
 
 group_ds = list()
-fname_group = op.join(path, 'group', 'group_OLDT_fixation_times.txt')
+fname_group = op.join(path, 'group', 'group_%s_fixation_times.txt' % exp)
 
 # Define OLDT interest areas
 fname_ia = op.join(path, 'group', 'OLDT_IAs.txt')
@@ -22,7 +22,7 @@ for subject, experiments in config_raw.subjects.items():
     print config.banner % subject
     # Define output
     fname_ds = op.join(path, subject, 'edf',
-                       subject + '_OLDT_fixation_times.txt')
+                       subject + '_%s_fixation_times.txt' % exp)
     exps = [experiments[0], experiments[2]]
     if 'n/a' in exps:
         exps.pop(exps.index('n/a'))

@@ -11,17 +11,22 @@ import config
 layout = mne.channels.read_layout('KIT-AD.lout')
 img = config.img
 drive = config.drive
-exp = 'OLDT'
+exp = config.exp
 filt = config.filt
 redo = True
 reject = config.reject
 baseline = (-.2, -.1)
 tmin, tmax = -.5, 1
 ylim = dict(mag=[-300, 300])
-event_id = {'word/prime/unprimed': 1,
-            'word/prime/primed': 5,
-            'nonword/prime': 9,
-           }
+if exp == 'OLDT':
+    event_id = {'word/prime/unprimed': 1,
+                'word/prime/primed': 5,
+                'nonword/prime': 9,
+               }
+else:
+    event_id = {'word/prime/unprimed': 1,
+                'word/prime/primed': 5,
+               }
 
 fname_rep_group = op.join(config.results_dir, 'group',
                           'group_%s_%s_filt_pca-report.html' % (exp, filt))

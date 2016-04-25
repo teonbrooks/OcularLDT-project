@@ -11,15 +11,17 @@ from sklearn.pipeline import make_pipeline
 import mne
 from mne.decoding import GeneralizationAcrossTime
 from mne.stats import linear_regression_raw
+from mne.channels import read_ch_connectivity
 
 import config
+from analysis_func import group_stats
 
 # parameters
+redo = False
 path = config.drive
 filt = config.filt
-redo = True
 img = config.img
-exp = 'OLDT'
+exp = config.exp
 clf_name = 'logit'
 analysis = 'word-nonword_%s_sensor_analysis' % clf_name
 decim = 2
@@ -102,17 +104,6 @@ if redo:
         gat.score(epochs, y=y)
         np.save(fname_gat, gat.scores_)
 
-    ##################
-    # Auxiliary info #
-    ##################
-    # define a layout
-    layout = mne.find_layout(epochs.info)
-    # additional properties
-    group_dict = dict()
-    group_dict['layout'] = layout
-    group_dict['times'] = epochs.times
-    group_dict['sfreq'] = epochs.info['sfreq']
-    group_dict['subjects'] = subjects
 
 else:
     group_dict = pickle.load(open(fname_group))
@@ -121,51 +112,6 @@ else:
 ####################
 # Group Statistics #
 ####################
-# Load the subject gats
-group_gat = list()
-group_rerf = list()
-for subject in subjects:
-    subject_template = op.join(path, subject, 'mne', subject + '_%s%s.%s')
-    fname_gat = subject_template % (exp, '_calm_' + filt + '_filt_' + analysis
-                                    + '_gat', 'npy')
-    fname_rerf = subject_template % (exp, '_calm_' + filt + '_filt_' + analysis
-                                     + '_rerf', 'mne')
-    group_gat.append(np.load(fname_gat))
-    rerf = pickle.load(open(fname_rerf))
-    # compute the diff
-    rerf_diff = mne.evoked.combine_evoked([rerf[c_names[0]], rerf[c_names[1]]],
-                                          weights=[1, -1])
-    # transpose for the stats func
-    group_rerf.append(rerf_diff.data.T)
-
-# Parameters
-threshold = 1.96
-p_accept = 0.05
-chance = .5
-n_subjects = len(subjects)
-connectivity, ch_names = read_ch_connectivity('KIT-208')
-
-##############################
-# run a spatio-temporal RERF #
-##############################
-group_rerf = np.array(group_rerf)
-group_dict['rerf_stats'] = stc_1samp_test(group_rerf, n_permutations=1000,
-                                          threshold=threshold, tail=0,
-                                          connectivity=connectivity,
-                                          seed=random_state)
-
-#########################
-# run a GAT clustering  #
-#########################
-# remove chance from the gats
-group_gat = np.array(group_gat) - chance
-_, clusters, p_values, _ = stc_1samp_test(group_gat, n_permutations=1000,
-                                          threshold=threshold, tail=0,
-                                          seed=random_state, out_type='mask')
-
-p_values_ = np.ones_like(group_gat[0]).T
-for cluster, pval in zip(clusters, p_values):
-    p_values_[cluster.T] = pval
-group_dict['gat_sig'] = p_values_ < p_accept
-
-pickle.dump(group_dict, open(fname_group, 'w'))
+group_dict = group_stats(subjects, path, exp, filt, analysis, c_names)
+#
+# pickle.dump(group_dict, open(fname_group, 'w'))

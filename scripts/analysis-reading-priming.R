@@ -27,14 +27,15 @@ std = aggregate(ffd ~ priming, data = ffd, FUN = sd)
 
 
 # remove outliers
-data.mean = mean(data$dur, na.rm=TRUE)
-dur.std = sd(data$dur, na.rm=TRUE)
-data[data$dur > dur.mean + 3*dur.std | data$ffd < dur.mean - 3*dur.std,] = NA
-data = data[data$ia == 'target',]
+gzd = data
+gzd.mean = mean(gzd$dur, na.rm=TRUE)
+gzd.std = sd(gzd$dur, na.rm=TRUE)
+gzd[gzd$dur > gzd.mean + 3*gzd.std | gzd$dur < gzd.mean - 3*gzd.std,] = NA
+gzd = gzd[gzd$ia == 'target',]
 
 
 # MLM
-model.dur <- lmer(dur~priming + trial + (1+priming|subject), data = data)
+model.gzd <- lmer(dur~priming + trial + (1+priming|subject), data = data)
 means = aggregate(dur ~ priming, data = data, FUN = mean)
 std = aggregate(dur ~ priming, data = data, FUN = sd)
 

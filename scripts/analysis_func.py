@@ -7,7 +7,7 @@ from mne.channels import read_ch_connectivity
 from mne.stats import spatio_temporal_cluster_1samp_test as stc_1samp_test
 
 def group_stats(subjects, path, exp, filt, analysis, c_names, seed=42,
-                threshold=1.96, p_accept=0.05, chance=.5, n_perm=1000):
+                threshold=1.96, p_accept=0.05, chance=.5, n_perm=1000, reg_type='rerf'):
     # Load the subject gats
     group_gat = list()
     group_reg = list()
@@ -17,12 +17,19 @@ def group_stats(subjects, path, exp, filt, analysis, c_names, seed=42,
         fname_gat = subject_template % (exp, '_calm_' + filt + '_filt_' + analysis
                                         + '_gat', 'npy')
         fname_reg = subject_template % (exp, '_calm_' + filt + '_filt_' + analysis
-                                         + '_reg-ave', 'fif')
+                                         + '_%s-ave' % reg_type, 'fif')
         group_gat.append(np.load(fname_gat))
         reg = mne.read_evokeds(fname_reg)
         if isinstance(c_names, list):
-            reg = mne.evoked.combine_evoked([reg[c_names[0]], reg[c_names[1]]],
-                                            weights=[1, -1])
+            evokeds = list()
+            for r in reg:
+                if r.comment == c_names[0]:
+                    evokeds.insert(0, r)
+                elif r.comment == c_names[1]:
+                    evokeds.append(r)
+            assert len(evokeds) == 2
+            reg = mne.evoked.combine_evoked([evokeds[0], evokeds[1]],
+                                             weights=[1, -1])
         elif isinstance(c_names, str):
             reg = reg[0]
         # transpose for the stats func
@@ -30,7 +37,16 @@ def group_stats(subjects, path, exp, filt, analysis, c_names, seed=42,
 
     n_subjects = len(subjects)
     connectivity, ch_names = read_ch_connectivity('KIT-208')
+    ##################
+    # Auxiliary info #
+    ##################
+    # define a layout
+    layout = mne.find_layout(reg.info)
+    group_dict['layout'] = layout
+    group_dict['times'] = reg.times
+    group_dict['sfreq'] = reg.info['sfreq']
 
+    asdf
     #############################
     # run a spatio-temporal REG #
     #############################

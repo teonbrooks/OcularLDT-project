@@ -185,6 +185,9 @@ else:
     group_dict = pickle.load(open(fname_group))
     subjects = group_dict['subjects']
 
+####################
+# Group Statistics #
+####################
 group_dict.update(group_stats(subjects, path, exp, filt, analysis, c_name))
 
 pickle.dump(group_dict, open(fname_group, 'w'))

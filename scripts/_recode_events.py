@@ -84,10 +84,11 @@ def _recode_events(exp, evts, idx=True):
     evts[targets_idx, -1] += 2
     # semantic priming
     evts[semantic_idx, -1] += 4
+    # fixation
+    evts[fix_idx, -1] = 128
     if exp.startswith('OLDT'):
         # word vs nonword
         evts[nonwords_idx, -1] += 8
-    # fixation
-    evts[fix_idx, -1] = 128
-
-    return evts, fix_idx, primes_idx, targets_idx, semantic_idx, nonwords_idx
+        return evts, fix_idx, primes_idx, targets_idx, semantic_idx, nonwords_idx
+    else:
+        return evts, fix_idx, primes_idx, targets_idx, semantic_idx

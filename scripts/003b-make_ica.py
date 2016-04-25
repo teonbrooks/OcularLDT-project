@@ -11,54 +11,62 @@ filt = config.filt
 redo = config.redo
 reject = {'mag': 3e-12}
 baseline = (-.2, -.1)
-tmin, tmax = -.2, .03
+tmin, tmax = -.2, 1
+event_id = config.event_id
+
+fname_rep = op.join(config.results_dir, 'group',
+                    'group_%s_%s_filt_ica-report.html' % (exp, filt))
+rep = Report()
 
 
 for subject in config.subjects:
     print config.banner % subject
-
-    # define filenames
-    path = op.join(drive)
-    fname_rep = op.join(config.results_dir, subject,
-                        subject + '_%s_%s_filt_ica-report.html'
-                        % (exp, filt))
-
     if redo:
-        rep = Report()
+        # define filenames
+        path = op.join(drive)
+
+
+        # define filenames
+        subject_template = op.join(path, subject, 'mne', subject + '_%s%s.%s')
+        fname_raw = subject_template % (exp, '_calm_' + filt + '_filt-raw', 'fif')
+        fname_evts = subject_template % (exp, '-eve', 'txt')
+        evts = mne.read_events(fname_evts)
 
         # load from raw
-        exps = config.subjects[subject]
-        raw = config.kit2fiff(subject=subject, exp=exps[0],
-                              path=path, preload=False)
-        raw2 = config.kit2fiff(subject=subject, exp=exps[2],
-                              path=path, dig=False, preload=False)
-        mne.concatenate_raws([raw, raw2])
-        raw.info['bads'] = config.bads[subject]
-        raw.preload_data()
-        if filt == 'fft':
-            raw.filter(.1, 40, method=filt, l_trans_bandwidth=.05)
-        else:
-            raw.filter(1, 40, method=filt)
+        raw = mne.io.read_raw_fif(fname_raw, preload=False, verbose=False)
 
         # target eye-movements
-        evts = mne.find_stim_steps(raw, merge=-2)
-        epochs = mne.Epochs(raw, evts, None, tmin=tmin, tmax=tmax,
-                            baseline=baseline, reject=reject,
-                            preload=True, verbose=False)
-        epochs.pick_types(meg=True, exclude='bads')
-
+        epochs = mne.Epochs(raw, evts, event_id, tmin=tmin, tmax=tmax,
+                            reject=reject, preload=False, verbose=False)
         # plot evoked
         evoked = epochs.average()
         p = evoked.plot(titles={'mag': 'Original Evoked'}, show=False)
         rep.add_figs_to_section(p, 'Original Evoked Response to Saccade',
                                 'Summary', image_format=img)
-        epochs.crop(-.1, .03, copy=False)
+        # epochs.crop(-.1, .03, copy=False)
 
         # compute the ICA
-        ica = mne.preprocessing.ICA(.9, random_state=42, method='infomax')
-        ica.fit(epochs, decim=4)
+        ica = mne.preprocessing.ICA(.9, random_state=42, method='fastica')
+        ica.fit(raw, decim=4)
 
-        ics = ica.get_sources(epochs)
+        ics = ica.get_sources(epochs.copy().load_data())
+        picks=range(len(ics.info['chs']))
+        p = ica.plot_sources(evoked)
+        rep.add_figs_to_section(p, 'IC Evoked Response to Saccade',
+                                'Summary', image_format=img)
+        # p = ica.plot_components()
+        rep.add_figs_to_section(p, 'IC Topos', 'Summary', image_format=img)
+
+        rep.save(fname_rep, overwrite=True)
+        asdf
+
+
+        ics.crop(-.03, .03, copy=False)
+        ics_mean = ics.average()
+        ics_std_error = ics.standard_error()
+        ics_wald = ics_mean / ics_std_error
+        ics_
+
         import numpy as np
         freqs = np.arange(4, 30, 2)
         cycles = freqs / 3.
