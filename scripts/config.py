@@ -11,7 +11,7 @@ drives = {'local': op.join(op.expanduser('~'), 'Experiments', 'E-MEG', 'data'),
                             'E-MEG', 'data'),
           'home': op.join('/Volumes', 'teon-backup', 'Experiments',
                           'E-MEG', 'data'),
-          'office': op.join('/Volumes', 'office', 'Experiments',
+          'office': op.join('/Volumes', 'backup', 'Experiments',
                             'E-MEG', 'data'),
           'google_drive': op.join(op.expanduser('~'), 'Google Drive',
                                   'E-MEG', 'data'),
@@ -38,7 +38,7 @@ filts = {'no': 'iir_no',
 filt = filts['hp0.51']
 banner = ('#' * 9 + '\n# %s #\n' + '#' * 9)
 # determine which drive you're working from
-drive = 'home'
+drive = 'office'
 event_id = {'word/prime/unprimed': 1,
             'word/target/unprimed': 2,
             'word/prime/primed': 5,

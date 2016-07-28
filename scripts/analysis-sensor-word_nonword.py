@@ -17,7 +17,7 @@ import config
 from analysis_func import group_stats
 
 # parameters
-redo = False
+redo = True
 path = config.drive
 filt = config.filt
 img = config.img
@@ -113,5 +113,5 @@ else:
 # Group Statistics #
 ####################
 group_dict = group_stats(subjects, path, exp, filt, analysis, c_names)
-#
-# pickle.dump(group_dict, open(fname_group, 'w'))
+
+pickle.dump(group_dict, open(fname_group, 'w'))

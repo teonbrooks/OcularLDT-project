@@ -18,7 +18,9 @@ def group_stats(subjects, path, exp, filt, analysis, c_names, seed=42,
                                         + '_gat', 'npy')
         fname_reg = subject_template % (exp, '_calm_' + filt + '_filt_' + analysis
                                          + '_%s-ave' % reg_type, 'fif')
-        group_gat.append(np.load(fname_gat))
+        gat = np.load(fname_gat)
+        group_gat.append(gat)
+
         reg = mne.read_evokeds(fname_reg)
         if isinstance(c_names, list):
             evokeds = list()
@@ -46,7 +48,6 @@ def group_stats(subjects, path, exp, filt, analysis, c_names, seed=42,
     group_dict['times'] = reg.times
     group_dict['sfreq'] = reg.info['sfreq']
 
-    asdf
     #############################
     # run a spatio-temporal REG #
     #############################
@@ -69,5 +70,24 @@ def group_stats(subjects, path, exp, filt, analysis, c_names, seed=42,
     for cluster, pval in zip(clusters, p_values):
         p_values_[cluster.T] = pval
     group_dict['gat_sig'] = p_values_ < p_accept
+
+    # #########################
+    # # run a GAT clustering  #
+    # #########################
+    # # determining deviation from diag
+    # for
+    # diag = np.diag(gat)[:, np.newaxis]
+    # dev = gat - diag
+    # group_dev.append(dev)
+    #
+    # group_gat = np.array(group_dev) - chance
+    # n_chan = len(ch_names)
+    # _, clusters, p_values, _ = stc_1samp_test(group_gat, n_permutations=n_perm,
+    #                                           threshold=threshold, tail=0,
+    #                                           seed=seed, out_type='mask')
+    # p_values_ = np.ones_like(group_gat[0]).T
+    # for cluster, pval in zip(clusters, p_values):
+    #     p_values_[cluster.T] = pval
+    # group_dict['gat_sig'] = p_values_ < p_accept
 
     return group_dict
