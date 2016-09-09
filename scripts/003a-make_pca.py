@@ -52,7 +52,7 @@ for subject in config.subjects:
 
         # compute the SSP
         evoked = epochs.average()
-        ev_proj = evoked.crop(-.1, .03, copy=True)
+        ev_proj = evoked.copy().crop(-.1, .03)
         projs = mne.compute_proj_evoked(ev_proj, n_mag=3)
 
         # apply projector individually

@@ -22,6 +22,7 @@ path = config.drive
 filt = config.filt
 exp = 'OLDT'
 clf_name = 'ridge'
+reg_type = 'reg'
 analysis = 'reading_%s_regression_sensor_analysis' % clf_name
 random_state = 42
 decim = 2
@@ -42,6 +43,7 @@ tmin, tmax = -.2, 1
 # smoothing window
 length = decim * 1e-3
 step = decim * 1e-3
+n_folds = 5
 
 # setup group
 group_template = op.join(path, 'group', 'group_%s_%s_filt_%s_%s.%s')
@@ -96,6 +98,10 @@ if redo:
                                         + '_gat', 'npy')
         fname_reg = subject_template % (exp, '_calm_' + filt + '_filt_' + analysis
                                         + '_reg-ave', 'fif')
+        fname_cov = subject_template % (exp, '_calm_' + filt + '_filt_' + analysis
+                                        + '_data-cov', 'fif')
+        fname_weights = subject_template % (exp, '_calm_' + filt + '_filt_'
+                                            + analysis + '_gat_weights', 'npy')
         # loading events and raw
         evts = mne.read_events(fname_evts)
 
@@ -105,7 +111,7 @@ if redo:
 
         # loading design matrix, epochs, proj
         design_matrix = np.loadtxt(fname_dm)
-        reg_names = ('intecept', 'ffd')
+        reg_names = ('intercept', 'ffd')
 
         # # let's look at the time around the fixation
         # durs = np.asarray(design_matrix[:, -1] * 1000, int)
@@ -125,7 +131,7 @@ if redo:
 
         # epochs rejection: filtering
         # drop based on MEG rejection, must happen first
-        epochs.drop_bad_epochs(reject=reject)
+        epochs.drop_bad(reject=reject)
         design_matrix = design_matrix[epochs.selection]
         evts = evts[epochs.selection]
         # remove zeros
@@ -165,7 +171,7 @@ if redo:
                        'length': length,
                        'step': step
                        }
-        cv = KFold(n=len(y), n_folds=5, random_state=random_state)
+        cv = KFold(n=len(y), n_folds=n_folds, random_state=random_state)
         gat = GeneralizationAcrossTime(predict_mode='cross-validation', n_jobs=-1,
                                        train_times=train_times, scorer=rank_scorer,
                                        clf=clf, cv=cv)
@@ -173,6 +179,16 @@ if redo:
         gat.score(epochs, y=y)
         print gat.scores_.shape
         np.save(fname_gat, gat.scores_)
+
+        # store weights
+        weights = list()
+        for fold in range(n_folds):
+            # weights explained: gat.estimator_[time_point][fold].steps[-1][-1].coef_
+            weights.append(np.vstack([gat.estimators_[idx][fold].steps[-1][-1].coef_
+                                      for idx in range(len(epochs.times))]))
+        np.save(fname_weights, np.array(weights))
+        cov = mne.compute_covariance(epochs)
+        cov.save(fname_cov)
 
     # define a layout
     layout = mne.find_layout(epochs.info)
@@ -188,6 +204,7 @@ else:
 ####################
 # Group Statistics #
 ####################
-group_dict.update(group_stats(subjects, path, exp, filt, analysis, c_name))
+group_dict.update(group_stats(subjects, path, exp, filt, analysis, c_name,
+                              reg_type=reg_type))
 
 pickle.dump(group_dict, open(fname_group, 'w'))

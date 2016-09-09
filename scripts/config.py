@@ -33,8 +33,8 @@ img = 'png'
 # can't really use `hp0.03` since there filter settings varied, name not true
 filts = {'no': 'iir_no',
          'hp0.03': 'iir_hp0.03_lp40',  # DO NOT USE!
+         'hp0.1': 'iir_hp0.1_lp40',  # try this after thesis is completed
          'hp0.51': 'iir_hp0.51_lp40', 'hp1': 'iir_hp1_lp40'}
-# filt = filts['hp0.03_lp200']
 filt = filts['hp0.51']
 banner = ('#' * 9 + '\n# %s #\n' + '#' * 9)
 # determine which drive you're working from

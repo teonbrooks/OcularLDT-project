@@ -32,6 +32,7 @@ subjects = config.subjects
 
 # classifier
 clf = make_pipeline(StandardScaler(), LogisticRegression())
+n_folds = 5
 random_state = 42
 # decoding parameters
 tmin, tmax = -.2, 1
@@ -56,6 +57,11 @@ if redo:
                                         + '_gat', 'npy')
         fname_rerf = subject_template % (exp, '_calm_' + filt + '_filt_' + analysis
                                          + '_rerf-ave', 'fif')
+        fname_cov = subject_template % (exp, '_calm_' + filt + '_filt_' + analysis
+                                        + '_data-cov', 'fif')
+        fname_weights = subject_template % (exp, '_calm_' + filt + '_filt_'
+                                            + analysis + '_gat_weights', 'npy')
+
 
         # loading events and raw
         evts = mne.read_events(fname_evts)
@@ -99,10 +105,21 @@ if redo:
                        'step': step
                        }
         gat = GeneralizationAcrossTime(predict_mode='cross-validation', n_jobs=-1,
-                                       train_times=train_times, clf=clf)
+                                       train_times=train_times, clf=clf,
+                                       cv=n_folds)
         gat.fit(epochs, y=y)
         gat.score(epochs, y=y)
         np.save(fname_gat, gat.scores_)
+
+        # store weights
+        weights = list()
+        for fold in range(n_folds):
+            # weights explained: gat.estimator_[time_point][fold].steps[-1][-1].coef_
+            weights.append(np.vstack([gat.estimators_[idx][fold].steps[-1][-1].coef_
+                                      for idx in range(len(epochs.times))]))
+        np.save(fname_weights, np.array(weights))
+        cov = mne.compute_covariance(epochs)
+        cov.save(fname_cov)
 
 
 else:
