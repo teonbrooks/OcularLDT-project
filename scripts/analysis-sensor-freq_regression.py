@@ -23,7 +23,8 @@ filt = config.filt
 exp = 'OLDT'
 clf_name = 'ridge'
 reg_type = 'reg'
-analysis = 'reading_%s_regression_sensor_analysis' % clf_name
+c_name = 'freq'
+analysis = '%s_%s_regression_sensor_analysis' % (c_name, clf_name)
 random_state = 42
 decim = 2
 event_id = {'word/prime/unprimed': 1,
@@ -32,7 +33,7 @@ event_id = {'word/prime/unprimed': 1,
             'word/target/primed': 6,
             }
 reject = config.reject
-c_name = 'ffd'
+
 
 # classifier
 reg = Ridge(alpha=1e-3)  # Ridge Regression
@@ -93,7 +94,7 @@ if redo:
         fname_proj = subject_template % (exp, '_calm_' + filt + '_filt-proj', 'fif')
         fname_raw = subject_template % (exp, '_calm_' + filt + '_filt-raw', 'fif')
         fname_evts = subject_template % (exp, '_fixation_coreg-eve', 'txt')
-        fname_dm = subject_template % (exp, '_fixation_design_matrix', 'txt')
+        fname_dm = subject_template % (exp, '_%s_design_matrix' % c_name, 'txt')
         fname_gat = subject_template % (exp, '_calm_' + filt + '_filt_' + analysis
                                         + '_gat', 'npy')
         fname_reg = subject_template % (exp, '_calm_' + filt + '_filt_' + analysis
@@ -111,7 +112,7 @@ if redo:
 
         # loading design matrix, epochs, proj
         design_matrix = np.loadtxt(fname_dm)
-        reg_names = ('intercept', 'ffd')
+        reg_names = ('intercept', c_name)
 
         # # let's look at the time around the fixation
         # durs = np.asarray(design_matrix[:, -1] * 1000, int)

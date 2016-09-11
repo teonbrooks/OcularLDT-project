@@ -8,7 +8,8 @@ from mne.stats import (spatio_temporal_cluster_1samp_test as stc_1samp_test,
                        permutation_cluster_1samp_test as pc_1samp_test)
 
 def group_stats(subjects, path, exp, filt, analysis, c_names, seed=42,
-                threshold=1.96, p_accept=0.05, chance=.5, n_perm=1000, reg_type='rerf'):
+                threshold=1.96, p_accept=0.05, chance=.5, n_perm=10000,
+                reg_type='rerf'):
     # Load the subject gats
     group_gat = list()
     group_td = list()

@@ -18,6 +18,7 @@ drives = {'local': op.join(op.expanduser('~'), 'Experiments', 'E-MEG', 'data'),
           'dropbox': op.join(op.expanduser('~'), 'Dropbox', 'academic',
                              'Experiments', 'E-MEG', 'output'),
           'mne_bin': '/Applications/packages/mne-c/bin',
+          'project': '/Applications/packages/E-MEG',
          }
 
 # Experiments
@@ -25,7 +26,7 @@ experiments = ['OLDT', 'SENT']
 exp = experiments[0]
 
 # analysis parameters
-redo = True
+redo = False
 results_dir = op.join(drives['dropbox'], 'results')
 reject = dict(mag=3e-12)
 baseline = (-.2, -.1)

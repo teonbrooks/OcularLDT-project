@@ -18,7 +18,7 @@ from analysis_func import group_stats
 
 
 # parameters
-redo = True
+redo = config.redo
 path = config.drive
 filt = config.filt
 img = config.img

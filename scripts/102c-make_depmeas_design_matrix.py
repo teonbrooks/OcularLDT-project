@@ -8,15 +8,20 @@ from mne import write_events
 path = config.drive
 exp = 'OLDT'
 redo = config.redo
+# analyses: fixation, bigram, freq
+# regressors: ffd, bg_mean, log_freq
 analysis = 'fixation'
-depmeas = 'ffd'
+regressor = 'ffd'
 
 for subject in config.subjects:
     print config.banner % subject
 
+    # template
     fname_template = op.join(path, subject, '%s', '_'.join((subject, exp)))
+    # input
     fname_meg = fname_template % 'mne' + '_meg_trial_struct.txt'
-    fname_em = fname_template % 'edf' + '_%s_times.txt' % analysis
+    fname_em = fname_template % 'edf' + '_fixation_times.txt'
+    # output
     fname_dm = fname_template % 'mne' + '_%s_design_matrix.txt' % analysis
     fname_eve = fname_template % 'mne' + '_%s_coreg-eve.txt' % analysis
 
@@ -29,18 +34,18 @@ for subject in config.subjects:
 
     interest = zip(em_ds['trial'], em_ds['trigger'])
     i_starts = list()
-    durations = list()
+    depmeas = list()
     triggers = list()
-    for ii, dur in zip(interest, em_ds[depmeas]):
+    for ii, dp in zip(interest, em_ds[regressor]):
         try:
             i_starts.append(meg_ds.iloc[lookup[ii]]['i_start'])
-            durations.append(dur)
+            depmeas.append(dp)
             triggers.append(meg_ds.iloc[lookup[ii]]['trigger'])
         except KeyError:
             pass
-    intercepts = np.ones(len(durations))
+    intercepts = np.ones(len(depmeas))
     # create and write out design matrix
-    design_matrix = np.vstack((intercepts, durations)).T
+    design_matrix = np.vstack((intercepts, depmeas)).T
     np.savetxt(fname_dm, design_matrix, fmt='%s', delimiter='\t')
 
     # create and write out a co-registered event file
