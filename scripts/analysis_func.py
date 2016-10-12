@@ -61,7 +61,7 @@ def group_stats(subjects, path, exp, filt, analysis, c_names, seed=42,
     group_dict['reg_stats'] = stc_1samp_test(group_reg, n_permutations=n_perm,
                                              threshold=threshold, tail=0,
                                              connectivity=connectivity,
-                                             seed=seed)
+                                             seed=seed, n_jobs=-1)
 
     #########################
     # run a GAT clustering  #
@@ -70,7 +70,8 @@ def group_stats(subjects, path, exp, filt, analysis, c_names, seed=42,
     group_gat = np.array(group_gat) - chance
     _, clusters, p_values, _ = stc_1samp_test(group_gat, n_permutations=n_perm,
                                               threshold=threshold, tail=0,
-                                              seed=seed, out_type='mask')
+                                              seed=seed, out_type='mask',
+                                              n_jobs=-1)
     p_values_ = np.ones_like(group_gat[0]).T
     for cluster, pval in zip(clusters, p_values):
         p_values_[cluster.T] = pval
@@ -83,7 +84,7 @@ def group_stats(subjects, path, exp, filt, analysis, c_names, seed=42,
     group_td = np.array(group_td) - chance
     group_dict['td_stats'] = pc_1samp_test(group_td, n_permutations=n_perm,
                                            threshold=threshold, tail=0,
-                                           seed=seed)
+                                           seed=seed, n_jobs=-1)
 
     #########################
     # run a GAT clustering  #
@@ -94,7 +95,8 @@ def group_stats(subjects, path, exp, filt, analysis, c_names, seed=42,
 
     _, clusters, p_values, _ = stc_1samp_test(group_dev, n_permutations=n_perm,
                                               threshold=threshold, tail=0,
-                                              seed=seed, out_type='mask')
+                                              seed=seed, out_type='mask',
+                                              n_jobs=-1)
     p_values_ = np.ones_like(group_dev[0]).T
     for cluster, pval in zip(clusters, p_values):
         p_values_[cluster.T] = pval

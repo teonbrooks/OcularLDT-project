@@ -6,7 +6,7 @@ from mne import write_events
 
 
 path = config.drive
-exp = 'OLDT'
+exp = config.exp
 redo = config.redo
 # analyses: fixation, bigram, freq
 # regressors: ffd, bg_mean, log_freq

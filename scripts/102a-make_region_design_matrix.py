@@ -6,7 +6,7 @@ from mne import write_events
 
 
 path = config.drive
-exp = 'OLDT'
+exp = config.exp
 redo = config.redo
 
 for subject in config.subjects:

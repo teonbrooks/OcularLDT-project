@@ -10,20 +10,21 @@ from _recode_events import _recode_events
 
 path = config.drive
 redo = config.redo
-exp = config.exp
+exp_fname = config.exp
+
 
 group_ds = list()
-fname_group = op.join(path, 'group', 'group_%s_region_times.txt' % exp)
+fname_group = op.join(path, 'group', 'group_%s_region_times.txt' % exp_fname)
 
 for subject, experiments in config_raw.subjects.items():
     print config.banner % subject
 
     # Define output
-    fname = op.join(path, subject, 'edf', subject + '_%s_region_times.txt' % exp)
+    fname = op.join(path, subject, 'edf', subject + '_%s_region_times.txt' % exp_fname)
 
     ds = [list(), list(), list(), list(),
           list(), list(), list(), list(), list()]
-    if exp == 'OLDT':
+    if exp_fname == 'OLDT':
         exps = [experiments[0], experiments[2]]
     else:
         exps = [experiments[1]]
@@ -31,8 +32,11 @@ for subject, experiments in config_raw.subjects.items():
         exps.pop(exps.index('n/a'))
     for ii, exp in enumerate(exps):
         # Define filenames
+        ident = exp
+        if exp.startswith('SENT'):
+            ident = 'Sime_Sent'
         fname_trial = glob(op.join(path, subject, 'edf',
-                           '*_Sime_Sent_*BLOCKTRIAL.dat'))[0]
+                           '*_%s_*BLOCKTRIAL.dat' % ident))[0]
         file_raw = op.join(path, subject, 'edf', '%s_%s.edf' % (subject, exp))
         # extracting triggering info from datasource file.
         # prime trigger is index 8, target trigger is index 10

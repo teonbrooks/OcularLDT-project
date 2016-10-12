@@ -59,9 +59,11 @@ def group_plot(subjects, path, results_dir, exp, filt, clf_name, analysis,
             clu_idx = [clu_idx]
         for idx in clu_idx:
             interval = clusters[idx][0].indices(len(times))
-            idx = (interval[0], interval[1])
+            if interval[1] == len(times):
+                idx = [interval[0], interval[1] - 1]
+            else:
+                idx = [interval[0], interval[1]]
             idx_time_sig.append(idx)
-
 
     ################
     # Group Evoked #
@@ -177,7 +179,7 @@ def group_plot(subjects, path, results_dir, exp, filt, clf_name, analysis,
         ax_signals.set_ylim(ymin, ymax)
 
         comment = ["Significant Time Region: %.3f to %.3f s"
-                   % (times[ymin], times[ymax])]
+                   % (sig_times[0], sig_times[-1])]
 
         # clean up viz
         mne.viz.tight_layout(fig=fig)
@@ -186,7 +188,7 @@ def group_plot(subjects, path, results_dir, exp, filt, clf_name, analysis,
         captions.append(suptitle)
         comments.extend(comment)
 
-    group_rep.add_figs_to_section(figs, captions, 'Group Plots')
+    group_rep.add_figs_to_section(figs, captions, 'Group Plots', comments=comments)
 
     #############
     # Group GAT #
@@ -220,7 +222,7 @@ def group_plot(subjects, path, results_dir, exp, filt, clf_name, analysis,
     sig_gg = np.ma.masked_where(sig == False, gg)
 
     ax = pretty_gat(scores=gg, chance=chance, sfreq=sfreq, times=times, sig=sig,
-                    clim=clim, alpha=.3)
+                    clim=clim, alpha=.5)
     ax.set_title('Group GAT corrected scores on Processing ' + title)
     fig = ax.get_figure()
     group_rep.add_figs_to_section(fig, 'Group GAT corrected', 'Group Plots',
@@ -228,20 +230,25 @@ def group_plot(subjects, path, results_dir, exp, filt, clf_name, analysis,
 
     # group gat dev plot
     gat_dev = group_dict['gat_dev_sig']
+    # tois = np.arange(7) * .1
+    # time_idx = [rerf_diff.time_as_index(toi) for toi in tois]
     ax = plt.imshow(gat_dev, origin='lower', extent=[-.2, 1, -.2, 1])
-    for val in zip(*idx_time_sig):
+    for val in [idx for interval in idx_time_sig for idx in interval]:
         plt.axvline(times[val], color='c')
         plt.axhline(times[val], color='c')
     fig = ax.get_figure()
 
     fig.suptitle('Group GAT dev on Processing ' + title)
-    comment = ['Time Bounds: %s (in s), from Time Decoding. '
-                % ([(times[imin], times[imax]) for (imin, imax) in idx_time_sig])
-                + 'Stats (in red) '
-                'from GAT - diagonal after correction. Blue means generalizing,'
-                ' while red means different classifier.']
+    comments = list()
+    for imin, imax in idx_time_sig:
+        comments.append(('Time Bounds: (%d - %d ms), from Time Decoding.'
+                         % (times[imin] * 1e3, times[imax] * 1e3)))
+    comments.append(('Stats (in red) from GAT - diagonal after correction. '
+                     'Blue means generalizing, while red means '
+                     'different classifier.'))
+    comments = ' '.join(comments)
     group_rep.add_figs_to_section(fig, 'Group GAT dev', 'Group Plots',
-                                  image_format=img)
+                                  comments=comments, image_format=img)
 
     ################
     # Group Slices #
@@ -254,6 +261,8 @@ def group_plot(subjects, path, results_dir, exp, filt, clf_name, analysis,
     ax = pretty_slices(gg, chance=chance, times=times, sfreq=sfreq,
                        tois=tois, axes=axes)
     fig.suptitle('Group GAT slices on Processing ' + title)
+
+    # comment = ['0ms: %s' %]
     group_rep.add_figs_to_section(fig, 'Group Slices: 0-200ms', 'Group Plots',
                                   image_format=img)
 
@@ -348,6 +357,8 @@ def group_plot(subjects, path, results_dir, exp, filt, clf_name, analysis,
                         % (times[imin], times[imax]))
     if not comments:
         comments = None
+    else:
+        comments = '<br>'.join(comments)
     ax = pretty_decod(group_diags, chance=chance, sfreq=sfreq, times=times,
                       fill=True, sig=td_sig, alpha=.3, fill_color='orange')
     fig = ax.get_figure()
@@ -370,17 +381,18 @@ def group_plot(subjects, path, results_dir, exp, filt, clf_name, analysis,
         toi_pattern = np.array(toi_pattern).mean(axis=0)
         group_patterns.append(toi_pattern)
 
-    fig, axes = plt.subplots(1, len(group_patterns), figsize=(10,10))
-    if not isinstance(axes, list):
-        axes = [axes]
-    for pattern, (imin, imax), ax in zip(group_patterns, idx_time_sig, axes):
-        tmin, tmax = times[imin], times[imax]
-        title_pattern = 'Averaged Weights ({:0.1f} - {:0.1f} ms)'.format(tmin, tmax)
-        plot_topomap(pattern, pos=pos, axes=ax)
-        ax.set_title(title_pattern)
-    fig.tight_layout()
-    group_rep.add_figs_to_section(fig, 'Group Patterns Sig Time Region',
-                                  'Extra', image_format=img)
+    if group_patterns:
+        fig, axes = plt.subplots(1, len(group_patterns), figsize=(10,10))
+        if not isinstance(axes, (np.ndarray, np.generic, list)):
+            axes = [axes]
+        for pattern, (imin, imax), ax in zip(group_patterns, idx_time_sig, axes):
+            tmin, tmax = times[imin], times[imax]
+            title_pattern = 'Averaged Weights ({:0.1f} - {:0.1f} ms)'.format(tmin, tmax)
+            plot_topomap(pattern, pos=pos, axes=ax)
+            ax.set_title(title_pattern)
+        fig.tight_layout()
+        group_rep.add_figs_to_section(fig, 'Group Patterns Sig Time Region',
+                                      'Extra', image_format=img)
 
     #################################
     # Group Pattern + Time Decoding #

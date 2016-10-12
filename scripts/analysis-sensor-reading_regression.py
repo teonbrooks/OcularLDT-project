@@ -20,10 +20,10 @@ from analysis_func import group_stats
 redo = config.redo
 path = config.drive
 filt = config.filt
-exp = 'OLDT'
+exp = config.exp
 clf_name = 'ridge'
 reg_type = 'reg'
-analysis = 'reading_%s_regression_sensor_analysis' % clf_name
+analysis = 'reading_%s_regression_no_pca_sensor_analysis' % clf_name
 random_state = 42
 decim = 2
 event_id = {'word/prime/unprimed': 1,
@@ -120,8 +120,8 @@ if redo:
         raw = mne.io.read_raw_fif(fname_raw, preload=True, verbose=False)
 
         # add/apply proj
-        proj = [mne.read_proj(fname_proj)[0]]
-        raw.add_proj(proj).apply_proj()
+        # proj = [mne.read_proj(fname_proj)[0]]
+        # raw.add_proj(proj).apply_proj()
         # select only meg channels
         raw.pick_types(meg=True)
 
@@ -166,15 +166,9 @@ if redo:
 
         print 'get ready for decoding ;)'
 
-        train_times = {'start': tmin,
-                       'stop': tmax,
-                       'length': length,
-                       'step': step
-                       }
         cv = KFold(n=len(y), n_folds=n_folds, random_state=random_state)
-        gat = GeneralizationAcrossTime(predict_mode='cross-validation', n_jobs=-1,
-                                       train_times=train_times, scorer=rank_scorer,
-                                       clf=clf, cv=cv)
+        gat = GeneralizationAcrossTime(predict_mode='cross-validation', n_jobs=1,
+                                       scorer=rank_scorer, clf=clf, cv=cv)
         gat.fit(epochs, y=y)
         gat.score(epochs, y=y)
         print gat.scores_.shape

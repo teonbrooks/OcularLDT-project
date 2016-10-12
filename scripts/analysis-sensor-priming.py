@@ -24,7 +24,7 @@ filt = config.filt
 img = config.img
 exp = config.exp
 clf_name = 'logit'
-analysis = 'priming_%s_sensor_analysis' % clf_name
+analysis = 'priming_%s_no_pca_sensor_analysis' % clf_name
 clf = make_pipeline(StandardScaler(), LogisticRegression())
 random_state = 42
 decim = 2
@@ -68,8 +68,8 @@ if redo:
         raw = mne.io.read_raw_fif(fname_raw, preload=True, verbose=False)
 
         # add/apply proj
-        proj = [mne.read_proj(fname_proj)[0]]
-        raw.add_proj(proj).apply_proj()
+        # proj = [mne.read_proj(fname_proj)[0]]
+        # raw.add_proj(proj).apply_proj()
         # select only meg channels
         raw.pick_types(meg=True)
 
@@ -101,7 +101,7 @@ if redo:
                        'length': length,
                        'step': step
                        }
-        gat = GeneralizationAcrossTime(predict_mode='cross-validation', n_jobs=2,
+        gat = GeneralizationAcrossTime(predict_mode='cross-validation', n_jobs=1,
                                        train_times=train_times, clf=clf, cv=n_folds)
         gat.fit(epochs, y=y)
         gat.score(epochs, y=y)

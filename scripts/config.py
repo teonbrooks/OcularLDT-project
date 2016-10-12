@@ -26,7 +26,7 @@ experiments = ['OLDT', 'SENT']
 exp = experiments[0]
 
 # analysis parameters
-redo = False
+redo = True
 results_dir = op.join(drives['dropbox'], 'results')
 reject = dict(mag=3e-12)
 baseline = (-.2, -.1)

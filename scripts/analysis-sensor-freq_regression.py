@@ -135,18 +135,13 @@ if redo:
         epochs.drop_bad(reject=reject)
         design_matrix = design_matrix[epochs.selection]
         evts = evts[epochs.selection]
-        # remove zeros
-        idx = design_matrix[:, -1] > 0
+        # remove nans
+        idx = np.logical_not(np.isnan(design_matrix[:, -1]))
         epochs = epochs[idx]
         design_matrix = design_matrix[idx]
         evts = evts[idx]
-        # define outliers
-        durs = design_matrix[:, -1]
-        mean, std = durs.mean(), durs.std()
-        devs = np.abs(durs - mean)
-        criterion = 3 * std
-        # remove outliers
-        idx = devs < criterion
+        # remove zeros
+        idx = design_matrix[:, -1] > 0
         epochs = epochs[idx]
         design_matrix = design_matrix[idx]
         evts = evts[idx]
@@ -166,14 +161,13 @@ if redo:
         reg[c_name].beta.save(fname_reg)
 
         print 'get ready for decoding ;)'
-
         train_times = {'start': tmin,
                        'stop': tmax,
                        'length': length,
                        'step': step
                        }
         cv = KFold(n=len(y), n_folds=n_folds, random_state=random_state)
-        gat = GeneralizationAcrossTime(predict_mode='cross-validation', n_jobs=-1,
+        gat = GeneralizationAcrossTime(predict_mode='cross-validation', n_jobs=1,
                                        train_times=train_times, scorer=rank_scorer,
                                        clf=clf, cv=cv)
         gat.fit(epochs, y=y)

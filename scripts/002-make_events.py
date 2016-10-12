@@ -23,7 +23,7 @@ exp = config.exp
 filt = config.filt
 
 
-for subject in config.subjects[11:]:
+for subject in config.subjects:
     print config.banner % subject
 
     fname_template = op.join(path, subject, 'mne', '_'.join((subject, exp)))

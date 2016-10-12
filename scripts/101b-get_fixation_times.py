@@ -19,7 +19,10 @@ fname_stim = op.join(config.drives['project'], 'input', 'stims',
 
 # Define OLDT interest areas
 fname_ia = op.join(path, 'group', '%s_IAs.txt' % exp_fname)
-ia_words = ['fixation', 'prime', 'target', 'post']
+if config.exp == 'OLDT':
+    ia_words = ['fixation', 'prime', 'target', 'post']
+else:
+    ia_words = ['fixation', 'aux', 'prime', 'target', 'post']
 # lexical properties
 # header: "Occurences","Word","Length","Freq_HAL","Log_Freq_HAL","BG_Mean"
 lex_props = read_csv(fname_stim, dtype=str, delimiter=',')
@@ -36,15 +39,22 @@ for subject, experiments in config_raw.subjects.items():
     # Define output
     fname_ds = op.join(path, subject, 'edf',
                        subject + '_%s_fixation_times.txt' % exp_fname)
-    exps = [experiments[0], experiments[2]]
+    if config.exp == 'OLDT':
+        exps = [experiments[0], experiments[2]]
+    else:
+        exps = [experiments[1]]
     if 'n/a' in exps:
         exps.pop(exps.index('n/a'))
+    print experiments
     subject_ds = list()
     n_trials = 0
     for ii, exp in enumerate(exps):
+        exp_dat = exp_fname
+        if exp_fname == 'SENT':
+            exp_dat = 'Sime_Sent'
         # Define filenames
         fname_trial = glob(op.join(path, subject, 'edf',
-                           '*_{}_*BLOCKTRIAL.dat'.format(exp)))[0]
+                           '*_{}_*BLOCKTRIAL.dat'.format(exp_dat)))[0]
         fname_raw = op.join(path, subject, 'edf',
                             '{}_{}.edf'.format(subject, exp))
 
@@ -66,7 +76,12 @@ for subject, experiments in config_raw.subjects.items():
         sem_dict = dict(zip(trials, semantics))
         word_dict = dict(zip(trials, data[:, 4].astype(int)))
 
-        for ia, ii in [('prime', 1), ('target', 2), ('post', 3)]:
+        if config.exp == 'OLDT':
+            iters = [('prime', 1), ('target', 2), ('post', 3)]
+        else:
+            iters = [('prime', 1), ('aux', 2),
+                     ('target', 3), ('post', 4)]
+        for ia, ii in iters:
             times = ias.get_gaze_duration(ia=ii, first_fix=True)
             times['trial'] -= n_practice
             # finally drop practice from em data
@@ -83,15 +98,29 @@ for subject, experiments in config_raw.subjects.items():
             for _, time in times.iterrows():
                 trial = time['trial'].astype(int)
                 if ia == 'prime':
-                    triggers.append(data[trial, 8])
-                    strings.append(data[trial, 7].strip('"'))
+                    if config.exp == 'OLDT':
+                        triggers.append(data[trial, 8])
+                        strings.append(data[trial, 7].strip('"'))
+                    if config.exp == 'SENT':
+                        triggers.append(data[trial, 4])
+                        strings.append(data[trial, 3].strip('"'))
+                elif ia == 'aux':
+                    triggers.append(data[trial, 6])
+                    strings.append(data[trial, 5].strip('"'))
                 elif ia == 'target':
-                    triggers.append(data[trial, 10])
-                    strings.append(data[trial, 9].strip('"'))
-                else:
-                    triggers.append(data[trial, 12])
-                    strings.append(data[trial, 11].strip('"'))
-
+                    if config.exp == 'OLDT':
+                        triggers.append(data[trial, 10])
+                        strings.append(data[trial, 9].strip('"'))
+                    if config.exp == 'SENT':
+                        triggers.append(data[trial, 8])
+                        strings.append(data[trial, 7].strip('"'))
+                elif ia == 'post':
+                    if config.exp == 'OLDT':
+                        triggers.append(data[trial, 12])
+                        strings.append(data[trial, 11].strip('"'))
+                    if config.exp == 'SENT':
+                        triggers.append(data[trial, 10])
+                        strings.append(data[trial, 9].strip('"'))
             bg_means = [lex_bg[string] if string in lex_bg else np.nan
                         for string in strings]
             log_freq = [lex_freq[string] if string in lex_freq else np.nan
@@ -100,8 +129,11 @@ for subject, experiments in config_raw.subjects.items():
             # coding trigger events
             evts = np.zeros((len(triggers), 3))
             triggers_old = evts[:, 2] = triggers
-            evts, fix_idx, primes_idx, targets_idx, \
-                semantic_idx, nonwords_idx = _recode_events(exp, evts)
+            if config.exp == 'OLDT':
+                evts, _, _, _, _, _ = _recode_events(exp, evts)
+            else:
+                evts, _, _, _, _ = _recode_events(exp, evts)
+
             triggers = evts[:, -1]
 
             # dummy label
@@ -109,6 +141,7 @@ for subject, experiments in config_raw.subjects.items():
             subject_label = [subject] * len(times)
             block = np.ones(len(times), int) * ii
 
+            strings = [string.lower() for string in strings]
             columns = list(times.columns)
             columns.extend(['priming', 'word', 'string', 'bg_mean', 'log_freq',
                             'ia', 'trigger', 'trigger_old', 'block', 'subject'])
