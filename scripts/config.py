@@ -31,7 +31,7 @@ results_dir = op.join(drives['dropbox'], 'results')
 reject = dict(mag=3e-12)
 baseline = (-.2, -.1)
 img = 'png'
-# can't really use `hp0.03` since there filter settings varied, name not true
+# can't really use `hp0.03` since their filter settings varied, name not true
 filts = {'no': 'iir_no',
          'hp0.03': 'iir_hp0.03_lp40',  # DO NOT USE!
          'hp0.1': 'iir_hp0.1_lp40',  # try this after thesis is completed

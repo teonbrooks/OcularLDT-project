@@ -24,7 +24,6 @@ subjects = {'A0023': ['OLDT2', 'SENT2', 'OLDT1'],
             'A0155': ['OLDT2', 'SENT2', 'OLDT1'],
             'A0159': ['OLDT1', 'SENT1', 'OLDT2'],
             'A0161': ['n/a', 'SENT1', 'OLDT2'],
-            'A0161': ['OLDT1', 'SENT1', 'OLDT2'],
             'A0163': ['OLDT2', 'SENT2', 'OLDT1'],
             'A0164': ['OLDT2', 'SENT2', 'OLDT1'],
             }

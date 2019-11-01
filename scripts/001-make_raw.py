@@ -8,13 +8,13 @@ import config_raw
 drive = config.drive
 filt_type = config.filt[:3]
 reject = None
-exp = 'SENT'
+exp = 'OLDT'
 redo = config.redo
 baseline = None
 subjects, experiments = zip(*config_raw.subjects.items())
 
 for subject, experiments in config_raw.subjects.items()[3:]:
-    print config.banner % subject
+    print(config.banner % subject)
 
     if exp == 'OLDT':
         exps = [experiments[0], experiments[2]]
