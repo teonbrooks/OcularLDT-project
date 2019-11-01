@@ -23,7 +23,11 @@ drives = {'local': op.join(op.expanduser('~'), 'Experiments', 'E-MEG', 'data'),
 
 # Experiments
 experiments = ['OLDT', 'SENT']
-exp = experiments[0]
+project_names = ['OcularLDT', 'OcularSimpleSentences']
+
+index = 0
+exp = experiments[index]
+project_name = project_names[index]
 
 # analysis parameters
 redo = True
