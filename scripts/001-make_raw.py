@@ -37,7 +37,7 @@ for subject, experiments in config_raw.subjects.items()[3:]:
             ri.load_data()
             ri.plot(block=True, duration=5, n_channels=10,
                     highpass=None, lowpass=40)
-            print "%s: Bad Chs: %s" % (exp, ri.info['bads'])
+            print("%s: Bad Chs: %s" % (exp, ri.info['bads']))
             ri.interpolate_bads()
             raws.append(ri)
         raw = mne.concatenate_raws(raws)
@@ -47,21 +47,11 @@ for subject, experiments in config_raw.subjects.items()[3:]:
         raw.load_data()
         raw.plot(block=True, duration=5, n_channels=10,
                 highpass=None, lowpass=40)
-        print "%s: Bad Chs: %s" % (exp, raw.info['bads'])
+        print("%s: Bad Chs: %s" % (exp, raw.info['bads']))
         raw.interpolate_bads()
 
-    # zeroth filtering option
-    highpass, lowpass = (.03, 200)
-    filt = filt_type + '_hp%s_lp%s' % (highpass, lowpass)
-    raw.save(fname_raw % filt, overwrite=redo)
-    # first filtering option
+    # bandpass filtering
     highpass, lowpass = (.51, 40)
     filt = filt_type + '_hp%s_lp%s' % (highpass, lowpass)
     raw.filter(highpass, lowpass, method=filt_type)
     raw.save(fname_raw % filt, overwrite=redo)
-    # second filtering option
-    highpass, lowpass = (1, 40)
-    filt = filt_type + '_hp%s_lp%s' % (highpass, lowpass)
-    raw.filter(highpass, lowpass, method=filt_type)
-    raw.save(fname_raw % filt, overwrite=redo)
-    del raw

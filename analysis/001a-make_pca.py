@@ -5,48 +5,46 @@ from matplotlib import gridspec
 
 import mne
 from mne.report import Report
-import config
+from mne_bids import read_raw_bids
+from mne_bids.utils import get_entity_vals
 
 
 layout = mne.channels.read_layout('KIT-AD.lout')
-img = config.img
-drive = config.drive
-exp = config.exp
-filt = config.filt
+img_ext = 'png'
+task = 'OcularLDT'
+bids_root = op.join('/', 'Volumes', 'teon-backup', 'Experiments', task)
+
 redo = True
-reject = config.reject
+reject = dict(mag=3e-12)
 baseline = (-.2, -.1)
 tmin, tmax = -.5, 1
 ylim = dict(mag=[-300, 300])
-if exp == 'OLDT':
-    event_id = {'word/prime/unprimed': 1,
-                'word/prime/primed': 5,
-                'nonword/prime': 9,
-               }
-else:
-    event_id = {'word/prime/unprimed': 1,
-                'word/prime/primed': 5,
-               }
+banner = ('#' * 9 + '\n# %s #\n' + '#' * 9)
+evts_labels = ['word/prime/unprimed', 'word/prime/primed', 'nonword/prime']
+subjects_list = get_entity_vals(bids_root, entity_key='sub')
 
-fname_rep_group = op.join(config.results_dir, 'group',
-                          'group_%s_%s_filt_pca-report.html' % (exp, filt))
+fname_rep_group = op.join('..', 'output', f'group_{task}_pca-report.html')
 rep_group = Report()
-for subject in config.subjects:
-    print config.banner % subject
+
+for subject in subjects_list:
+    print(banner % subject)
 
     # define filenames
-    path = op.join(drive, subject, 'mne')
-    fname_raw = op.join(path, subject + '_%s_calm_%s_filt-raw.fif'
-                        % (exp, filt))
-    fname_evts = op.join(path, subject + '_{}-eve.txt'.format(exp))
-    fname_proj = op.join(path, subject + '_%s_calm_%s_filt-proj.fif'
-                         % (exp, filt))
+    path = op.join(bids_root, f"sub-{subject}", 'meg')
+    fname_raw = op.join(path, f"sub-{subject}_task-{task}_meg.fif")
+    fname_mp_raw = op.join(path, f"sub-{subject}_task-{task}_part-01_meg.fif")
+    fname_proj = op.join(path, f"sub-{subject}_task-{task}_proj.fif")
 
     if not op.exists(fname_proj) or redo:
         # pca input is from fixation cross to three hashes
         # no language involved
-        raw = mne.io.read_raw_fif(fname_raw)
-        events = mne.read_events(fname_evts)
+        try:
+            raw = read_raw_bids(fname_raw, bids_root=bids_root)
+        except FileNotFoundError:
+            raw = read_raw_bids(fname_mp_raw, bids_root=bids_root)
+        events, event_id = mne.events_from_annotations(raw)
+        event_id = {key: value for key, value in event_id.items()
+                    if key in evts_labels}
         epochs = mne.Epochs(raw, events, event_id, tmin=-.2, tmax=1,
                             baseline=baseline, reject=reject, verbose=False)
 
@@ -71,12 +69,12 @@ for subject in config.subjects:
                          axes=axes[1], ylim=ylim)
         rep_group.add_figs_to_section(fig, '%s: Before and After PCA: Evoked'
                                       % subject, 'Before and After All',
-                                      image_format=img)
+                                      image_format=img_ext)
 
         # 2. plot PCA topos
         p = mne.viz.plot_projs_topomap(projs, layout, show=False)
         rep_group.add_figs_to_section(p, '%s: PCA topos' % subject,
-                                      'Topos', image_format=img)
+                                      'Topos', image_format=img_ext)
 
         # 3. plot evoked - each proj
         for ii, ev in enumerate(evokeds):
@@ -92,10 +90,10 @@ for subject in config.subjects:
                                            show=False, axes=axes[1])
             rep_group.add_figs_to_section(fig, '%s: Evoked w/o PC %d'
                                           % (subject, ii), tab,
-                                          image_format=img)
+                                          image_format=img_ext)
 
         # save projs
         mne.write_proj(fname_proj, projs)
         # cleanup
         del epochs
-rep_group.save(fname_rep_group, overwrite=True, open_browser=False)
+rep_group.save(fname_rep_group, open_browser=False)

@@ -17,10 +17,11 @@ group_ds = list()
 fname_group = op.join(path, 'group', 'group_%s_region_times.txt' % exp_fname)
 
 for subject, experiments in config_raw.subjects.items():
-    print config.banner % subject
+    print(config.banner % subject)
 
     # Define output
-    fname = op.join(path, subject, 'edf', subject + '_%s_region_times.txt' % exp_fname)
+    fname = op.join(path, subject, 'edf',
+                    f'{subject}_{exp_fname}_region_times.txt')
 
     ds = [list(), list(), list(), list(),
           list(), list(), list(), list(), list()]

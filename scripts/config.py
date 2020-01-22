@@ -6,19 +6,11 @@ import numpy as np
 
 
 # directories
-drives = {'local': op.join(op.expanduser('~'), 'Experiments', 'E-MEG', 'data'),
-          'server': op.join('/Volumes', 'server', 'MORPHLAB', 'Teon',
-                            'E-MEG', 'data'),
-          'home': op.join('/Volumes', 'teon-backup', 'Experiments',
-                          'E-MEG', 'data'),
+drives = {'home': op.join('/Volumes', 'teon-backup', 'Experiments',
+                          'OcularLDT'),
           'office': op.join('/Volumes', 'backup', 'Experiments',
-                            'E-MEG', 'data'),
-          'google_drive': op.join(op.expanduser('~'), 'Google Drive',
-                                  'E-MEG', 'data'),
-          'dropbox': op.join(op.expanduser('~'), 'Dropbox', 'academic',
-                             'Experiments', 'E-MEG', 'output'),
-          'mne_bin': '/Applications/packages/mne-c/bin',
-          'project': '/Applications/packages/E-MEG',
+                            'OcularLDT'),
+          'project': '/Applications/codespace/OcularLDT-code',
          }
 
 # Experiments
@@ -31,7 +23,7 @@ project_name = project_names[index]
 
 # analysis parameters
 redo = True
-results_dir = op.join(drives['dropbox'], 'results')
+results_dir = op.join(drives['project'], 'output')
 reject = dict(mag=3e-12)
 baseline = (-.2, -.1)
 img = 'png'
@@ -43,7 +35,7 @@ filts = {'no': 'iir_no',
 filt = filts['hp0.51']
 banner = ('#' * 9 + '\n# %s #\n' + '#' * 9)
 # determine which drive you're working from
-drive = 'office'
+drive = 'home'
 event_id = {'word/prime/unprimed': 1,
             'word/target/unprimed': 2,
             'word/prime/primed': 5,
@@ -55,6 +47,6 @@ if exp == 'OLDT':
                      # 'fixation': 128
                     })
 drive = drives[drive]
-subjects = glob(op.join(drive, 'A*'))
+subjects = glob(op.join(drive, 'sub-A*'))
 for ii, subject in enumerate(subjects):
-    subjects[ii] = re.findall('/(A[0-9]*)', subject)[0]
+    subjects[ii] = re.findall('/sub-(A[0-9]*)', subject)[0]
