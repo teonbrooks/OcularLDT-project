@@ -1,21 +1,24 @@
-import mne
 import os.path as op
+
+import mne
 from mne.report import Report
-import config
+
+from mne_bids import read_raw_bids
+from mne_bids.utils import get_entity_vals
 
 
 layout = mne.channels.read_layout('KIT-AD.lout')
 img = config.img
 drive = config.drive
-exp = 'OLDT'
-filt = config.filt
-redo = config.redo
+task = 'OcularLDT'
+bids_root = op.join('/', 'Volumes', 'Experiments', task)
 
+subjects_list = get_entity_vals(bids_root, entity_key='sub')
 
-for subject in config.subjects:
-    print config.banner % subject
+for subject in subjects_list[:1]:
+    print("#" * 9 + f"\n# {subject} #\n" + "#" * 9)
     # define filenames
-    path = op.join(drive, subject, 'mne')
+    path = op.join(bids_root, f"sub-{subject}", 'meg')
     fname_epo = op.join(path, subject + '_%s_xca_calm_%s_filt-epo.fif'
                         % (exp, filt))
     fname_cov = op.join(path, subject + '_%s_calm_%s_filt-cov.fif'

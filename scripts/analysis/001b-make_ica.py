@@ -13,7 +13,7 @@ from mne_bids.utils import get_entity_vals
 layout = mne.channels.read_layout('KIT-AD.lout')
 img_ext = 'png'
 task = 'OcularLDT'
-bids_root = op.join('/', 'Volumes', 'teon-backup', 'Experiments', task)
+bids_root = op.join('/', 'Volumes', 'Experiments', task)
 
 redo = True
 reject = dict(mag=3e-12)
@@ -56,11 +56,25 @@ for subject in subjects_list[:1]:
                         window_title=subject, show=False)
         rep_group.add_figs_to_section(p, f'{subject}: Evoked Response peri-saccade',
                                       'Summary Evokeds', image_format=img_ext)
-        epochs.load_data().crop(-.1, .03)
+
+        ica_tmin, ica_tmax = -.1, .1
+        min_cycles = 1 / (ica_tmax - ica_tmin)
+        epochs.load_data().crop(ica_tmin, ica_tmax)
 
         # compute the ICA
         ica = mne.preprocessing.ICA(.9, random_state=42, method='fastica')
         ica.fit(epochs)
+
+        # transform epochs to ICs
+        epochs_ica = ica.get_sources(epochs)
+
+        # compute the inter-trial coherence
+        itc = mne.time_frequency.tfr_array_morlet(epochs_ica.get_data(),
+                                                  epochs_ica.info['sfreq'],
+                                                  np.arange(min_cycles, 30),
+                                                  n_cycles=.1,
+                                                  output='itc')
+
 
         # plot ICs
         picks=range(ica.n_components_)
