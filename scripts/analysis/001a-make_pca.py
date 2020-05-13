@@ -1,3 +1,11 @@
+"""
+001a-make_pca.py
+
+This script is used for the computation of the SSP for
+each subject in the experiment. One approach to this analysis is to project
+out this SSP that is related to the saccadic eye movement in this experiment.
+"""
+
 import os.path as op
 import numpy as np
 import matplotlib.pyplot as plt
@@ -10,25 +18,25 @@ from mne_bids.utils import get_entity_vals
 
 
 layout = mne.channels.read_layout('KIT-AD.lout')
-img_ext = 'png'
 task = 'OcularLDT'
 bids_root = op.join('/', 'Volumes', 'teon-backup', 'Experiments', task)
+derivative = 'pca'
 
 redo = True
 reject = dict(mag=3e-12)
 baseline = (-.2, -.1)
 tmin, tmax = -.5, 1
 ylim = dict(mag=[-300, 300])
-banner = ('#' * 9 + '\n# %s #\n' + '#' * 9)
+
 evts_labels = ['word/prime/unprimed', 'word/prime/primed', 'nonword/prime']
 subjects_list = get_entity_vals(bids_root, entity_key='sub')
 
 fname_rep_group = op.join('..', 'output', 'group',
-                          f'group_{task}_pca-report.html')
+                          f'group_{task}_{derivative}-report.html')
 rep_group = Report()
 
 for subject in subjects_list:
-    print(banner % subject)
+    print("#" * 9 + f"\n# {subject} #\n" + "#" * 9)
 
     # define filenames
     path = op.join(bids_root, f"sub-{subject}", 'meg')
@@ -69,8 +77,7 @@ for subject in subjects_list:
         evoked_proj.plot(titles={'mag': 'After: Evoked - All PCs'}, show=False,
                          axes=axes[1], ylim=ylim)
         rep_group.add_figs_to_section(fig, '%s: Before and After PCA: Evoked'
-                                      % subject, 'Before and After All',
-                                      image_format=img_ext)
+                                      % subject, 'Before and After All')
 
         # 2. plot PCA topos
         p = mne.viz.plot_projs_topomap(projs, layout, show=False)
