@@ -23,7 +23,8 @@ banner = ('#' * 9 + '\n# %s #\n' + '#' * 9)
 evts_labels = ['word/prime/unprimed', 'word/prime/primed', 'nonword/prime']
 subjects_list = get_entity_vals(bids_root, entity_key='sub')
 
-fname_rep_group = op.join('..', 'output', f'group_{task}_pca-report.html')
+fname_rep_group = op.join('..', 'output', 'group',
+                          f'group_{task}_pca-report.html')
 rep_group = Report()
 
 for subject in subjects_list:
