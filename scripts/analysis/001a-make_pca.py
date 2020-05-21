@@ -41,15 +41,16 @@ for subject in subjects_list:
     # define filenames
     path = op.join(bids_root, f"sub-{subject}", 'meg')
     fname_raw = op.join(path, f"sub-{subject}_task-{task}_meg.fif")
-    fname_mp_raw = op.join(path, f"sub-{subject}_task-{task}_part-01_meg.fif")
+    fname_mp_raw = op.join(path, f"sub-{subject}_task-{task}_split-01_meg.fif")
     fname_proj = op.join(path, f"sub-{subject}_task-{task}_proj.fif")
 
     if not op.exists(fname_proj) or redo:
         # pca input is from fixation cross to three hashes
         # no language involved
+        # TODO: replace path with basename
         try:
             raw = read_raw_bids(fname_raw, bids_root=bids_root)
-        except FileNotFoundError:
+        except RuntimeError:
             raw = read_raw_bids(fname_mp_raw, bids_root=bids_root)
         events, event_id = mne.events_from_annotations(raw)
         event_id = {key: value for key, value in event_id.items()
