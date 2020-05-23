@@ -18,20 +18,16 @@ task = 'OcularLDT'
 bids_root = op.join('/', 'Volumes', 'teon-backup', 'Experiments', task)
 
 redo = True
-reject = dict(mag=3e-12)
-baseline = (-.2, -.1)
-tmin, tmax = -.5, 1
-ylim = dict(mag=[-300, 300])
-banner = ('#' * 9 + '\n# %s #\n' + '#' * 9)
+
 evts_labels = ['word/prime/unprimed', 'word/prime/primed', 'nonword/prime']
 subjects_list = get_entity_vals(bids_root, entity_key='sub')
 
-fname_rep_group = op.join('..', 'output',
+fname_rep_group = op.join('..', '..', 'output',
                           'group', f'group_{task}_ica-report.html')
 rep_group = Report()
 
 for subject in subjects_list:
-    print(banner % subject)
+    print("#" * 9 + f"\n# {subject} #\n" + "#" * 9)
 
     # define filenames
     path = op.join(bids_root, f"sub-{subject}", 'meg')
@@ -40,83 +36,80 @@ for subject in subjects_list:
     fname_mp_raw = op.join(path, f"sub-{subject}_task-{task}_split-01_meg.fif")
     fname_ica = op.join(path, f"sub-{subject}_task-{task}_ica.fif")
 
+
+    # pca input is from fixation cross to three hashes
+    # no language involved
+    try:
+        raw = mne.io.read_raw_fif(fname_raw)
+    except FileNotFoundError:
+        raw = mne.io.read_raw_fif(fname_mp_raw)
+    # TODO: replace with proper solution
+    raw = _handle_events_reading(events_fname, raw)
+    events, event_id = mne.events_from_annotations(raw)
+    event_id = {key: value for key, value in event_id.items()
+                if key in evts_labels}
+
+    epo_tmin, epo_tmax = -.1, .1
+    reject = dict(mag=3e-12)
+    epochs = mne.Epochs(raw, events, event_id, tmin=epo_tmin, tmax=epo_tmax,
+                        reject=reject, verbose=False, preload=True)
+
+    # plot evoked
+    evoked = epochs.average()
+    p = evoked.plot(titles={'mag': 'Original Evoked'},
+                    window_title=subject, show=False)
+    rep_group.add_figs_to_section(p, f'{subject}: Evoked Response peri-saccade',
+                                    'Summary Evokeds', image_format=img_ext)
+
     if not op.exists(fname_ica) or redo:
-        # pca input is from fixation cross to three hashes
-        # no language involved
-        try:
-            raw = mne.io.read_raw_fif(fname_raw)
-        except FileNotFoundError:
-            raw = mne.io.read_raw_fif(fname_mp_raw)
-        # TODO: replace with proper solution
-        raw = _handle_events_reading(events_fname, raw)
-        events, event_id = mne.events_from_annotations(raw)
-        event_id = {key: value for key, value in event_id.items()
-                    if key in evts_labels}
-        epochs = mne.Epochs(raw, events, event_id, tmin=-.2, tmax=.1,
-                            baseline=baseline, reject=reject, verbose=False)
-
-        # plot evoked
-        evoked = epochs.average()
-        p = evoked.plot(titles={'mag': 'Original Evoked'},
-                        window_title=subject, show=False)
-        rep_group.add_figs_to_section(p, f'{subject}: Evoked Response peri-saccade',
-                                      'Summary Evokeds', image_format=img_ext)
-
-        ica_tmin, ica_tmax = -.1, .1
-        min_cycles = 1 / (ica_tmax - ica_tmin)
-        epochs.load_data().crop(ica_tmin, ica_tmax)
-
         # compute the ICA
+        # TODO: is there a good heuristic for why .9?
         ica = mne.preprocessing.ICA(.9, random_state=42, method='fastica')
         ica.fit(epochs)
 
-        # transform epochs to ICs
-        epochs_ica = ica.get_sources(epochs)
+    else:
+        ica = mne.preprocessing.read_ica(fname_ica)
 
-        # compute the inter-trial coherence
-        itc = mne.time_frequency.tfr_array_morlet(epochs_ica.get_data(),
-                                                  epochs_ica.info['sfreq'],
-                                                  np.arange(min_cycles, 30),
-                                                  n_cycles=.1,
-                                                  output='itc')
-        # let's find the most coherent over this time course
-        time_course = (-.1, .03)
-        start, stop = epochs.time_as_index(time_course)
-        # sum itc across time then sum across frequency
-        itc_score = itc[start:stop].sum(axis=(1,2))
-        # take the top three for comparison-sake
-        ica_idx = (itc_score).argsort()[::-1][:3]
+    # transform epochs to ICs
+    epochs_ica = ica.get_sources(epochs)
 
-        p = ica.plot_scores(itc_score)
-        rep_group.add_figs_to_section(p, f'{subject}: IC scores',
-                                      'IC Scores', image_format=img_ext)
+    # compute the inter-trial coherence
+    min_cycles = 1 / (epo_tmax - epo_tmin)
+    itc = mne.time_frequency.tfr_array_morlet(epochs_ica.get_data(),
+                                              epochs_ica.info['sfreq'],
+                                              np.arange(min_cycles, 30),
+                                              n_cycles=.1,
+                                              output='itc')
+    # let's find the most coherent over this time course
+    # TODO: find a source for time duration of saccade.
+    itc_tmin, itc_tmax = -.1, .03
+    start, stop = epochs_ica.time_as_index((itc_tmin, itc_tmax))
+    # sum itc across time then sum across frequency
+    itc_score = itc[start:stop].sum(axis=(1,2))
+    # take the top three for comparison-sake
+    ica_idx = (itc_score).argsort()[::-1][:3]
 
-        # plot ICs
-        picks=range(ica.n_components_)
-        p = ica.plot_sources(evoked)
-        rep_group.add_figs_to_section(p, f'{subject}: Reconstructed IC sources peri-saccade',
-                                      'Summary Time-locked ICs', image_format=img_ext)
-        p = ica.plot_components(picks)
-        rep_group.add_figs_to_section(p, f'{subject}: IC Topos',
-                                      'Summary IC Topos',
-                                      image_format=img_ext)
+    p = ica.plot_scores(itc_score)
+    rep_group.add_figs_to_section(p, f'{subject}: IC scores',
+                                    'IC Scores', image_format=img_ext)
 
-        for ii, idx in enumerate(ica_idx):
-            tab = f'IC {idx}'
-            fig = plt.figure(figsize=(12, 6))
-            gs = gridspec.GridSpec(1, 2, width_ratios=[3, 1])
-            axes = [plt.subplot(gs[0]), plt.subplot(gs[1])]
+    # plot ICs
+    picks=range(ica.n_components_)
+    p = ica.plot_sources(evoked)
+    rep_group.add_figs_to_section(p, f'{subject}: IC t.s. peri-saccade',
+                                    'Summary Time-locked ICs', image_format=img_ext)
+    p = ica.plot_components(picks)
+    rep_group.add_figs_to_section(p, f'{subject}: IC Topos',
+                                    'Summary IC Topos',
+                                    image_format=img_ext)
 
-            # TODO: Currently hacked mne to support axes args
-            # make a pull request to allow for axes there
-            ica.plot_sources(evoked, picks=idx, fig=fig, axes=axes[0])
-            ica.plot_components(idx, fig=fig, axes=axes[1])
-            fig.tight_layout()
-            caption = (f'{subject}: IC {idx}')
+    for ii, idx in enumerate(ica_idx):
+        fig = ica.plot_properties(epochs, picks=idx)
+        caption = (f'{subject}: IC {idx}')
+        rep_group.add_figs_to_section(fig, caption, f'IC Sum(ITC) Rank-{ii}')
 
-            rep_group.add_figs_to_section(fig, caption, f'IC Sum(ITC) R-{ii}')
-        ica.exclude = ica_idx
-        ica.save(fname_ica)
+    ica.exclude = ica_idx
+    ica.save(fname_ica)
     plt.close('all')
 
     rep_group.save(fname_rep_group, overwrite=True, open_browser=False)
