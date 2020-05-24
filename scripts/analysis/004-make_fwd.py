@@ -1,32 +1,64 @@
 import os.path as op
+
 import mne
-import config
+from mne.report import Report
+
+from mne_bids import read_raw_bids
+from mne_bids.read import _handle_events_reading
+from mne_bids.utils import get_entity_vals
+
+layout = mne.channels.read_layout('KIT-AD.lout')
+task = 'OcularLDT'
+bids_root = op.join('/', 'Volumes', 'teon-backup', 'Experiments', task)
+fs_home = op.join('/', 'Applications', 'freesurfer', '7.1.0')
+mri_subjects_dir = op.join('/', 'Volumes', 'teon-backup', 'Experiments',
+                           task + '_MRI')
+derivative = 'fwd'
+
+redo = False
+
+subjects_list = get_entity_vals(bids_root, entity_key='sub')
+
+# fname_rep_group = op.join('/', 'Users', 'tbrooks', 'codespace',
+#                           f'{task}-code', 'output', 'preprocessing',
+#                           f'group_{task}_{derivative}-report.html')
+# rep_group = Report()
+# set up the fsaverage source space
+ss = mne.setup_source_space(subject='fsaverage', spacing='ico4',
+                            surface='white', subjects_dir=mri_subjects_dir)
+fname_src = op.join(mri_subjects_dir, 'fsaverage', 'bem',
+                    'fsaverage-ico-4-src.fif')
+mne.write_source_spaces(fname_src, ss)
 
 
-path = op.join(config.drive, '..', 'MRI')
-exp = 'OLDT'
-filt = config.filt
-redo = config.redo
+for subject in subjects_list:
+    print("#" * 9 + f"\n# {subject} #\n" + "#" * 9)
 
-for subject in config.subjects:
-    print config.banner % subject
-
-    # Define filenames
-    fname_epo = op.join(config.drive, subject, 'mne', 
-                        subject + '_%s_xca_calm_%s_filt-epo.fif'
-                        % (exp, filt))
-    fname_trans = op.join(config.drive, subject, 'mne',
-                          subject +'-trans.fif')
-    fname_fwd = op.join(config.drive, subject, 'mne',
-                        subject + '_%s-fwd.fif' % exp)
-    bem_sol = op.join(path, subject, 'bem',
-                      subject + '-inner_skull-bem-sol.fif')
-    src = op.join(path, subject, 'bem', subject + '-ico-4-src.fif')
-
+    # define filenames
+    path = op.join(bids_root, f"sub-{subject}", 'meg')
+    fname_raw = op.join(path, f"sub-{subject}_task-{task}_meg.fif")
+    fname_mp_raw = op.join(path, f"sub-{subject}_task-{task}_split-01_meg.fif")
+    fname_fwd = op.join(path, f"sub-{subject}_task-{task}_{derivative}.fif")
+    fname_trans = op.join(path, f"sub-{subject}_task-{task}_trans.fif")
+    bem_sol = op.join(mri_subjects_dir, f"sub-{subject}", 'bem',
+                      f'sub-{subject}-inner_skull-bem-sol.fif')
+    fname_src = op.join(mri_subjects_dir, f"sub-{subject}", 'bem',
+                        f'sub-{subject}-ico-4-src.fif')
     if not op.exists(fname_fwd) or redo:
-        info = mne.io.read_info(fname_epo)
+        try:
+            raw = mne.io.read_raw_fif(fname_raw)
+        except FileNotFoundError:
+            raw = mne.io.read_raw_fif(fname_mp_raw)
+            fname_raw = fname_mp_raw
 
-        fwd = mne.make_forward_solution(info=info, trans=fname_trans, src=src,
-                                        bem=bem_sol, fname=fname_fwd,
+        info = mne.io.read_info(fname_raw)
+
+        # TODO: delete after run. should be copied over in coreg update
+        mne.scale_source_space(subject_to=f'sub-{subject}', src_name='ico4',
+                               subjects_dir=mri_subjects_dir)
+
+        fwd = mne.make_forward_solution(info=info, trans=fname_trans,
+                                        src=fname_src, bem=bem_sol,
                                         meg=True, eeg=False,
                                         mindist=0.0, ignore_ref=True)
+        mne.write_forward_solution(fname=fname_fwd, fwd=fwd)
