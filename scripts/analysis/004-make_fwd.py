@@ -19,18 +19,6 @@ redo = False
 
 subjects_list = get_entity_vals(bids_root, entity_key='sub')
 
-# fname_rep_group = op.join('/', 'Users', 'tbrooks', 'codespace',
-#                           f'{task}-code', 'output', 'preprocessing',
-#                           f'group_{task}_{derivative}-report.html')
-# rep_group = Report()
-# set up the fsaverage source space
-ss = mne.setup_source_space(subject='fsaverage', spacing='ico4',
-                            surface='white', subjects_dir=mri_subjects_dir)
-fname_src = op.join(mri_subjects_dir, 'fsaverage', 'bem',
-                    'fsaverage-ico-4-src.fif')
-mne.write_source_spaces(fname_src, ss)
-
-
 for subject in subjects_list:
     print("#" * 9 + f"\n# {subject} #\n" + "#" * 9)
 
@@ -52,10 +40,6 @@ for subject in subjects_list:
             fname_raw = fname_mp_raw
 
         info = mne.io.read_info(fname_raw)
-
-        # TODO: delete after run. should be copied over in coreg update
-        mne.scale_source_space(subject_to=f'sub-{subject}', src_name='ico4',
-                               subjects_dir=mri_subjects_dir)
 
         fwd = mne.make_forward_solution(info=info, trans=fname_trans,
                                         src=fname_src, bem=bem_sol,

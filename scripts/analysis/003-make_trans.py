@@ -44,7 +44,11 @@ rep_group = Report()
 # first, copy over fsaverage from FreeSurfer
 mne.coreg.create_default_subject(fs_home=fs_home, update=True,
                                  subjects_dir=mri_subjects_dir)
-
+ss = mne.setup_source_space(subject='fsaverage', spacing='ico4',
+                            surface='white', subjects_dir=mri_subjects_dir)
+fname_src = op.join(mri_subjects_dir, 'fsaverage', 'bem',
+                    'fsaverage-ico-4-src.fif')
+mne.write_source_spaces(fname_src, ss)
 
 for subject in subjects_list:
     print("#" * 9 + f"\n# {subject} #\n" + "#" * 9)
