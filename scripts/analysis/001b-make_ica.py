@@ -1,3 +1,12 @@
+"""
+001b-make_ica.py
+
+This script is used for the computation of the ICs to be removed for
+each subject in the experiment. One approach to this analysis is to remove
+the independent component that is related to the saccadic eye movement
+in this experiment.
+"""
+
 import os.path as op
 import numpy as np
 import matplotlib.pyplot as plt
@@ -23,7 +32,7 @@ evts_labels = ['word/prime/unprimed', 'word/prime/primed', 'nonword/prime']
 subjects_list = get_entity_vals(bids_root, entity_key='sub')
 
 fname_rep_group = op.join('..', '..', 'output',
-                          'group', f'group_{task}_ica-report.html')
+                          'preprocessing', f'group_{task}_ica-report.html')
 rep_group = Report()
 
 for subject in subjects_list:
@@ -112,4 +121,4 @@ for subject in subjects_list:
     ica.save(fname_ica)
     plt.close('all')
 
-    rep_group.save(fname_rep_group, overwrite=True, open_browser=False)
+    rep_group.save(fname_rep_group, open_browser=False, overwrite=True)

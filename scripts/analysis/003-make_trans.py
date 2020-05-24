@@ -1,81 +1,79 @@
 """
 003-make_trans.py
 
-This script is used for the computation of the covariance matrix for
-each subject in the experiment. The covariance matrix is used for the
-inverse estimate when the sensor data is projected to source space.
+This script is used for the computation of the trans matrix for
+each subject in the experiment. The trans matrix is used to transform
+data from MEG sensor space to MRI space. This is necessary for source
+estimation. In this study, we used the template brain, fsaverage, from
+FreeSurfer and scale the head model using digitization data for
+constraints. This is semi-automatic, we will use a uniform scaling mode
+and will fit using ICP.
+
+Note, the scaled MRI creation does not follow the BIDS standard as of now.
+To prevent breaking the dataset, these MRIs are placed in a separate
+directory, `OcularLDT_MRI`.
 """
 import os.path as op
 
 import mne
 from mne.report import Report
+mne.viz.set_3d_backend('mayavi')
 
 from mne_bids import read_raw_bids
+from mne_bids.read import _handle_events_reading
 from mne_bids.utils import get_entity_vals
 
 
 layout = mne.channels.read_layout('KIT-AD.lout')
 task = 'OcularLDT'
-bids_root = op.join('/', 'Volumes', 'Experiments', task)
+bids_root = op.join('/', 'Volumes', 'teon-backup', 'Experiments', task)
+fs_home = op.join('/', 'Applications', 'freesurfer', '7.1.0')
+mri_subjects_dir = op.join('/', 'Volumes', 'teon-backup', 'Experiments',
+                           task + '_MRI')
 derivative = 'trans'
 
-redo = True
+redo = False
 
-evts_labels = ['word/prime/unprimed', 'word/prime/primed', 'nonword/prime']
 subjects_list = get_entity_vals(bids_root, entity_key='sub')
 
-fname_rep_group = op.join('..', 'output', 'group',
+fname_rep_group = op.join('/', 'Users', 'tbrooks', 'codespace',
+                          f'{task}-code', 'output', 'preprocessing',
                           f'group_{task}_{derivative}-report.html')
 rep_group = Report()
 
-for subject in subjects_list[:1]:
+# first, copy over fsaverage from FreeSurfer
+mne.coreg.create_default_subject(fs_home=fs_home, update=True,
+                                 subjects_dir=mri_subjects_dir)
+
+
+for subject in subjects_list:
     print("#" * 9 + f"\n# {subject} #\n" + "#" * 9)
     # define filenames
     path = op.join(bids_root, f"sub-{subject}", 'meg')
     fname_raw = op.join(path, f"sub-{subject}_task-{task}_meg.fif")
-    fname_mp_raw = op.join(path, f"sub-{subject}_task-{task}_part-01_meg.fif")
-    fname_cov = op.join(path, "derivatives", f"sub-{subject}_task-{task}_{derivative}.fif")
+    fname_mp_raw = op.join(path, f"sub-{subject}_task-{task}_split-01_meg.fif")
+    fname_trans = op.join(path, f"sub-{subject}_task-{task}_{derivative}.fif")
 
-    if not op.exists(fname_cov) or redo:
-        try:
-            raw = read_raw_bids(fname_raw, bids_root=bids_root)
-        except FileNotFoundError:
-            raw = read_raw_bids(fname_mp_raw, bids_root=bids_root)
 
-        events, event_id = mne.events_from_annotations(raw)
-        event_id = {key: value for key, value in event_id.items()
-                    if key in evts_labels}
-        epochs = mne.Epochs(raw, events, event_id, tmin=-.2, tmax=1,
-                            baseline=baseline, reject=reject, verbose=False)
+    try:
+        raw = mne.io.read_raw_fif(fname_raw)
+    except FileNotFoundError:
+        raw = mne.io.read_raw_fif(fname_mp_raw)
+        fname_raw = fname_mp_raw
 
-        # # back to coding
-        # proj = mne.read_proj(fname_proj)
-        # epochs.add_proj(proj)
-        # epochs.apply_proj()
+    if not op.exists(fname_trans) or redo:
+        mne.viz.set_3d_backend('mayavi')
+        mne.gui.coregistration(inst=fname_raw, subjects_dir=mri_subjects_dir)
 
-        # plot evoked
-        evoked = epochs.average()
-        p = evoked.plot(titles={'mag': 'Evoked Response'}, show=False)
-        rep.add_figs_to_section(p,
-                                f"{subject}: Evoked Response to Prime Word",
-                                'Evoked')
+    mne.viz.set_3d_backend('pyvista')
+    p = mne.viz.plot_alignment(raw.info, trans=fname_trans,
+                                subject=f'sub-{subject}',
+                                subjects_dir=mri_subjects_dir,
+                                surfaces='head',
+                                dig=True, eeg=[], meg='sensors',
+                                coord_frame='meg')
+    rep_group.add_figs_to_section(p, f"{subject}", 'Coreg')
 
-        # plot covariance and whitened evoked
-        epochs.crop(-.2, -.1, copy=False)
-        cov = mne.compute_covariance(epochs, method='auto', verbose=False)
-        p = cov.plot(epochs.info, show_svd=0, show=False)[0]
-        comments = ('The covariance matrix is computed on the -200:-100 ms '
-                    'baseline. -100:0 ms is confounded with the eye-mvt.')
-        rep.add_figs_to_section(p, f"{subject}: Covariance Matrix",
-                                'Covariance', comments=comments)
-        p = evoked.plot_white(cov, show=False)
-        rep.add_figs_to_section(p,
-                                f"{subject}: Whitened Evoked to Prime Word",
-                                'Covariance')
-
-        # save covariance
-        mne.write_cov(fname_cov, cov)
-
-rep.save(fname_rep, overwrite=True, open_browser=False)
+    rep_group.save(fname_rep_group, overwrite=True, open_browser=False)
 
 

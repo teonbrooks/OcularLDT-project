@@ -13,11 +13,12 @@ from matplotlib import gridspec
 
 import mne
 from mne.report import Report
+
 from mne_bids import read_raw_bids
+from mne_bids.read import _handle_events_reading
 from mne_bids.utils import get_entity_vals
 
 
-layout = mne.channels.read_layout('KIT-AD.lout')
 task = 'OcularLDT'
 bids_root = op.join('/', 'Volumes', 'teon-backup', 'Experiments', task)
 derivative = 'pca'
@@ -26,12 +27,12 @@ redo = True
 reject = dict(mag=3e-12)
 baseline = (-.2, -.1)
 tmin, tmax = -.5, 1
-ylim = dict(mag=[-300, 300])
+ylim = dict(mag=[-200, 200])
 
 evts_labels = ['word/prime/unprimed', 'word/prime/primed', 'nonword/prime']
 subjects_list = get_entity_vals(bids_root, entity_key='sub')
 
-fname_rep_group = op.join('..', 'output', 'group',
+fname_rep_group = op.join('..', '..', 'output', 'preprocessing',
                           f'group_{task}_{derivative}-report.html')
 rep_group = Report()
 
@@ -40,6 +41,7 @@ for subject in subjects_list:
 
     # define filenames
     path = op.join(bids_root, f"sub-{subject}", 'meg')
+    events_fname = op.join(path, f"sub-{subject}_task-{task}_events.tsv")
     fname_raw = op.join(path, f"sub-{subject}_task-{task}_meg.fif")
     fname_mp_raw = op.join(path, f"sub-{subject}_task-{task}_split-01_meg.fif")
     fname_proj = op.join(path, f"sub-{subject}_task-{task}_proj.fif")
@@ -49,9 +51,11 @@ for subject in subjects_list:
         # no language involved
         # TODO: replace path with basename
         try:
-            raw = read_raw_bids(fname_raw, bids_root=bids_root)
-        except RuntimeError:
-            raw = read_raw_bids(fname_mp_raw, bids_root=bids_root)
+            raw = mne.io.read_raw_fif(fname_raw)
+        except FileNotFoundError:
+            raw = mne.io.read_raw_fif(fname_mp_raw)
+        # TODO: replace with proper solution
+        raw = _handle_events_reading(events_fname, raw)
         events, event_id = mne.events_from_annotations(raw)
         event_id = {key: value for key, value in event_id.items()
                     if key in evts_labels}
@@ -71,19 +75,21 @@ for subject in subjects_list:
         gs = gridspec.GridSpec(1, 2)
         axes = [plt.subplot(gs[0]), plt.subplot(gs[1])]
         # plot evoked
-        evoked.plot(titles={'mag': 'Before: Original Evoked'}, show=False,
-                    axes=axes[0], ylim=ylim)
+        evoked.crop(-.1,.1).plot(titles={'mag': 'Before: Original Evoked'},
+                                 show=False,
+                                 axes=axes[0], ylim=ylim)
         # remove all
         evoked_proj = evoked.copy().add_proj(projs).apply_proj()
-        evoked_proj.plot(titles={'mag': 'After: Evoked - All PCs'}, show=False,
-                         axes=axes[1], ylim=ylim)
-        rep_group.add_figs_to_section(fig, '%s: Before and After PCA: Evoked'
-                                      % subject, 'Before and After All')
+        evoked_proj.plot(titles={'mag': 'After: Evoked - First 3 PCs'},
+                         show=False, axes=axes[1], ylim=ylim)
+        rep_group.add_figs_to_section(fig, '%s: Evoked, Before and After PCA'
+                                      % subject, 'Evoked, Before and After')
 
         # 2. plot PCA topos
-        p = mne.viz.plot_projs_topomap(projs, layout, show=False)
+        p = mne.viz.plot_projs_topomap(projs, evoked.info, show=False,
+                                       extrapolate='head')
         rep_group.add_figs_to_section(p, '%s: PCA topos' % subject,
-                                      'Topos', image_format=img_ext)
+                                      'Topos')
 
         # 3. plot evoked - each proj
         for ii, ev in enumerate(evokeds):
@@ -93,16 +99,16 @@ for subject in subjects_list:
             fig = plt.figure(figsize=(12, 6))
             gs = gridspec.GridSpec(1, 2, width_ratios=[3, 1])
             axes = [plt.subplot(gs[0]), plt.subplot(gs[1])]
-            e = ev.plot(titles={'mag': title}, ylim=ylim,
+            e = ev.plot(titles={'mag': title},
                         show=False, axes=axes[0])
-            p = mne.viz.plot_projs_topomap(ev.info['projs'], layout,
-                                           show=False, axes=axes[1])
+            p = mne.viz.plot_projs_topomap(ev.info['projs'], ev.info,
+                                           show=False, axes=axes[1],
+                                           extrapolate='head')
             rep_group.add_figs_to_section(fig, '%s: Evoked w/o PC %d'
-                                          % (subject, ii), tab,
-                                          image_format=img_ext)
+                                          % (subject, ii), tab)
 
         # save projs
         mne.write_proj(fname_proj, projs)
         # cleanup
         del epochs
-rep_group.save(fname_rep_group, open_browser=False)
+    rep_group.save(fname_rep_group, open_browser=False, overwrite=True)

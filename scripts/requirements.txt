@@ -1,0 +1,6 @@
+mayavi >= 4.3.0
+freesurfer == 7.1.0
+mne-python == 20.0
+mne-bids == 0.4.0
+pyvista
+pyQt5 >= 5.10
