@@ -5,16 +5,13 @@ import numpy as np
 import pyeparse as pp
 import config
 import config_raw
-from _recode_events import _recode_events
+from _preprocessing._recode_events import _recode_events
 
 
-path = config.drive
-redo = config.redo
-exp_fname = config.exp
-
-
+task = 'OcularLDT'
+bids_root = op.join('/', 'Volumes', 'teon-backup', 'Experiments', task)
+fname_group = op.join(bids_root, 'group', f'group_{task}_region_times.txt')
 group_ds = list()
-fname_group = op.join(path, 'group', 'group_%s_region_times.txt' % exp_fname)
 
 for subject, experiments in config_raw.subjects.items():
     print(config.banner % subject)

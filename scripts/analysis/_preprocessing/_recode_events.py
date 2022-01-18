@@ -52,27 +52,9 @@ def _recode_events(exp, evts, idx=True):
         # semantic
         semantic_idx = np.where(semantic)[0]
 
-    elif exp.startswith('SENT'):
-        # remove practice
-        expt = np.array([(x & 2 ** 4) >> 4 for x in evts[:, 2]], dtype=bool)
-        evts = evts[expt]
-        idx = np.nonzero(evts[:, 2])[0]
-        evts = evts[idx]
-        triggers = evts[:, 2]
-
-        semantic = np.array([(x & 2 ** 3) >> 3 for x in triggers],
-                            dtype=bool)
-        current_pos = np.array([(x & (2 ** 2 + 2 ** 1 + 2 ** 0)) >> 0
-                                for x in triggers])
-
-        semantic_idx = np.where(semantic)[0]
-        fix_idx = np.where(current_pos == 0)[0]
-        primes_idx = np.where(current_pos == 1)[0]
-        targets_idx = np.where(current_pos == 3)[0]
-
     else:
         raise ValueError('This function only works for '
-                         'OLDTX or SENTX experiments, not %s.' % exp)
+                         'OLDTX experiments, not %s.' % exp)
 
     ############
     # Recoding #

@@ -1,5 +1,5 @@
 """
-001b-make_ica.py
+001-make_ica.py
 
 This script is used for the computation of the ICs to be removed for
 each subject in the experiment. One approach to this analysis is to remove
