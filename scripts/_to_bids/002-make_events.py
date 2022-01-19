@@ -26,8 +26,8 @@ filt = config.filt
 for subject in config.subjects:
     print(config.banner % subject)
 
-    fname_template = op.join(path, subject, 'meg', 'sub-{}_task-{}'.format(subject, exp))
-    fname_evts = fname_template + '-events.tsv'
+    fname_template = op.join(path, subject, 'mne', '_'.join((subject, exp)))
+    fname_evts = fname_template + '-eve.txt'
     fname_raw = fname_template + '_calm_' + filt + '_filt-raw.fif'
     # write the co-registration file
     fname_trial = fname_template + '_meg_trial_struct.txt'
