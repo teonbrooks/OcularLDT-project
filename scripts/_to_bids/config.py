@@ -1,52 +1,86 @@
 import os.path as op
-from glob import glob
-import re
-import itertools
-import numpy as np
 
 
-# directories
-drives = {'home': op.join('/Volumes', 'teon-backup', 'Experiments',
-                          'OcularLDT'),
-          'office': op.join('/Volumes', 'backup', 'Experiments',
-                            'OcularLDT'),
-          'project': '/Applications/codespace/OcularLDT-code',
-         }
+# Folders
+raw_root = '/Volumes/teon-backup/Experiments/E-MEG/data'
+bids_root = '/Volumes/teon-backup/Experiments/OcularLDT'
+scripts_dir = '/Applications/codespace/OcularLDT-code'
+results_dir = op.join(scripts_dir, 'output')
 
 # Experiments
-experiments = ['OLDT', 'SENT']
-project_names = ['OcularLDT', 'OcularSimpleSentences']
+experiment = 'OLDT'
+project_name = 'OcularLDT'
 
-index = 0
-exp = experiments[index]
-project_name = project_names[index]
-
-# analysis parameters
-redo = True
-results_dir = op.join(drives['project'], 'output')
 reject = dict(mag=3e-12)
+redo = False
 baseline = (-.2, -.1)
 img = 'png'
-# can't really use `hp0.03` since their filter settings varied, name not true
-filts = {'no': 'iir_no',
-         'hp0.03': 'iir_hp0.03_lp40',  # DO NOT USE!
-         'hp0.1': 'iir_hp0.1_lp40',  # try this after thesis is completed
-         'hp0.51': 'iir_hp0.51_lp40', 'hp1': 'iir_hp1_lp40'}
-filt = filts['hp0.51']
+filt = 'iir_hp0.51_lp40'
 banner = ('#' * 9 + '\n# %s #\n' + '#' * 9)
-# determine which drive you're working from
-drive = 'home'
+
 event_id = {'word/prime/unprimed': 1,
             'word/target/unprimed': 2,
             'word/prime/primed': 5,
-            'word/target/primed': 6}
-if exp == 'OLDT':
-    event_id.update({'nonword/prime': 9, 'nonword/target': 10,
-                     # for the co-registration, there are no
-                     # fixations in the evts
-                     # 'fixation': 128
-                    })
-drive = drives[drive]
-subjects = glob(op.join(drive, 'sub-A*'))
-for ii, subject in enumerate(subjects):
-    subjects[ii] = re.findall('/sub-(A[0-9]*)', subject)[0]
+            'word/target/primed': 6,
+            'nonword/prime': 9,
+            'nonword/target': 10,
+            # for the co-registration, there are no
+            # fixations in the evts
+            # 'fixation': 128
+            }
+
+# arrange the OLDT in the presentation order
+# this is for the 001-make_raw.py
+exp_list = {'A0023': ['OLDT2', 'OLDT1'],
+            'A0078': ['OLDT1', 'OLDT2'],
+            'A0085': ['OLDT2', 'OLDT1'],
+            'A0100': ['OLDT1', 'OLDT2'],
+            'A0106': ['OLDT1', 'OLDT2'],
+            'A0110': ['OLDT2', 'OLDT1'],
+            'A0123': ['OLDT1', 'OLDT2'],
+            'A0125': ['OLDT1', 'OLDT2'],
+            'A0127': ['OLDT2', 'OLDT1'],
+            'A0129': ['OLDT1', 'OLDT2'],
+            # 'A0130': ['OLDT2', 'OLDT1'],
+            'A0134': ['OLDT2', 'OLDT1'],
+            'A0136': ['OLDT1', 'OLDT2'],
+            'A0148': ['OLDT1', 'OLDT2'],
+            'A0150': ['OLDT2', 'OLDT1'],
+            'A0155': ['OLDT2', 'OLDT1'],
+            'A0159': ['OLDT1', 'OLDT2'],
+            'A0161': ['n/a', 'OLDT2'],
+            'A0163': ['OLDT2', 'OLDT1'],
+            'A0164': ['OLDT2', 'OLDT1'],
+            }
+
+
+# Custom kit2fiff fit to the naming scheme of the original recordings
+def kit2fiff(subject, exp, path, dig=True, preload=False):
+    from glob import glob
+    from mne.io import read_raw_kit
+
+
+    kit = op.join(path, subject, 'kit',
+                  subject + '*' + exp + '*' + 'calm.con')
+    mrk_pre = op.join(path, subject, 'kit',
+                      subject + '*mrk*' + 'pre_' + exp + '*.mrk')
+    mrk_post = op.join(path, subject, 'kit',
+                       subject + '*mrk*' + 'post_' + exp + '*.mrk')
+    elp = op.join(path, subject, 'kit', subject + '*p.txt')
+    hsp = op.join(path, subject, 'kit', subject + '*h.txt')
+
+    mrk_pre = glob(mrk_pre)[0]
+    mrk_post = glob(mrk_post)[0]
+    elp = glob(elp)[0]
+    hsp = glob(hsp)[0]
+    kit = glob(kit)[0]
+
+    if dig:
+        raw = read_raw_kit(input_fname=kit, mrk=[mrk_pre, mrk_post],
+                           elp=elp, hsp=hsp, stim='>', slope='+',
+                           preload=preload, verbose=False)
+    else:
+        raw = read_raw_kit(input_fname=kit, stim='>', slope='+',
+                           preload=preload, verbose=False)
+
+    return raw
