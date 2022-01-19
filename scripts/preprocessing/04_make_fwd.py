@@ -2,22 +2,19 @@ import os.path as op
 
 import mne
 from mne.report import Report
+from mne_bids import get_entity_vals
 
-from mne_bids import read_raw_bids
-from mne_bids.read import _handle_events_reading
-from mne_bids.utils import get_entity_vals
 
 layout = mne.channels.read_layout('KIT-AD.lout')
 task = 'OcularLDT'
 bids_root = op.join('/', 'Volumes', 'teon-backup', 'Experiments', task)
-fs_home = op.join('/', 'Applications', 'freesurfer', '7.1.0')
 mri_subjects_dir = op.join('/', 'Volumes', 'teon-backup', 'Experiments',
                            task + '_MRI')
 derivative = 'fwd'
 
 redo = False
 
-subjects_list = get_entity_vals(bids_root, entity_key='sub')
+subjects_list = get_entity_vals(bids_root, entity_key='subject')
 
 for subject in subjects_list:
     print("#" * 9 + f"\n# {subject} #\n" + "#" * 9)
