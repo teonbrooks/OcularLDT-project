@@ -1,6 +1,6 @@
 import mne
 import os.path as op
-import config
+from . import config
 
 
 redo = config.redo

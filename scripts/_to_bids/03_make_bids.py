@@ -1,5 +1,4 @@
 import os.path as op
-import numpy as np
 import shutil as sh
 
 from mne import read_events
@@ -8,28 +7,27 @@ from mne_bids import (write_raw_bids, make_bids_basename,
                       make_bids_folders, make_dataset_description)
 
 import config
-import config_raw
 
 
-filt_type = config.filt[:3]
-reject = None
-exp = config.exp
+experiment = config.experiment
+filt = config.filt
 event_id = config.event_id
 project_name = config.project_name
+subjects = config.exp_list.keys()
 
 input_path = config.drives['home']
 output_path = op.join(config.drives['home'], '..', '..', project_name)
 
 # meg.
-for subject in config_raw.subjects.keys():
+for subject in subjects:
     print(config.banner % subject)
 
     fname_raw = op.join(input_path, subject, 'mne',
-                        subject + '_%s_calm_iir_hp0.51_lp40_filt-raw.fif' % exp)
+                        '{subject}_{experiment}_calm_{filt}_filt-raw.fif')
 
     raw = read_raw_fif(fname_raw)
     events_data = read_events(op.join(input_path, subject, 'mne',
-                              subject + '_%s-eve.txt' % exp))
+                              subject + '_%s-eve.txt' % experiment))
     bids_basename = make_bids_basename(subject=subject, task=project_name)
     write_raw_bids(raw, bids_basename, output_path,
                    event_id=event_id, events_data=events_data,
@@ -37,10 +35,9 @@ for subject in config_raw.subjects.keys():
 
 # eyetrack. note, the BEP for eyetracking isn't merged
 # but this is likely the naming convention for it
-for subject, experiments in config_raw.subjects.items():
-    exps = experiments[0], experiments[2]
+for subject, experiments in config.exp_list.items():
     subname = 'sub-{}'.format(subject)
-    for ii, exp in enumerate(exps, 1):
+    for ii, exp in enumerate(experiments, 1):
         if exp != 'n/a':
             bids_basename = make_bids_basename(subject=subject,
                                             run='{:02d}'.format(ii),

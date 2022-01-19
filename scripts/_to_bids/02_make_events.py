@@ -11,7 +11,6 @@ Here, we're creating two files for all of the MEG analyses:
 """
 
 import os.path as op
-from copy import deepcopy
 import numpy as np
 import mne
 import config
