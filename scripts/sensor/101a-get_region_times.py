@@ -4,7 +4,6 @@ import numpy as np
 
 import pyeparse as pp
 import config
-import config_raw
 from _preprocessing._recode_events import _recode_events
 
 
@@ -13,7 +12,7 @@ bids_root = op.join('/', 'Volumes', 'teon-backup', 'Experiments', task)
 fname_group = op.join(bids_root, 'group', f'group_{task}_region_times.txt')
 group_ds = list()
 
-for subject, experiments in config_raw.subjects.items():
+for subject, experiments in config.exp_list.items():
     print(config.banner % subject)
 
     # Define output
