@@ -16,7 +16,7 @@ for subject, experiments in config.exp_list.items():
     print(config.banner % subject)
 
     # Define output
-    fname = op.join(path, subject, 'edf',
+    fname = op.join(bids_root, subject, 'edf',
                     f'{subject}_{exp_fname}_region_times.txt')
 
     ds = [list(), list(), list(), list(),

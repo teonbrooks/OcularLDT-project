@@ -4,7 +4,7 @@ library("ggplot2")
 control = lmerControl(optimizer='bobyqa')
 
 
-data <- read.csv("/Volumes/backup/Experiments/E-MEG/data/group/group_OLDT_region_times.txt")
+data <- read.csv("/Volumes/teon-backup/Experiments/E-MEG/data/group/group_OLDT_region_times.txt")
 data = data[!is.na(data$dur),]
 data = data[data$word == 1,]
 data$subject = factor(data$subject)
