@@ -4,7 +4,7 @@ import numpy as np
 from pandas import concat, DataFrame, read_csv
 import config
 import config_raw
-from pyeparse import reading
+import reading
 from _recode_events import _recode_events
 
 
@@ -18,11 +18,9 @@ fname_stim = op.join(config.drives['project'], 'input', 'stims',
                      '%s_stimuli_properties.csv' % exp_fname)
 
 # Define OLDT interest areas
-fname_ia = op.join(path, 'group', '%s_IAs.txt' % exp_fname)
-if config.exp == 'OLDT':
-    ia_words = ['fixation', 'prime', 'target', 'post']
-else:
-    ia_words = ['fixation', 'aux', 'prime', 'target', 'post']
+fname_ia = op.join(path, 'group', 'OLDT_IAs.txt')
+ia_words = ['fixation', 'prime', 'target', 'post']
+
 # lexical properties
 # header: "Occurences","Word","Length","Freq_HAL","Log_Freq_HAL","BG_Mean"
 lex_props = read_csv(fname_stim, dtype=str, delimiter=',')
@@ -34,27 +32,21 @@ lex_props['Log_Freq_HAL'] = map(float, lex_props['Log_Freq_HAL'])
 lex_bg = dict(zip(lex_props['Word'], lex_props['BG_Mean']))
 lex_freq = dict(zip(lex_props['Word'], lex_props['Log_Freq_HAL']))
 
-for subject, experiments in config_raw.subjects.items():
-    print config.banner % subject
+for subject, experiments in config_raw.exp_list.items():
+    print(config.banner % subject)
     # Define output
     fname_ds = op.join(path, subject, 'edf',
-                       subject + '_%s_fixation_times.txt' % exp_fname)
-    if config.exp == 'OLDT':
-        exps = [experiments[0], experiments[2]]
-    else:
-        exps = [experiments[1]]
+                       f'{subject}_OLDT_fixation_times.txt')
     if 'n/a' in exps:
         exps.pop(exps.index('n/a'))
     print experiments
     subject_ds = list()
     n_trials = 0
-    for ii, exp in enumerate(exps):
+    for ii, exp in enumerate(experiments):
         exp_dat = exp_fname
-        if exp_fname == 'SENT':
-            exp_dat = 'Sime_Sent'
         # Define filenames
         fname_trial = glob(op.join(path, subject, 'edf',
-                           '*_{}_*BLOCKTRIAL.dat'.format(exp_dat)))[0]
+                           f'*_{exp_dat}_*BLOCKTRIAL.dat'))[0]
         fname_raw = op.join(path, subject, 'edf',
                             '{}_{}.edf'.format(subject, exp))
 
@@ -76,11 +68,7 @@ for subject, experiments in config_raw.subjects.items():
         sem_dict = dict(zip(trials, semantics))
         word_dict = dict(zip(trials, data[:, 4].astype(int)))
 
-        if config.exp == 'OLDT':
-            iters = [('prime', 1), ('target', 2), ('post', 3)]
-        else:
-            iters = [('prime', 1), ('aux', 2),
-                     ('target', 3), ('post', 4)]
+        iters = [('prime', 1), ('target', 2), ('post', 3)]
         for ia, ii in iters:
             times = ias.get_gaze_duration(ia=ii, first_fix=True)
             times['trial'] -= n_practice
