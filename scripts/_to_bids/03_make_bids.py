@@ -51,7 +51,7 @@ for subject, experiments in config.exp_list.items():
             sh.copyfile(input_fname, bids_eyetrack)
 
 # make a dataset description
-make_dataset_description(path=output_path, data_license='CC-BY',
+make_dataset_description(path=output_path, data_license='CC0',
                          name=project_name,
                          authors=['Teon L Brooks', 'Laura Gwilliams',
                                   'Alexandre Gramfort', 'Alec Marantz'],
