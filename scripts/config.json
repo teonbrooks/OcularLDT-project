@@ -93,9 +93,12 @@
         ]
     },
     "experiment": "OLDT",
+    "freesurfer_root": "/Applications/freesurfer/7.1.0",
+    "mri_root": "/Volumes/teon-backup/Experiments/OcularLDT_MRI",
     "project_name": "OcularLDT",
     "project_path": "~/codespace/OcularLDT-project",
     "reject": {
         "mag": 3e-12
-    }
+    },
+    "task": "OcularLDT"
 }

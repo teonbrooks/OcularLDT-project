@@ -1,90 +1,84 @@
 """
-002-make_cov.py
+001_make_cov.py
 
 This script is used for the computation of the covariance matrix for
 each subject in the experiment. The covariance matrix is used for the
 inverse estimate when the sensor data is projected to source space.
 """
 import os.path as op
+import json
 
 import mne
 from mne.report import Report
 
-from mne_bids import read_raw_bids
-from mne_bids.read import _handle_events_reading
-from mne_bids.utils import get_entity_vals
+from mne_bids import read_raw_bids, BIDSPath
+from mne_bids import get_entity_vals
 
 
-layout = mne.channels.read_layout('KIT-AD.lout')
-task = 'OcularLDT'
-bids_root = op.join('/', 'Volumes', 'teon-backup', 'Experiments', task)
+cfg = json.load(open(op.join('/', 'Users', 'tbrooks', 'codespace',
+                     'OcularLDT-project', 'scripts', 'config.json')))
+task = cfg['task']
 derivative = 'cov'
 
-redo = True
+redo = False
 
 evts_labels = ['word/prime/unprimed', 'word/prime/primed', 'nonword/prime']
-subjects_list = get_entity_vals(bids_root, entity_key='sub')
+subjects_list = get_entity_vals(cfg['bids_root'], entity_key='subject')
+bids_path = BIDSPath(root=cfg['bids_root'], session=None, task=task,
+                     datatype=cfg['datatype'])
 
-fname_rep_group = op.join('/', 'Users', 'tbrooks', 'codespace', 'OcularLDT-code',
-                          'output', 'group',
-                          f'group_{task}_{derivative}-report.html')
-rep_group = Report()
+fname_rep_cov = op.join(cfg['project_path'], 'output', 'reports',
+                        f'group_{task}_{derivative}-report.html')
+fname_rep_group_h5 = op.join(cfg['project_path'], 'output', 'reports',
+                             f'group_{task}-report.h5')
+fname_rep_group_html = op.join(cfg['project_path'], 'output', 'reports',
+                             f'group_{task}-report.html')
+rep_cov = Report()
 
-for subject in subjects_list:
-    print("#" * 9 + f"\n# {subject} #\n" + "#" * 9)
-    # define filenames
-    path = op.join(bids_root, f"sub-{subject}", 'meg')
-    events_fname = op.join(path, f"sub-{subject}_task-{task}_events.tsv")
-    # TODO: replace path with basename
-    fname_raw = op.join(path, f"sub-{subject}_task-{task}_meg.fif")
-    fname_mp_raw = op.join(path, f"sub-{subject}_task-{task}_split-01_meg.fif")
-    fname_cov = op.join(path, f"sub-{subject}_task-{task}_{derivative}.fif")
+with mne.open_report(fname_rep_group_h5) as rep_group:
+    for subject in subjects_list:
+        print(cfg['banner'] % subject)
+        bids_path.update(subject=subject)
 
-    if not op.exists(fname_cov) or redo:
+        # define filenames
+        fname_cov = op.join(cfg['bids_root'], f"sub-{subject}",
+                            cfg['datatype'],
+                            f"sub-{subject}_task-{task}_{derivative}.fif")
+        fname_ica = op.join(cfg['bids_root'], f"sub-{subject}",
+                            cfg['datatype'],
+                            f"sub-{subject}_task-{task}_ica.fif")
 
-        try:
-            raw = mne.io.read_raw_fif(fname_raw)
-        except FileNotFoundError:
-            raw = mne.io.read_raw_fif(fname_mp_raw)
-        # TODO: replace with proper solution
-        raw = _handle_events_reading(events_fname, raw)
+
+        raw = read_raw_bids(bids_path)
         events, event_id = mne.events_from_annotations(raw)
         event_id = {key: value for key, value in event_id.items()
                     if key in evts_labels}
         epochs = mne.Epochs(raw, events, event_id, tmin=-.2, tmax=.2,
-                            baseline=(-.2, -.1), reject={'mag': 3e-12},
-                            verbose=False)
+                            baseline=None, reject={'mag': 3e-12},
+                            verbose=False, preload=True)
 
-        # # back to coding
-        # proj = mne.read_proj(fname_proj)
-        # epochs.add_proj(proj)
-        # epochs.apply_proj()
-
-        # plot evoked
+        # apply ica to epochs
+        ica = mne.preprocessing.read_ica(fname_ica)
+        epochs = ica.apply(epochs)
         evoked = epochs.average()
-        p = evoked.plot(titles={'mag': 'Evoked Response'}, show=False)
-        rep_group.add_figs_to_section(p,
-                                      (f"{subject}: Evoked Response " +
-                                       "to Prime Word"),
-                                      'Evoked')
 
-        # plot covariance and whitened evoked
-        epochs.load_data().crop(-.2, -.1)
-        cov = mne.compute_covariance(epochs, method='auto', verbose=False)
-        p = cov.plot(epochs.info, show_svd=0, show=False)[0]
-        # comments = ('The covariance matrix is computed on the -200:-100 ms '
-        #             'baseline. -100:0 ms is confounded with the eye-mvt.')
-        rep_group.add_figs_to_section(p,
-                                      f"{subject}: Covariance Matrix",
-                                      'Covariance Matrix')
-        p = evoked.plot_white(cov, show=False)
-        rep_group.add_figs_to_section(p,
-                                f"{subject}: Whitened Evoked to Prime Word",
-                                'Whitened Evoked')
+        if not op.exists(fname_cov) or redo:
+            # plot covariance and whitened evoked
+            epochs.load_data().crop(-.2, -.1)
 
-        # save covariance
-        mne.write_cov(fname_cov, cov)
+            cov = mne.compute_covariance(epochs, method='auto', verbose=False)
+            # comments = ('The covariance matrix is computed on the -200:-100 ms '
+            #             'baseline. -100:0 ms is confounded with the eye-mvt.')
+            # save covariance
+            mne.write_cov(fname_cov, cov)
+        else:
+            cov = mne.read_cov(fname_cov)
 
-rep_group.save(fname_rep_group, overwrite=True, open_browser=False)
+        rep_group.add_covariance(cov, info=epochs.info,
+                                 title=f'{subject} {derivative}')
 
+        rep_group.add_evokeds(evoked,  titles=f'{subject} evoked',
+                              noise_cov=cov, tags=('evoked',))
 
+    rep_group.save(fname_rep_group_html, overwrite=redo, open_browser=False,
+                   sort_content=True)
