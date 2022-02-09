@@ -11,8 +11,7 @@ import json
 import mne
 from mne.report import Report
 
-from mne_bids import read_raw_bids, BIDSPath
-from mne_bids import get_entity_vals
+from mne_bids import get_entity_vals, read_raw_bids, BIDSPath
 
 
 cfg = json.load(open(op.join('/', 'Users', 'tbrooks', 'codespace',
@@ -27,15 +26,10 @@ subjects_list = get_entity_vals(cfg['bids_root'], entity_key='subject')
 bids_path = BIDSPath(root=cfg['bids_root'], session=None, task=task,
                      datatype=cfg['datatype'])
 
-fname_rep_cov = op.join(cfg['project_path'], 'output', 'reports',
-                        f'group_{task}_{derivative}-report.html')
-fname_rep_group_h5 = op.join(cfg['project_path'], 'output', 'reports',
-                             f'group_{task}-report.h5')
-fname_rep_group_html = op.join(cfg['project_path'], 'output', 'reports',
-                             f'group_{task}-report.html')
-rep_cov = Report()
+fname_rep_group = op.join(cfg['project_path'], 'output', 'reports',
+                          f'group_{task}-report.%s')
 
-with mne.open_report(fname_rep_group_h5) as rep_group:
+with mne.open_report(fname_rep_group % 'h5') as rep_group:
     for subject in subjects_list:
         print(cfg['banner'] % subject)
         bids_path.update(subject=subject)
@@ -80,5 +74,5 @@ with mne.open_report(fname_rep_group_h5) as rep_group:
         rep_group.add_evokeds(evoked,  titles=f'{subject} evoked',
                               noise_cov=cov, tags=('evoked',))
 
-    rep_group.save(fname_rep_group_html, overwrite=redo, open_browser=False,
-                   sort_content=True)
+    rep_group.save(fname_rep_group % 'html', overwrite=redo,
+                   open_browser=False)

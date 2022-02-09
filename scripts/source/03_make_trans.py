@@ -35,14 +35,11 @@ bids_path = BIDSPath(root=cfg['bids_root'], session=None, task=task,
                      datatype=cfg['datatype'])
 subjects_list = get_entity_vals(cfg['bids_root'], entity_key='subject')
 
-fname_rep_group_html = op.join(cfg['project_path'], 'output', 'reports',
-                               f'group_{task}_{derivative}-report.html')
-fname_rep_group_h5 = op.join(cfg['project_path'], 'output', 'reports',
-                             f'group_{task}-report.h5')
-rep_trans = Report()
+fname_rep_group = op.join(cfg['project_path'], 'output', 'reports',
+                          f'group_{task}-report.%s')
 
 # first, copy over fsaverage from FreeSurfer
-with mne.open_report(fname_rep_group_h5) as rep_group:
+with mne.open_report(fname_rep_group % 'h5') as rep_group:
     for subject in subjects_list:
         print(cfg['banner'] % subject)
         bids_path.update(subject=subject)
@@ -61,4 +58,4 @@ with mne.open_report(fname_rep_group_h5) as rep_group:
                             subject=f"sub-{subject}",
                             subjects_dir=cfg['mri_root'], tags=('trans',))
 
-rep_group.save(fname_rep_group_html, overwrite=True, open_browser=False)
+rep_group.save(fname_rep_group % 'html', overwrite=True, open_browser=False)

@@ -30,12 +30,10 @@ bids_path = BIDSPath(root=cfg['bids_root'], session=None, task=task,
                      datatype=cfg['datatype'])
 subjects_list = get_entity_vals(cfg['bids_root'], entity_key='subject')
 
-fname_rep_group_h5 = op.join(cfg['project_path'], 'output',
-                             'reports', f'group_{task}-report.h5')
-fname_rep_group_html = op.join(cfg['project_path'], 'output',
-                               'reports', f'group_{task}-report.html')
+fname_rep_group = op.join(cfg['project_path'], 'output', 'reports',
+                          f'group_{task}-report.%s')
 
-with mne.open_report(fname_rep_group_h5) as rep_group:
+with mne.open_report(fname_rep_group % 'h5') as rep_group:
     rep_group.title = f"{task} Group Report"
     for subject in subjects_list:
         print(cfg['banner'] % subject)
@@ -97,4 +95,4 @@ with mne.open_report(fname_rep_group_h5) as rep_group:
 
         ica.save(fname_ica, overwrite=redo)
 
-    rep_group.save(fname_rep_group_html, open_browser=False, overwrite=redo)
+    rep_group.save(fname_rep_group % 'html', open_browser=False, overwrite=redo)
