@@ -13,3 +13,4 @@ output/results
 *.synctex.gz
 
 *.Rhistory
+.DS_Store

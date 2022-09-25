@@ -1,0 +1,5 @@
+Type    ID  left    top right   bottom  label
+RECTANGLE   1   000 100 200 500 fixation
+RECTANGLE   2   200 100 450 500 prime
+RECTANGLE   3   450 100 700 500 target
+RECTANGLE   4   700 100 950 500 post
