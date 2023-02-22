@@ -3,28 +3,28 @@ import json
 
 import numpy as np
 from pandas import concat, DataFrame, read_csv
-from _reading import Reading
 
+from _reading import Reading
 from _recode_events import _recode_events
 
 
-cfg = json.load(open(op.join('/', 'Users', 'tbrooks', 'codespace',
+cfg = json.load(open(op.join('/', 'Users', 'teonbrooks', 'codespace',
                              'OcularLDT-project', 'scripts', 'config.json')))
 
-group_ds = list()
 fname_stim = op.join(cfg['project_path'], 'input', 'stims',
-                     f"{exp_fname}_stimuli_properties.csv")
+                     'OcularLDT_stimuli_properties.csv')
 
 # Define OLDT interest areas
-fname_ia = op.join(cfg['project_path'], 'input', 'stimuli', 'OLDT_ias.txt')
+fname_ia = op.join(cfg['project_path'], 'input', 'stimuli',
+                   'OcularLDT_ias.txt')
 ia_words = ['fixation', 'prime', 'target', 'post']
 
 
 for subject, experiments in cfg['exp_list'].items():
     print(cfg['banner'] % subject)
     # Define output
-    fname_ds = op.join(cfg['project_path'], 'derivatives', f"sub-{subject}",
-                       f"{subject}_OLDT_ffd.txt")
+    fname_ds = op.join(cfg['bids_root'], f"sub-{subject}", "eyetrack",
+                       f"{subject}_OcularLDT_ffd.txt")
 
     subject_ds = list()
     n_trials = 0
@@ -32,8 +32,8 @@ for subject, experiments in cfg['exp_list'].items():
         if exp == 'n/a':
             continue
         # Define filenames
-        basename = op.join(cfg['project_path'], f"sub-{subject}", 'eyetrack',
-                           f"sub-{subject}_task-{cfg['task']}_run-{ii:2d}")
+        basename = op.join(cfg['bids_root'], f"sub-{subject}", 'eyetrack',
+                           f"sub-{subject}_task-{cfg['task']}_run-{ii:02d}")
         fname_log = basename + "_log.dat"
         fname_edf = basename + "_eyetrack.edf"
 
@@ -46,7 +46,7 @@ for subject, experiments in cfg['exp_list'].items():
         data = data[idx]
 
         # extracting fixation times from the edf file.
-        ias = Reading(fname_raw, fname_ia, ia_words)
+        ias = Reading(fname_edf, fname_ia, ia_words)
         assert data_orig_len == ias.shape[0]
 
         # trial properties

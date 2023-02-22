@@ -69,7 +69,7 @@ class InterestAreas(object):
 
         trial_ids = raw.find_events(trial_msg, 1)
         self.n_trials = n_trials = trial_ids.shape[0]
-        self.n_ias = n_ias = ias.shape[0]
+        self.n_ias = ias.shape[0]
         last = trial_ids[-1].copy()
         last[0] = str(int(last[0]) + 10000)
         trial_ids = np.vstack((trial_ids, last))
@@ -211,7 +211,7 @@ class Reading(InterestAreas):
         super(Reading, self).__init__(
             raw=raw, ias=ias, ia_labels=ia_labels, depmeas=depmeas)
 
-        labels = self._data.columns.get_values()
+        labels = self._data.columns.values
         max_pos, gaze, first_fix = self._define_gaze()
         data = map(DataFrame, [max_pos, gaze, first_fix])
         data.insert(0, self._data)
