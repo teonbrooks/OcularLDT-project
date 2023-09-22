@@ -205,7 +205,6 @@ class AOIReport(object):
 
         # initializing
         gaze = np.zeros(len(data), int)
-        gaze[0] = 1
         gaze_ias = np.zeros(self.n_ias)
         ref_trial_no = data.iloc[0]['trial_no']
         first_fix = np.zeros(len(data), int)
@@ -218,7 +217,7 @@ class AOIReport(object):
             if meas['trial_no'] > ref_trial_no:
                 gaze_ias = np.zeros(self.n_ias, int)
                 ref_trial_no = meas['trial_no']
-            if fix_pos >= (0 and max_pos[idx]):
+            if all((fix_pos > 0, fix_pos >= max_pos[idx])):
                 if gaze_ias[fix_pos] == 0:
                     gaze_ias[fix_pos] = 1
                     gaze[idx] = 1
