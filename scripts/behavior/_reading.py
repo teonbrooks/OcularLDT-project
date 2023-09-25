@@ -82,7 +82,11 @@ class AOIReport(object):
         # Add Trial Start timestamp
         df_trial = df[df['msg'].str.contains('TRIALID')].copy()
         df_trial['metric'] = 'trial_start'
-        self.n_trials = n_trials = df_trial.shape[0]
+        self.n_trials = df_trial.shape[0]
+        # Add Invisible Boundary Message
+        pat = 'INVISIBLE_BOUNDARY_[A-Za-z]*_IN'
+        df_boundary = df[df['msg'].str.contains(pat)].copy()
+        df_boundary['metric'] = 'boundary'
         # Add an end of recording trial to make computation easier
         last = df_trial.iloc[-1].copy()
         last['stime'] += 20.
@@ -102,7 +106,9 @@ class AOIReport(object):
         df_button['metric'] = 'btn_press'
         
         data = concat([df_sac, df_fix, df_trial, df_ttl,
-                       df_blink, df_button], axis=0).reset_index(drop=True)
+                       df_boundary, df_blink, df_button],
+                       axis=0).reset_index(drop=True)
+        data['msg'] = data['msg'].fillna('').astype(str)
         data.sort_values('stime', inplace=True)
 
         trial_times = np.array((df_trial['stime'].to_numpy(),
@@ -113,6 +119,7 @@ class AOIReport(object):
 
         # adding new columns, initializing to -1
         # fix_pos is the IA number
+        boundary_pos = np.negative(np.ones(len(data), int))
         fix_pos = np.negative(np.ones(len(data), int))
         trial_no = np.negative(np.ones(len(data), int))
 
@@ -122,6 +129,16 @@ class AOIReport(object):
             idx = ((trial_times[:,0][:, np.newaxis] <= stime) &
                    (stime <= trial_times[:,1][:, np.newaxis]))
             trial_no[ii] = np.where(idx)[0][0]
+
+            if 'INVISIBLE' in meas['msg']:
+                if 'FIX' in meas['msg']:
+                    boundary_pos[ii] = fix_pos[ii] = 0
+                elif 'PRIME' in meas['msg']:
+                    boundary_pos[ii] = fix_pos[ii] = 1
+                elif 'TARGET' in meas['msg']:
+                    boundary_pos[ii] = fix_pos[ii] = 2
+                elif 'POST' in meas['msg']:
+                    boundary_pos[ii] = fix_pos[ii] = 3
 
             if meas['metric'] not in ('fixation', 'saccade'):
                 continue
@@ -140,7 +157,8 @@ class AOIReport(object):
         dur = data['etime'] - data['stime']
         aoi = DataFrame({'trial_no': trial_no,
                          'dur': dur,
-                         'fix_pos': fix_pos})
+                         'fix_pos': fix_pos,
+                         'boundary_pos': boundary_pos})
         data = concat([data, aoi], axis=1).reset_index(drop=True)
 
         # # drop all fixations outside of the interest areas
@@ -148,11 +166,8 @@ class AOIReport(object):
         # data = data.reset_index()
         # data.fix_pos = data.fix_pos.astype(int)
 
-        max_pos, gaze, first_fix = self._define_gaze(data)
-        df_temp = DataFrame({'max_pos': max_pos,
-                             'is_gaze': gaze,
-                             'is_first_fix': first_fix})
-        data = concat((data, df_temp), axis=1).reset_index(drop=True)
+        df_gaze = self._define_gaze(data)
+        data = concat((data, df_gaze), axis=1).reset_index(drop=True)
 
         # DataFrame
         self.data = data
@@ -192,10 +207,17 @@ class AOIReport(object):
         # # create a max position using lag
         # max_pos is the maximum IA visited
         max_pos = np.negative(np.ones(len(data), int))
+        max_boundary_pos = np.negative(np.ones(len(data), int))
         max_pos[0] = data.iloc[0]['fix_pos']
         for idx, meas in enumerate(data.iloc[1:].iterrows(), 1):
             _, meas = meas
-            if meas['trial_no'] != data.iloc[idx - 1]['trial_no']:
+            # propagate boundary info
+            if meas['metric'] == 'boundary':
+                max_boundary_pos[idx] = meas['boundary_pos']
+            elif meas['trial_no'] == data.loc[idx - 1, 'trial_no']:
+                max_boundary_pos[idx] = max_boundary_pos[idx - 1]
+            
+            if meas['trial_no'] != data.loc[idx - 1, 'trial_no']:
                 max_pos[idx] = meas['fix_pos']
             else:
                 if meas['fix_pos'] > max_pos[idx - 1]:
@@ -225,7 +247,11 @@ class AOIReport(object):
                 elif gaze[idx - 1] == 1 and fix_pos == prev_fix_pos:
                     gaze[idx] = 1
 
-        return max_pos, gaze, first_fix
+        df_gaze = DataFrame({'max_pos': max_pos,
+                             'max_boundary_pos': max_boundary_pos,
+                             'gaze': gaze,
+                             'first_fix': first_fix})
+        return df_gaze
 
 def read_ia(filename):
     with open(filename) as FILE:
@@ -237,4 +263,3 @@ def read_ia(filename):
     ias = np.array([line.split() for line in ias])
 
     return ias
-
