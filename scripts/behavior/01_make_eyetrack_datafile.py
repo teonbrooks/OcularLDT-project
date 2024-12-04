@@ -1,5 +1,6 @@
 import os.path as op
 import json
+import csv
 
 from _recode_coreg_events import _recode_events
 from _reading import AOIReport
@@ -12,12 +13,8 @@ fname_ia = op.join(cfg['project_path'], 'input', 'stimuli',
                    'OcularLDT_ias.txt')
 ia_words = ['fixation', 'prime', 'target', 'post']
 
-
 for subject, experiments in cfg['exp_list'].items():
     print(cfg['banner'] % subject)
-    # Define output
-    subject_ds = list()
-    n_trials = 0
     for ii, exp in enumerate(experiments, 1):
         if exp == 'n/a':
             continue

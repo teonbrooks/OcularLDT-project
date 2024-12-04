@@ -139,6 +139,10 @@ class AOIReport(object):
                     boundary_pos[ii] = fix_pos[ii] = 2
                 elif 'POST' in meas['msg']:
                     boundary_pos[ii] = fix_pos[ii] = 3
+            
+            if 'TTL' in meas['msg']:
+                trig = int(meas['msg'].split()[-1])
+                fix_pos[ii] = trig & (2 ** 1 + 2 ** 0) >> 0
 
             if meas['metric'] not in ('fixation', 'saccade'):
                 continue
@@ -233,6 +237,8 @@ class AOIReport(object):
 
         for idx, meas in enumerate(data.iloc[1:].iterrows(), 1):
             _, meas = meas
+            if meas['metric'] != 'fixation':
+                continue                        
             fix_pos = meas['fix_pos']
             prev_fix_pos = data.iloc[idx - 1]['fix_pos']
 
@@ -249,8 +255,8 @@ class AOIReport(object):
 
         df_gaze = DataFrame({'max_pos': max_pos,
                              'max_boundary_pos': max_boundary_pos,
-                             'gaze': gaze,
-                             'first_fix': first_fix})
+                             'is_gaze': gaze,
+                             'is_first_fix': first_fix})
         return df_gaze
 
 def read_ia(filename):

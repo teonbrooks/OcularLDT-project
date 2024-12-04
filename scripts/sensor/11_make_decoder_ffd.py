@@ -1,55 +1,51 @@
-import pickle
+import json
 import os.path as op
 import numpy as np
-import scipy as sp
+import pandas as pd
 
-from sklearn.preprocessing import LabelEncoder, StandardScaler
 from sklearn.linear_model import Ridge
-from sklearn.pipeline import Pipeline
-from sklearn.cross_validation import KFold
+from sklearn.pipeline import make_pipeline
 
 import mne
-from mne.decoding import GeneralizationAcrossTime
-from mne.stats import linear_regression
+from mne_bids import get_entity_vals, BIDSPath, read_raw_bids
+from mne.decoding import (Vectorizer, SlidingEstimator, cross_val_multiscore,
+                          Scaler, LinearModel, get_coef)
 
-import config
-from analysis_func import group_stats
-
-
+cfg = json.load(open(op.join('/', 'Users', 'teonbrooks', 'codespace',
+                     'OcularLDT-project', 'scripts', 'config.json')))
+task = cfg['task']
 # parameters
-redo = config.redo
-path = config.drive
-filt = config.filt
-exp = config.exp
+random_state = 42
+tmin, tmax = -.1, 1
 clf_name = 'ridge'
 reg_type = 'reg'
-analysis = 'reading_%s_regression_no_pca_sensor_analysis' % clf_name
-random_state = 42
-decim = 2
 event_id = {'word/prime/unprimed': 1,
             'word/target/unprimed': 2,
             'word/prime/primed': 5,
             'word/target/primed': 6,
             }
-reject = config.reject
+reject = cfg['reject']
 c_name = 'ffd'
 
 # classifier
 reg = Ridge(alpha=1e-3)  # Ridge Regression
-clf = Pipeline([('scaler', StandardScaler()), ('ridge', reg)])
+clf = make_pipeline(Scaler(scalings='median'),
+                    Vectorizer(),
+                    LinearModel(Ridge(alpha=1e-3)))
+# clf = Pipeline([('scaler', StandardScaler()), ('ridge', reg)])
 
 # decoding parameters
-tmin, tmax = -.2, 1
+# tmin, tmax = -.2, 1
 # smoothing window
-length = decim * 1e-3
-step = decim * 1e-3
 n_folds = 5
 
 # setup group
-group_template = op.join(path, 'group', 'group_%s_%s_filt_%s_%s.%s')
-fname_group = group_template % (exp, filt, analysis, 'dict', 'mne')
-group_dict = dict()
-group_dict['subjects'] = subjects = config.subjects
+fname_group_template= op.join(cfg['project_path'], 'output', 'group',
+                              f'group_{task}_sensor_ffd_%s.npy')
+
+subjects_list = get_entity_vals(cfg['bids_root'], entity_key='subject')
+bids_path = BIDSPath(root=cfg['bids_root'], session=None, task=task,
+                     datatype=cfg['datatype'])
 
 
 # Ranker function
@@ -85,115 +81,124 @@ def rank_scorer(y, y_pred):
 
     return score
 
-if redo:
-    for subject in config.subjects:
-        print config.banner % subject
-        # define filenames
-        subject_template = op.join(path, subject, 'mne', subject + '_%s%s.%s')
-        fname_proj = subject_template % (exp, '_calm_' + filt + '_filt-proj', 'fif')
-        fname_raw = subject_template % (exp, '_calm_' + filt + '_filt-raw', 'fif')
-        fname_evts = subject_template % (exp, '_fixation_coreg-eve', 'txt')
-        fname_dm = subject_template % (exp, '_fixation_design_matrix', 'txt')
-        fname_gat = subject_template % (exp, '_calm_' + filt + '_filt_' + analysis
-                                        + '_gat', 'npy')
-        fname_reg = subject_template % (exp, '_calm_' + filt + '_filt_' + analysis
-                                        + '_reg-ave', 'fif')
-        fname_cov = subject_template % (exp, '_calm_' + filt + '_filt_' + analysis
-                                        + '_data-cov', 'fif')
-        fname_weights = subject_template % (exp, '_calm_' + filt + '_filt_'
-                                            + analysis + '_gat_weights', 'npy')
-        # loading events and raw
-        evts = mne.read_events(fname_evts)
+group_scores = list()
+group_patterns = list()
+for subject in subjects_list[:1]:
+    print(cfg['banner'] % subject)
 
-        # map word, then nonword
-        evts = mne.event.merge_events(evts, [1, 2, 5, 6], 99)
-        event_id = {'word': 99}
+    bids_path.update(subject=subject)
+    # # define filenames
+    # subject_template = op.join(path, subject, 'mne', subject + '_%s%s.%s')
+    # fname_proj = subject_template % (exp, '_calm_' + filt + '_filt-proj', 'fif')
+    # fname_raw = subject_template % (exp, '_calm_' + filt + '_filt-raw', 'fif')
+    # fname_evts = subject_template % (exp, '_fixation_coreg-eve', 'txt')
+    # fname_dm = subject_template % (exp, '_fixation_design_matrix', 'txt')
+    # fname_gat = subject_template % (exp, '_calm_' + filt + '_filt_' + analysis
+    #                                 + '_gat', 'npy')
+    # fname_reg = subject_template % (exp, '_calm_' + filt + '_filt_' + analysis
+    #                                 + '_reg-ave', 'fif')
+    # fname_cov = subject_template % (exp, '_calm_' + filt + '_filt_' + analysis
+    #                                 + '_data-cov', 'fif')
+    # fname_weights = subject_template % (exp, '_calm_' + filt + '_filt_'
+    #                                     + analysis + '_gat_weights', 'npy')
 
-        # loading design matrix, epochs, proj
-        design_matrix = np.loadtxt(fname_dm)
-        reg_names = ('intercept', 'ffd')
+    # define filenames
+    subject_template = op.join(cfg['bids_root'], f"sub-{subject}", 'meg',
+                               f"sub-{subject}_task-{task}")
+    fname_ica = f"{subject_template}_ica.fif"
+    fname_weights = f"{subject_template}_weights.npy"
 
-        # # let's look at the time around the fixation
-        # durs = np.asarray(design_matrix[:, -1] * 1000, int)
-        # evts[:, 0] = evts[:, 0] + durs
+    fname_ffd = op.join(cfg['bids_root'], f"sub-{subject}", 'eyetrack',
+                        f"{subject}_OLDT_fixation_times.txt")
 
-        raw = mne.io.read_raw_fif(fname_raw, preload=True, verbose=False)
+    # loading events and raw
+    raw = read_raw_bids(bids_path)
+    raw.picks('meg')
+    events, event_id = mne.events_from_annotations(raw)
 
-        # add/apply proj
-        # proj = [mne.read_proj(fname_proj)[0]]
-        # raw.add_proj(proj).apply_proj()
-        # select only meg channels
-        raw.pick_types(meg=True)
+    # map word, then nonword
+    events = mne.event.merge_events(events, [1, 2, 5, 6], 99)
+    event_id = {'word': 99}
 
-        epochs = mne.Epochs(raw, evts, event_id, tmin=tmin, tmax=tmax,
-                            baseline=None, decim=decim, reject=reject,
-                            preload=True, verbose=False)
+    # loading design matrix, epochs, proj
+    design_matrix = pd.read_csv(fname_ffd)
+    reg_names = ('intercept', 'ffd')
 
-        # epochs rejection: filtering
-        # drop based on MEG rejection, must happen first
-        epochs.drop_bad(reject=reject)
-        design_matrix = design_matrix[epochs.selection]
-        evts = evts[epochs.selection]
-        # remove zeros
-        idx = design_matrix[:, -1] > 0
-        epochs = epochs[idx]
-        design_matrix = design_matrix[idx]
-        evts = evts[idx]
-        # define outliers
-        durs = design_matrix[:, -1]
-        mean, std = durs.mean(), durs.std()
-        devs = np.abs(durs - mean)
-        criterion = 3 * std
-        # remove outliers
-        idx = devs < criterion
-        epochs = epochs[idx]
-        design_matrix = design_matrix[idx]
-        evts = evts[idx]
+    # # let's look at the time around the fixation
+    # durs = np.asarray(design_matrix[:, -1] * 1000, int)
+    # evts[:, 0] = evts[:, 0] + durs
 
-        # rerf keys
-        dm_keys = evts[:, 0]
+    raw = read_raw_bids(bids_path)
+    raw.pick('meg')
 
-        assert len(design_matrix) == len(epochs) == len(dm_keys)
-        # group_ols[subject] = epochs.average()
-        # Define 'y': what you're predicting
-        y = design_matrix[:, -1]
+    # apply ICA
+    ica = mne.preprocessing.read_ica(fname_ica)
 
-        # run a rERF
-        covariates = dict(zip(dm_keys, y))
-        # linear regression
-        reg = linear_regression(epochs, design_matrix, reg_names)
-        reg[c_name].beta.save(fname_reg)
+    epochs = mne.Epochs(raw, events, event_id, tmin=tmin, tmax=tmax,
+                        baseline=None, preload=True, verbose=False)
 
-        print 'get ready for decoding ;)'
+    # epochs rejection: filtering
+    # drop based on MEG rejection, must happen first
+    epochs.drop_bad(reject=reject)
+    design_matrix = design_matrix.loc[epochs.selection]
+    evts = evts[epochs.selection]
+    # remove zeros
+    idx = design_matrix[:, -1] > 0
+    epochs = epochs[idx]
+    design_matrix = design_matrix[idx]
+    evts = evts[idx]
+    # define outliers
+    durs = design_matrix[:, -1]
+    mean, std = durs.mean(), durs.std()
+    devs = np.abs(durs - mean)
+    criterion = 3 * std
+    # remove outliers
+    idx = devs < criterion
+    epochs = epochs[idx]
+    design_matrix = design_matrix[idx]
+    evts = evts[idx]
 
-        cv = KFold(n=len(y), n_folds=n_folds, random_state=random_state)
-        gat = GeneralizationAcrossTime(predict_mode='cross-validation', n_jobs=1,
-                                       scorer=rank_scorer, clf=clf, cv=cv)
-        gat.fit(epochs, y=y)
-        gat.score(epochs, y=y)
-        print gat.scores_.shape
-        np.save(fname_gat, gat.scores_)
+    # rerf keys
+    dm_keys = evts[:, 0]
 
-        # store weights
-        weights = list()
-        for fold in range(n_folds):
-            # weights explained: gat.estimator_[time_point][fold].steps[-1][-1].coef_
-            weights.append(np.vstack([gat.estimators_[idx][fold].steps[-1][-1].coef_
-                                      for idx in range(len(epochs.times))]))
-        np.save(fname_weights, np.array(weights))
-        cov = mne.compute_covariance(epochs)
-        cov.save(fname_cov)
+    assert len(design_matrix) == len(epochs) == len(dm_keys)
+    # group_ols[subject] = epochs.average()
+    # Define 'y': what you're predicting
+    y = design_matrix[:, -1]
 
-    # define a layout
-    layout = mne.find_layout(epochs.info)
-    # additional properties
-    group_dict['layout'] = layout
-    group_dict['times'] = epochs.times
-    group_dict['sfreq'] = epochs.info['sfreq']
+    # run a rERF
+    covariates = dict(zip(dm_keys, y))
+    # linear regression
+    reg = linear_regression(epochs, design_matrix, reg_names)
+    reg[c_name].beta.save(fname_reg)
 
-else:
-    group_dict = pickle.load(open(fname_group))
-    subjects = group_dict['subjects']
+    print('get ready for decoding ;)')
+
+    scores = cross_val_multiscore(reg, X, y=y, cv=n_folds, n_jobs=-1)
+    # cv = KFold(n=len(y), n_folds=n_folds, random_state=random_state)
+    # gat = GeneralizationAcrossTime(predict_mode='cross-validation', n_jobs=1,
+    #                                 scorer=rank_scorer, clf=clf, cv=cv)
+    # gat.fit(epochs, y=y)
+    # gat.score(epochs, y=y)
+    # print gat.scores_.shape
+    # np.save(fname_gat, gat.scores_)
+
+    # store weights
+    weights = list()
+    for fold in range(n_folds):
+        # weights explained: gat.estimator_[time_point][fold].steps[-1][-1].coef_
+        weights.append(np.vstack([gat.estimators_[idx][fold].steps[-1][-1].coef_
+                                    for idx in range(len(epochs.times))]))
+    np.save(fname_weights, np.array(weights))
+    cov = mne.compute_covariance(epochs)
+    cov.save(fname_cov)
+
+# define a layout
+layout = mne.find_layout(epochs.info)
+# additional properties
+group_dict['layout'] = layout
+group_dict['times'] = epochs.times
+group_dict['sfreq'] = epochs.info['sfreq']
 
 ####################
 # Group Statistics #

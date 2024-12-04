@@ -26,10 +26,8 @@ reject = cfg['reject']
 c_names = ['word/target/primed', 'word/target/unprimed']
 
 # setup group
-fname_group_scores = op.join(cfg['project_path'], 'output', 'group',
-                             f'group_{task}_sensor_priming_scores.npy')
-fname_group_patterns = op.join(cfg['project_path'], 'output', 'group',
-                               f'group_{task}_sensor_priming_patterns.npy')
+fname_group_template= op.join(cfg['project_path'], 'output', 'group',
+                              f'group_{task}_sensor_priming_%s.npy')
 
 subjects_list = get_entity_vals(cfg['bids_root'], entity_key='subject')
 bids_path = BIDSPath(root=cfg['bids_root'], session=None, task=task,
@@ -88,9 +86,11 @@ for subject in subjects_list:
 
 # save all the scores across participants
 group_scores = np.vstack(group_scores)
-np.save(fname_group_scores, group_scores)
+np.save(fname_group_template % 'scores', group_scores)
 
 # save all the spatial patterns across participants
 group_patterns = np.vstack(group_patterns)
-np.save(fname_group_patterns, group_patterns)
+np.save(fname_group_template % 'patterns', group_patterns)
 
+# save the shared time course
+np.save(fname_group_template % 'times', epochs.times)
