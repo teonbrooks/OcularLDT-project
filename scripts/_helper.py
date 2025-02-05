@@ -20,7 +20,7 @@ This recoding efficiency allows for Hierarchial Event Descriptors
 import numpy as np
 
 
-def _recode_events(triggers):
+def recode_events(triggers):
     
     expt_idx = np.array([(x & 2 ** 5) >> 5 for x in triggers], dtype=bool)
 
@@ -77,3 +77,35 @@ def _recode_events(triggers):
     #             'trig': recodeds}
     
     return recodeds
+
+def find_eyetrack_events(raw, pattern):
+    """Find messages already parsed
+
+    Parameters
+    ----------
+    raw : instance of eyelinkio.RawEDF
+        the raw file to find events in.
+    pattern : str | callable
+        A substring to be matched or a callable that matches
+        a string, for example ``lambda x: 'my-message' in x``
+    event_id : int
+        The event id to use.
+
+    Returns
+    -------
+    idx : instance of numpy.ndarray (times, event_id)
+        The indices found.
+    """
+    df = raw.discrete['messages']
+    if callable(pattern):
+        func = pattern
+    elif isinstance(pattern, str):
+        def func(x):
+            return pattern in x
+    else:
+        raise ValueError('Pattern not valid. Pass string or function')
+    # may not need to decode string in eyelinkio>=0.4.0
+    idx = np.array([func(msg.decode('ASCII')) for msg in df['msg']])
+    msg = df['msg'][idx]
+
+    return msg

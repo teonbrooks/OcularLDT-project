@@ -2,7 +2,7 @@ import os.path as op
 import json
 import csv
 
-from _recode_coreg_events import _recode_events
+from scripts._helper import recode_events
 from _reading import AOIReport
 
 
@@ -30,6 +30,6 @@ for subject, experiments in cfg['exp_list'].items():
         # we need to recode before we save to disk
         data['trigger'] = data['msg'].str.extract(r'TTL ([0-9]+)')
         data['trigger'] = data['trigger'].fillna(0).astype(int)
-        data['trigger'] = _recode_events(data['trigger'])
+        data['trigger'] = recode_events(data['trigger'])
 
         data.to_csv(fname_ds, sep='\t', index=False)

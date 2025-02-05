@@ -2,7 +2,7 @@ from copy import copy
 import numpy as np
 from pandas import DataFrame, concat
 
-from pyeparse import read_raw, RawEDF
+from eyelinkio import read_edf, RawEDF
 
 
 """Terminology
@@ -58,7 +58,7 @@ class AOIReport(object):
     def __init__(self, raw, ias, ia_labels=None):
 
         if isinstance(raw, str):
-            raw = read_raw(raw)
+            raw = read_edf(raw)
         elif not isinstance(raw, RawEDF):
             raise TypeError('raw must be Raw instance of filename, not %s'
                             % type(raw))
