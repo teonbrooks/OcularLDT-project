@@ -1,6 +1,7 @@
 import json
 import os.path as op
 import numpy as np
+import scipy as sp
 import pandas as pd
 
 from sklearn.linear_model import Ridge
@@ -17,6 +18,7 @@ task = cfg['task']
 # parameters
 random_state = 42
 tmin, tmax = -.1, 1
+n_folds = 5
 clf_name = 'ridge'
 reg_type = 'reg'
 event_id = {'word/prime/unprimed': 1,
@@ -37,7 +39,7 @@ clf = make_pipeline(Scaler(scalings='median'),
 # decoding parameters
 # tmin, tmax = -.2, 1
 # smoothing window
-n_folds = 5
+
 
 # setup group
 fname_group_template= op.join(cfg['project_path'], 'output', 'group',
@@ -109,7 +111,7 @@ for subject in subjects_list[:1]:
     fname_weights = f"{subject_template}_weights.npy"
 
     fname_ffd = op.join(cfg['bids_root'], f"sub-{subject}", 'eyetrack',
-                        f"{subject}_OLDT_fixation_times.txt")
+                        f"{subject}_task-{task}_coreg-eyetrack_log.txt")
 
     # loading events and raw
     raw = read_raw_bids(bids_path)

@@ -82,6 +82,8 @@ for subject in subjects_list:
     # retrieve the pattern for the model fit
     time_decod.fit(X, y)
     pattern = get_coef(time_decod, 'patterns_', inverse_transform=True)
+    evoked_time_gen = mne.EvokedArray(pattern, epochs.info,
+                                      tmin=epochs.times[0])
     group_patterns.append(pattern)
 
 # save all the scores across participants

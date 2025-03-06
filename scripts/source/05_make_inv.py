@@ -23,62 +23,27 @@ fname_rep_group = op.join(cfg['project_path'], 'output', 'reports',
 with mne.open_report(fname_rep_group % 'h5') as rep_group:
     for subject in subjects_list:
         print(cfg['banner'] % subject)
-        bids_path.update(subject=subject, suffix='meg')
+        bids_path.update(subject=subject)
 
-        # define filenames
+        # Define filenames
         path = op.join(cfg['bids_root'], f"sub-{subject}", 'meg')
-        fname_fwd = op.join(path, f"sub-{subject}_task-{task}_{derivative}.fif")
-        fname_trans = op.join(path, f"sub-{subject}_task-{task}_trans.fif")
-        bem_sol = op.join(cfg['mri_root'], f"sub-{subject}", 'bem',
-                        f'sub-{subject}-inner_skull-bem-sol.fif')
-        fname_src = op.join(cfg['mri_root'], f"sub-{subject}", 'bem',
-                            f'sub-{subject}-ico-4-src.fif')
-        if not op.exists(fname_fwd) or redo:
-            info = mne.io.read_info(bids_path.fpath)
-            fwd = mne.make_forward_solution(info=info, trans=fname_trans,
-                                            src=fname_src, bem=bem_sol,
-                                            meg=True, eeg=False,
-                                            mindist=0.0, ignore_ref=True)
-            mne.write_forward_solution(fname=fname_fwd, fwd=fwd,
-                                       overwrite=redo)
+        fname_meg = bids_path.update(suffix='meg').fpath
+        fname_cov = bids_path.update(suffix='cov').fpath
+        fname_fwd = bids_path.update(suffix='fwd').fpath
+        fname_inv = bids_path.update(suffix='inv').fpath
 
-        rep_group.add_forward(fwd, subject=f"sub-{subject}",
-                              subjects_dir=cfg['mri_root'],
-                              tags=('forward-solution', ))
+        if not op.exists(fname_inv) or redo:
+            info = mne.io.read_info(fname_meg)
+            cov = mne.read_cov(fname_cov)
+            fwd = mne.read_forward_solution(fname_fwd, surf_ori=True)
+            # Use surface orientation
+            mne.convert_forward_solution(fwd, surf_ori=True, copy=False)
+            # Fix the orientation of the dipole, loose by default (0.2)
+            inv_op = mne.minimum_norm.make_inverse_operator(info, fwd, cov)
+            mne.minimum_norm.write_inverse_operator(fname_inv, inv_op)
+        
+        rep_group.add_inverse_operator(inverse_operator=inv_op,
+                                       title=f"{subject} inv",
+                                       tags=('inverse-operator'))
 
 rep_group.save(fname_rep_group % 'html', overwrite=redo, open_browser=False)
-
-
-
-import os.path as op
-import mne
-import config
-
-
-path = op.join(config.drive, '..', 'MRI')
-exp = 'OLDT'
-filt = config.filt
-redo = config.redo
-
-for subject in config.subjects:
-    print config.banner % subject
-
-    # Define filenames
-    fname_epo = op.join(config.drive, subject, 'mne',
-                        subject + '_%s_xca_calm_%s_filt-epo.fif'
-                        % (exp, filt))
-    fname_cov = op.join(config.drive, subject, 'mne',
-                        subject +'_%s_calm_%s_filt-cov.fif' % (exp, filt))
-    fname_fwd = op.join(config.drive, subject, 'mne',
-                        subject + '_%s-fwd.fif' % exp)
-    fname_inv = op.join(config.drive, subject, 'mne',
-                        subject + '_%s-inv.fif' % exp)
-
-    if not op.exists(fname_inv) or redo:
-        # COV
-        cov = mne.read_cov(fname_cov)
-        # INV OP
-        fwd = mne.read_forward_solution(fname_fwd, surf_ori=True)
-        info = mne.io.read_info(fname_epo)
-        inv_op = mne.minimum_norm.make_inverse_operator(info, fwd, cov)
-        mne.minimum_norm.write_inverse_operator(fname_inv, inv_op)

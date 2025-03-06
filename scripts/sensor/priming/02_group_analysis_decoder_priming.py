@@ -3,7 +3,6 @@ import os.path as op
 import numpy as np
 import scipy as sp
 
-import mne
 from mne.report import Report
 from mne.stats import (permutation_cluster_1samp_test as pc_1samp_test)
 
