@@ -31,9 +31,10 @@ bids_path = BIDSPath(root=cfg['bids_root'], session=None, task=task,
 subjects_list = get_entity_vals(cfg['bids_root'], entity_key='subject')
 
 fname_rep_group = op.join(cfg['project_path'], 'output', 'reports',
-                          f'group_{task}-report.%s')
+                          f'group_{task}-report.h5')
 
-with mne.open_report(fname_rep_group % 'h5') as rep_group:
+## some versioning change in either mne or h5io cause my h5 object to break
+with mne.open_report(fname_rep_group) as rep_group:
     rep_group.title = f"{task} Group Report"
     for subject in subjects_list:
         print(cfg['banner'] % subject)

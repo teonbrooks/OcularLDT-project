@@ -12,9 +12,10 @@ from mne.decoding import (Vectorizer, SlidingEstimator, cross_val_multiscore,
                           Scaler, LinearModel, get_coef)
 
 
-cfg = json.load(open(op.join('/', 'Users', 'teonbrooks', 'codespace',
-                     'OcularLDT-project', 'scripts', 'config.json')))
+# update this so it doesn't require manually changing per user
+cfg = json.load(open(op.join('..', '..' 'config.json')))
 task = cfg['task']
+
 # parameters
 random_state = 42
 # decoding parameters

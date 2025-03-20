@@ -1,8 +1,0 @@
-mayavi == 4.7.2
-freesurfer == 7.1.0
-mne-python == 0.24.1
-mne-bids == 0.5.0
-pyvista == 0.25.3
-pyQt5 == 5.15.0
-git+git://github.com/pyeparse/pyeparse.git@abb3b81
-sklearn == 1.1.2

@@ -1,0 +1,16 @@
+[project]
+name = "ocularldt-project"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "eyelinkio>=0.3.0",
+    "mne[hdf5]>=1.9.0",
+    "scikit-learn>=1.6.1",
+]
+
+[project.optional-dependencies]
+interactive = [
+    "ipython>=9.0.2",
+]
