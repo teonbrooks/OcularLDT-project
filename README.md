@@ -19,3 +19,5 @@ To install the dependencies, use the following commands. Note, with flag `--all-
 uv venv
 uv pip install -r pyproject.toml --all-extras
 ```
+
+## TODO add the data instructions to the main readme

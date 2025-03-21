@@ -8,6 +8,7 @@ in this experiment.
 """
 
 import os.path as op
+from pathlib import Path
 import numpy as np
 import toml
 
@@ -22,16 +23,13 @@ redo = True
 derivative = 'ica'
 evts_labels = ['word/prime/unprimed', 'word/prime/primed', 'nonword/prime']
 
-cfg = toml.load(open(op.join('/', 'Users', 'tbrooks', 'codespace',
-                     'OcularLDT-project', 'scripts', 'config.json')))
-task = cfg['project_name']
+cfg = toml.load(open(Path('./config.toml'), 'rb'))
 task = cfg['task']
 bids_path = BIDSPath(root=cfg['bids_root'], session=None, task=task,
                      datatype=cfg['datatype'])
 subjects_list = get_entity_vals(cfg['bids_root'], entity_key='subject')
 
-fname_rep_group = op.join(cfg['project_path'], 'output', 'reports',
-                          f'group_{task}-report.h5')
+fname_rep_group = op.join('output', 'reports', f'group_{task}-report.h5')
 
 ## some versioning change in either mne or h5io cause my h5 object to break
 with mne.open_report(fname_rep_group) as rep_group:

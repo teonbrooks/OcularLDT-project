@@ -1,7 +1,7 @@
 [project]
 name = "ocularldt-project"
 version = "0.1.0"
-description = "Add your description here"
+description = "OcularLDT project containing analysis scripts"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
@@ -9,7 +9,6 @@ dependencies = [
     "mne-bids>=0.16.0",
     "mne[hdf5]>=1.9.0",
     "scikit-learn>=1.6.1",
-    "toml>=0.10.2",
 ]
 
 [project.optional-dependencies]
