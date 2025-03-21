@@ -10,3 +10,12 @@ Once you have the dataset, please set the path of the dataset in the `scripts/co
 - `bids_root`
 - `mri_root`: the path of the MRI
 - `project_path`: the path of this repository
+
+## Installing dependency
+
+To install the dependencies, use the following commands. Note, with flag `--all-extras`, this will include dependencies such as `ipython`
+
+```bash
+uv venv
+uv pip install -r pyproject.toml --all-extras
+```

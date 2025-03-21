@@ -1,19 +1,17 @@
 from glob import glob
-import json
+import tomllib as toml
 import os.path as op
+from pathlib import Path
 import numpy as np
 
 import eyelinkio as eio
 from scripts._helper import recode_events, find_eyetrack_events
 
-
-cfg = json.load(open(op.join('/', 'Users', 'teonbrooks', 'codespace',
-                             'OcularLDT-project', 'scripts', 'config.json')))
+cfg = toml.load(open(Path('./config.toml'), 'rb'))
 task = cfg['task']
 bids_root = cfg['bids_root']
 project_path = cfg['project_path']
-fname_group = op.join(project_path, 'output', 'group',
-                      f'group_{task}_region_times.tsv')
+fname_group = Path('.') / 'output' / 'group' / f'group_{task}_region_times.tsv'
 group_ds = list()
 
 for subject, exps in cfg['exp_list'].items():

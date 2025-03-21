@@ -1,13 +1,11 @@
 import os.path as op
-import json
-import csv
+from pathlib import Path
+import tomllib as toml
 
 from scripts._helper import recode_events
 from _reading import AOIReport
 
-
-cfg = json.load(open(op.join('/', 'Users', 'teonbrooks', 'codespace',
-                             'OcularLDT-project', 'scripts', 'config.json')))
+cfg = toml.load(open(Path('./config.toml'), 'rb'))
 # Define OLDT interest areas
 fname_ia = op.join(cfg['project_path'], 'input', 'stimuli',
                    'OcularLDT_ias.txt')

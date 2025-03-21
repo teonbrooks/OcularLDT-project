@@ -15,3 +15,5 @@ output/results
 *.Rhistory
 .DS_Store
 /.jupyter
+data/OcularLDT
+data/OcularLDT_MRI

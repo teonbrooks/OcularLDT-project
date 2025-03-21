@@ -11,14 +11,13 @@ for ease of matching later on.
 """
 
 import os.path as op
-import json
+from pathlib import Path
+import tomllib as toml
 
 import pandas as pd
 
 
-cfg = json.load(open(op.join('/', 'Users', 'teonbrooks', 'codespace',
-                     'OcularLDT-project', 'scripts', 'config.json')))
-task = cfg['project_name']
+cfg = toml.load(open(Path('./config.toml'), 'rb'))
 task = cfg['task']
 datatype = 'eyetrack'
 derivative = 'log'

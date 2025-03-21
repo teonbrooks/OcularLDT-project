@@ -1,12 +1,10 @@
 banner = "#########\n# %s #\n#########"
 baseline = [ -0.2, -0.1,]
-bids_root = "/Volumes/teon-backup/Experiments/OcularLDT"
+bids_root = "./data/OcularLDT"
 datatype = "meg"
-experiment = "OLDT"
 freesurfer_root = "/Applications/freesurfer/7.1.0"
-mri_root = "/Volumes/teon-backup/Experiments/OcularLDT_MRI"
-project_name = "OcularLDT"
-project_path = "/Users/teonbrooks/codespace/OcularLDT-project"
+# this should have a parallel name to the bids_root
+mri_root = "./data/OcularLDT_MRI"
 task = "OcularLDT"
 
 [event_id]

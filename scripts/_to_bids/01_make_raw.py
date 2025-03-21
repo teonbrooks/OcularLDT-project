@@ -26,7 +26,7 @@ for subject, experiments in config.exp_list.items():
         ri.load_data()
         ri.plot(block=True, duration=5, n_channels=10,
                 highpass=None, lowpass=40)
-        print("%s: Bad Chs: %s" % (exp, ri.info['bads']))
+        print(f"{exp}: Bad Chs: {ri.info['bads']}")
         ri.interpolate_bads()
         raws.append(ri)
     raw = mne.concatenate_raws(raws)
@@ -35,6 +35,6 @@ for subject, experiments in config.exp_list.items():
     # bandpass filtering
     highpass, lowpass = (.51, 40)
     filt_type = 'iir'
-    filt = filt_type + '_hp%s_lp%s' % (highpass, lowpass)
+    filt = f'{filt_type}_hp{highpass}_lp{lowpass}'
     raw.filter(highpass, lowpass, method=filt_type)
     raw.save(fname_raw % filt, overwrite=redo)

@@ -9,7 +9,7 @@ in this experiment.
 
 import os.path as op
 import numpy as np
-import json
+import toml
 
 import mne
 from mne.report import Report
@@ -22,7 +22,7 @@ redo = True
 derivative = 'ica'
 evts_labels = ['word/prime/unprimed', 'word/prime/primed', 'nonword/prime']
 
-cfg = json.load(open(op.join('/', 'Users', 'tbrooks', 'codespace',
+cfg = toml.load(open(op.join('/', 'Users', 'tbrooks', 'codespace',
                      'OcularLDT-project', 'scripts', 'config.json')))
 task = cfg['project_name']
 task = cfg['task']

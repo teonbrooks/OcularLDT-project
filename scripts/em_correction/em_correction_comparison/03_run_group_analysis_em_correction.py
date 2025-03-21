@@ -1,13 +1,12 @@
-import os.path as op
-import json
+from pathlib import Path
+import tomllib as toml
 
 import mne
 from mne_bids import BIDSPath, read_raw_bids, get_entity_vals
 
 
-cfg = json.load(open(op.join('/', 'Users', 'tbrooks', 'codespace',
-                     'OcularLDT-project', 'scripts', 'config.json')))
-task = cfg['project_name']
+cfg = toml.load(open(Path('./config.toml'), 'rb'))
+task = cfg['task']
 bids_path = BIDSPath(root=cfg['bids_root'], session=None, task=task,
                      datatype=cfg['datatype'])
 tmin, tmax = -.2, .2
