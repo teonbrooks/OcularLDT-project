@@ -10,7 +10,7 @@ in this experiment.
 import os.path as op
 from pathlib import Path
 import numpy as np
-import toml
+import tomllib as toml
 
 import mne
 from mne.report import Report
@@ -23,7 +23,8 @@ redo = True
 derivative = 'ica'
 evts_labels = ['word/prime/unprimed', 'word/prime/primed', 'nonword/prime']
 
-cfg = toml.load(open(Path('./config.toml'), 'rb'))
+cfg = toml.load(open(Path(op.dirname(op.realpath(__file__))) 
+                     / '..' / '..' / 'config.toml', 'rb'))
 task = cfg['task']
 bids_path = BIDSPath(root=cfg['bids_root'], session=None, task=task,
                      datatype=cfg['datatype'])
