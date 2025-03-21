@@ -31,7 +31,7 @@ bids_path = BIDSPath(root=root, session=None, task=task,
                      datatype=cfg['datatype'])
 subjects_list = get_entity_vals(root, entity_key='subject')
 
-fname_rep_group = op.join('output', 'reports', f'group_{task}-report.h5')
+fname_rep_group = root / 'output' / 'reports' / f'group_{task}-report.h5'
 
 ## some versioning change in either mne or h5io cause my h5 object to break
 with mne.open_report(fname_rep_group) as rep_group:
