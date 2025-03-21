@@ -9,3 +9,5 @@ To alias the dataset here, use the following command:
 ```bash
 ln -s /path/to/dataset/ds002312 ./data/OcularLDT
 ```
+
+ <!-- Scripts need to be run from the root bc of the location of the config file -->

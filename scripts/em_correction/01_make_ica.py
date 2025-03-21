@@ -27,11 +27,11 @@ evts_labels = ['word/prime/unprimed', 'word/prime/primed', 'nonword/prime']
 root = Path(op.dirname(op.realpath(__file__)))  / '..' / '..'
 cfg = toml.load(open(root / 'config.toml', 'rb'))
 task = cfg['task']
-bids_path = BIDSPath(root=root, session=None, task=task,
+bids_path = BIDSPath(root=root / 'data' / task, session=None, task=task,
                      datatype=cfg['datatype'])
 subjects_list = get_entity_vals(root, entity_key='subject')
 
-fname_rep_group = root / 'output' / 'reports' / f'group_{task}-report.%s'
+fname_rep_group = str(root / 'output' / 'reports' / f'group_{task}-report.%s')
 
 ## some versioning change in either mne or h5io cause my h5 object to break
 with mne.open_report(fname_rep_group % 'h5') as rep_group:
