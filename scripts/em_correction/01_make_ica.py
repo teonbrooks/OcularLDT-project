@@ -23,12 +23,13 @@ redo = True
 derivative = 'ica'
 evts_labels = ['word/prime/unprimed', 'word/prime/primed', 'nonword/prime']
 
-cfg = toml.load(open(Path(op.dirname(op.realpath(__file__))) 
-                     / '..' / '..' / 'config.toml', 'rb'))
+
+root = Path(op.dirname(op.realpath(__file__)))  / '..' / '..'
+cfg = toml.load(open(root / 'config.toml', 'rb'))
 task = cfg['task']
-bids_path = BIDSPath(root=cfg['bids_root'], session=None, task=task,
+bids_path = BIDSPath(root=root, session=None, task=task,
                      datatype=cfg['datatype'])
-subjects_list = get_entity_vals(cfg['bids_root'], entity_key='subject')
+subjects_list = get_entity_vals(root, entity_key='subject')
 
 fname_rep_group = op.join('output', 'reports', f'group_{task}-report.h5')
 
@@ -40,7 +41,7 @@ with mne.open_report(fname_rep_group) as rep_group:
         bids_path.update(subject=subject)
 
         # define filenames
-        fname_ica = op.join(cfg['bids_root'], f"sub-{subject}", cfg['datatype'],
+        fname_ica = op.join(root, f"sub-{subject}", cfg['datatype'],
                             f"sub-{subject}_task-{task}_{derivative}.fif")
 
         # ica input is from fixation cross to three hashes
