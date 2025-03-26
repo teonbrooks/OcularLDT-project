@@ -1,14 +1,16 @@
-import os.path as op
-import json
+from pathlib import Path
+import tomllib as toml
 
 import mne
 from mne.stats import linear_regression_raw
 from mne_bids import BIDSPath, read_raw_bids, get_entity_vals
 
 
-cfg = json.load(open(op.join('/', 'Users', 'tbrooks', 'codespace',
-                     'OcularLDT-project', 'scripts', 'config.json')))
-task = cfg['project_name']
+parents = list(Path(__file__).resolve().parents)
+root = [path for path in parents if str(path).endswith('OcularLDT-project')][0]
+cfg = toml.load(open(root / 'config.toml', 'rb'))
+
+task = cfg['task']
 bids_path = BIDSPath(root=cfg['bids_root'], session=None, task=task,
                      datatype=cfg['datatype'])
 decim = 2
@@ -17,18 +19,17 @@ tmin, tmax = -.2, 1
 c_names = ['word/target/unprimed', 'word/target/primed']
 event_id = {c_name: cfg['event_id'][c_name] for c_name in c_names}
 
-subjects = get_entity_vals(cfg['bids_root'], entity_key='subject')
+bids_root = root / 'data' / 'OcularLDT'
+subjects = get_entity_vals(bids_root, entity_key='subject')
 
 for subject in subjects[:1]:
     bids_path.update(subject=subject)
     print(cfg['banner'] % subject)
     # define filenames
-    subject_template = op.join(cfg['bids_root'], f'sub-{subject}',
-                               'meg', f'sub-{subject}_task-{task}')
-    fname_raw = f'{subject_template}_meg.fif'
-    fname_ica = f'{subject_template}_ica.fif'
-    fname_erf_uncorrected = f'{subject_template}_priming_uncorrected_ave.fif'
-    fname_erf_corrected = f'{subject_template}_priming_corrected_ave.fif'
+    fname_raw = bids_path.update(suffix='meg').fpath
+    fname_ica = bids_path.update(suffix='ica').fpath
+    fname_erf_uncorrected = bids_path.update(suffix='priming_uncorrected_ave').fpath
+    fname_erf_corrected = bids_path.update(suffix='priming_corrected_ave').fpath
 
     # select only meg channels
     raw = read_raw_bids(bids_path).pick_types(meg=True).load_data()

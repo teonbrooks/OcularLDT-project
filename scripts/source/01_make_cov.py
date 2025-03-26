@@ -5,43 +5,34 @@ This script is used for the computation of the covariance matrix for
 each subject in the experiment. The covariance matrix is used for the
 inverse estimate when the sensor data is projected to source space.
 """
-import os.path as op
-import json
+from pathlib import Path
+import tomllib as toml
 
 import mne
-from mne.report import Report
-
-from mne_bids import get_entity_vals, read_raw_bids, BIDSPath
+from mne_bids import BIDSPath, get_entity_vals, read_raw_bids
 
 
-cfg = json.load(open(op.join('/', 'Users', 'tbrooks', 'codespace',
-                     'OcularLDT-project', 'scripts', 'config.json')))
-task = cfg['task']
-derivative = 'cov'
+parents = list(Path(__file__).resolve().parents)
+root = [path for path in parents if str(path).endswith('OcularLDT-project')][0]
+cfg = toml.load(open(root / 'config.toml' , 'rb'))
 
 redo = False
+task = cfg['task']
+bids_root = root / 'data' / task
+derivative = 'cov'
+
 
 evts_labels = ['word/prime/unprimed', 'word/prime/primed', 'nonword/prime']
-subjects_list = get_entity_vals(cfg['bids_root'], entity_key='subject')
-bids_path = BIDSPath(root=cfg['bids_root'], session=None, task=task,
+subjects_list = get_entity_vals(bids_root, entity_key='subject')
+bids_path = BIDSPath(root=bids_root, session=None, task=task,
                      datatype=cfg['datatype'])
 
-fname_rep_group = op.join(cfg['project_path'], 'output', 'reports',
-                          f'group_{task}-report.%s')
+basename_rep_group = str(root / 'output' / 'reports', f'group_{task}-report')
 
-with mne.open_report(fname_rep_group % 'h5') as rep_group:
+with mne.open_report(basename_rep_group + '.h5') as rep_group:
     for subject in subjects_list:
         print(cfg['banner'] % subject)
         bids_path.update(subject=subject)
-
-        # define filenames
-        fname_cov = op.join(cfg['bids_root'], f"sub-{subject}",
-                            cfg['datatype'],
-                            f"sub-{subject}_task-{task}_{derivative}.fif")
-        fname_ica = op.join(cfg['bids_root'], f"sub-{subject}",
-                            cfg['datatype'],
-                            f"sub-{subject}_task-{task}_ica.fif")
-
 
         raw = read_raw_bids(bids_path)
         events, event_id = mne.events_from_annotations(raw)
@@ -51,12 +42,18 @@ with mne.open_report(fname_rep_group % 'h5') as rep_group:
                             baseline=None, reject={'mag': 3e-12},
                             verbose=False, preload=True)
 
+        # define filenames
+        fname_cov = bids_path.update(suffix=derivative, extension='.fif',
+                                     check=False).fpath
+        fname_ica = bids_path.update(suffix='ica', extension='.fif',
+                                     check=False).fpath
+
         # apply ica to epochs
         ica = mne.preprocessing.read_ica(fname_ica)
         epochs = ica.apply(epochs)
         evoked = epochs.average()
 
-        if not op.exists(fname_cov) or redo:
+        if not fname_cov.exists() or redo:
             # plot covariance and whitened evoked
             epochs.load_data().crop(-.2, -.1)
 
@@ -68,11 +65,11 @@ with mne.open_report(fname_rep_group % 'h5') as rep_group:
         else:
             cov = mne.read_cov(fname_cov)
 
-        rep_group.add_covariance(cov, info=epochs.info,
+        rep_group.add_covariance(cov, info=epochs.info, tags=(derivative,),
                                  title=f'{subject} {derivative}')
 
         rep_group.add_evokeds(evoked,  titles=f'{subject} evoked',
-                              noise_cov=cov, tags=('evoked',))
+                              tags=('evoked',), noise_cov=cov)
 
-    rep_group.save(fname_rep_group % 'html', overwrite=redo,
+    rep_group.save(basename_rep_group + '.html', overwrite=True,
                    open_browser=False)

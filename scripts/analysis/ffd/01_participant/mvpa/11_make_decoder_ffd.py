@@ -1,5 +1,6 @@
-import json
+import tomllib as toml
 import os.path as op
+from pathlib import Path
 import numpy as np
 import scipy as sp
 import pandas as pd
@@ -12,8 +13,9 @@ from mne_bids import get_entity_vals, BIDSPath, read_raw_bids
 from mne.decoding import (Vectorizer, SlidingEstimator, cross_val_multiscore,
                           Scaler, LinearModel, get_coef)
 
-cfg = json.load(open(op.join('/', 'Users', 'teonbrooks', 'codespace',
-                     'OcularLDT-project', 'scripts', 'config.json')))
+parents = list(Path(__file__).resolve().parents)
+root = [path for path in parents if str(path).endswith('OcularLDT-project')][0]
+cfg = toml.load(open(root / 'config.toml', 'rb'))
 task = cfg['task']
 # parameters
 random_state = 42

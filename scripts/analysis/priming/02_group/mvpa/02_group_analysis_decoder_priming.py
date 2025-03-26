@@ -1,13 +1,14 @@
-import json
-import os.path as op
+import tomllib as toml
+from pathlib import Path
 import numpy as np
-import scipy as sp
 
-from mne.report import Report
 from mne.stats import (permutation_cluster_1samp_test as pc_1samp_test)
 
-cfg = json.load(open(op.join('/', 'Users', 'teonbrooks', 'codespace',
-                     'OcularLDT-project', 'scripts', 'config.json')))
+
+parents = list(Path(__file__).resolve().parents)
+root = [path for path in parents if str(path).endswith('OcularLDT-project')][0]
+cfg = toml.load(open(root / 'config.toml' , 'rb'))
+
 task = cfg['task']
 # parameters
 random_state = 42
@@ -21,8 +22,8 @@ c_names = ['word/target/primed', 'word/target/unprimed']
 chance = .5
 
 # setup group
-fname_group_template = op.join(cfg['project_path'], 'output', 'group',
-                               f'group_{task}_sensor_priming_%s.npy')
+fname_group_template = str(root / 'output' / 'group',
+                           f'group_{task}_sensor_priming_%s.npy')
 
 ####################
 # Group Statistics #

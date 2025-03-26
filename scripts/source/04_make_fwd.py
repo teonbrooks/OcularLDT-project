@@ -1,39 +1,42 @@
+from pathlib import Path
+import tomllib as toml
 import os.path as op
-import json
 
 import mne
-from mne.report import Report
-from mne_bids import get_entity_vals, BIDSPath
+from mne_bids import BIDSPath, get_entity_vals
 
 
-cfg = json.load(open(op.join('/', 'Users', 'tbrooks', 'codespace',
-                     'OcularLDT-project', 'scripts', 'config.json')))
+parents = list(Path(__file__).resolve().parents)
+root = [path for path in parents if str(path).endswith('OcularLDT-project')][0]
+cfg = toml.load(open(root / 'config.toml' , 'rb'))
+
 task = cfg['task']
 derivative = 'fwd'
 
 redo = True
 
-subjects_list = get_entity_vals(cfg['bids_root'], entity_key='subject')
-bids_path = BIDSPath(root=cfg['bids_root'], session=None, task=task,
+bids_root = root / 'data' / task
+mri_root = bids_root + '_MRI'
+subjects_list = get_entity_vals(bids_root, entity_key='subject')
+bids_path = BIDSPath(root=bids_root, session=None, task=task,
                      datatype=cfg['datatype'])
 
-fname_rep_group = op.join(cfg['project_path'], 'output', 'reports',
-                          f'group_{task}-report.%s')
+basename_rep_group = str(root / 'output' / 'reports', f'group_{task}-report')
 
-with mne.open_report(fname_rep_group % 'h5') as rep_group:
+with mne.open_report(basename_rep_group + '.h5') as rep_group:
     for subject in subjects_list:
         print(cfg['banner'] % subject)
         bids_path.update(subject=subject, suffix='meg')
 
         # define filenames
-        path = op.join(cfg['bids_root'], f"sub-{subject}", 'meg')
-        fname_fwd = op.join(path, f"sub-{subject}_task-{task}_{derivative}.fif")
-        fname_trans = op.join(path, f"sub-{subject}_task-{task}_trans.fif")
-        bem_sol = op.join(cfg['mri_root'], f"sub-{subject}", 'bem',
-                        f'sub-{subject}-inner_skull-bem-sol.fif')
+        fname_fwd = bids_path.update(suffix='fwd', extension='.fif').fpath
+        fname_trans = bids_path.update(suffix='trans', extension='.fif').fpath
+        # TODO: update bem and src to use BIDSPath
+        bem_sol = (mri_root / f"sub-{subject}" / 'bem' /
+                   f'sub-{subject}-inner_skull-bem-sol.fif')
         fname_src = op.join(cfg['mri_root'], f"sub-{subject}", 'bem',
                             f'sub-{subject}-ico-4-src.fif')
-        if not op.exists(fname_fwd) or redo:
+        if not fname_fwd.exists() or redo:
             info = mne.io.read_info(bids_path.fpath)
             fwd = mne.make_forward_solution(info=info, trans=fname_trans,
                                             src=fname_src, bem=bem_sol,
@@ -47,4 +50,5 @@ with mne.open_report(fname_rep_group % 'h5') as rep_group:
                               subjects_dir=cfg['mri_root'],
                               tags=('forward-solution', ))
 
-rep_group.save(fname_rep_group % 'html', overwrite=redo, open_browser=False)
+rep_group.save(basename_rep_group + '.html', overwrite=True,
+               open_browser=False)

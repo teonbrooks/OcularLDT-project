@@ -19,24 +19,27 @@ from mne_bids import read_raw_bids, BIDSPath
 from mne_bids import get_entity_vals
 
 
+parents = list(Path(__file__).resolve().parents)
+root = [path for path in parents if str(path).endswith('OcularLDT-project')][0]
+cfg = toml.load(open(root / 'config.toml', 'rb'))
+
 redo = True
+task = cfg['task']
 derivative = 'ica'
 evts_labels = ['word/prime/unprimed', 'word/prime/primed', 'nonword/prime']
 
-
-root = Path(op.dirname(op.realpath(__file__)))  / '..' / '..'
-cfg = toml.load(open(root / 'config.toml', 'rb'))
-task = cfg['task']
-bids_path = BIDSPath(root=root / 'data' / task, session=None, task=task,
+bids_root = root / 'data' / task
+subjects_list = get_entity_vals(bids_root, entity_key='subject')
+bids_path = BIDSPath(root=bids_root, session=None, task=task,
                      datatype=cfg['datatype'])
-subjects_list = get_entity_vals(root, entity_key='subject')
 
-fname_rep_group = str(root / 'output' / 'reports' / f'group_{task}-report.%s')
+fname_rep_group = op.join(root, 'output', 'reports', f'group_{task}-report.%s')
 
 ## some versioning change in either mne or h5io cause my h5 object to break
+# pick types -> pick
 with mne.open_report(fname_rep_group % 'h5') as rep_group:
     rep_group.title = f"{task} Group Report"
-    for subject in subjects_list:
+    for subject in [subjects_list[0]]:
         print(cfg['banner'] % subject)
         bids_path.update(subject=subject)
 
@@ -87,6 +90,7 @@ with mne.open_report(fname_rep_group % 'h5') as rep_group:
 
         # here, we're only remove the top offender
         ica.exclude = [ica_idx[0]]
+        # find out why the add ica to the report is breaking
         p = rep_group.add_ica(ica, title=f"{subject} {derivative}", inst=epochs,
                               picks=ica_idx, eog_evoked=epochs.average(),
                               eog_scores=itc_score, tags=(derivative,))
@@ -97,4 +101,3 @@ with mne.open_report(fname_rep_group % 'h5') as rep_group:
         ica.save(fname_ica, overwrite=redo)
 
     rep_group.save(fname_rep_group % 'html', open_browser=False, overwrite=redo)
-    rep_group.save(fname_rep_group % 'h5', open_browser=False, overwrite=redo)

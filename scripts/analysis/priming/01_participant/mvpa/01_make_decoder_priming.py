@@ -1,5 +1,5 @@
-import json
-import os.path as op
+import tomllib as toml
+from pathlib import Path
 import numpy as np
 
 from sklearn.preprocessing import LabelEncoder
@@ -7,13 +7,14 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.pipeline import make_pipeline
 
 import mne
-from mne_bids import get_entity_vals, BIDSPath, read_raw_bids
+from mne_bids import BIDSPath, get_entity_vals, read_raw_bids
 from mne.decoding import (Vectorizer, SlidingEstimator, cross_val_multiscore,
                           Scaler, LinearModel, get_coef)
 
 
-# update this so it doesn't require manually changing per user
-cfg = json.load(open(op.join('..', '..' 'config.json')))
+parents = list(Path(__file__).resolve().parents)
+root = [path for path in parents if str(path).endswith('OcularLDT-project')][0]
+cfg = toml.load(open(root / 'config.toml' , 'rb'))
 task = cfg['task']
 
 # parameters
@@ -41,10 +42,8 @@ for subject in subjects_list:
     bids_path.update(subject=subject)
 
     # define filenames
-    subject_template = op.join(cfg['bids_root'], f"sub-{subject}", 'meg',
-                               f"sub-{subject}_task-{task}")
-    fname_ica = f"{subject_template}_ica.fif"
-    fname_weights = f"{subject_template}_weights.npy"
+    fname_ica = bids_path.update(suffix='ica').fpath
+    fname_weights = bids_path.update(suffix='weights', extension='.npy').fpath
 
     # loading events and raw
     raw = read_raw_bids(bids_path)
