@@ -106,6 +106,6 @@ with mne.open_report(fname_rep_group % 'h5') as rep_group:
         ii = np.unravel_index(ii, (row,col))
         p = ica.plot_components(ica.exclude, axes=group_ax[ii], show=False)
         ica.save(fname_ica, overwrite=redo)
-        group_fig.savefig('/Users/teonbrooks/Desktop/test.svg')
+        group_fig.savefig('~/Desktop/test.svg')
 
     rep_group.save(fname_rep_group % 'html', open_browser=False, overwrite=redo)
