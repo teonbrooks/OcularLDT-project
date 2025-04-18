@@ -38,9 +38,8 @@ fname_rep_group = op.join(root, 'output', 'reports', f'group_{task}-report.%s')
 ## some versioning change in either mne or h5io cause my h5 object to break
 # pick types -> pick
 n_subjects = len(subjects_list)
-group_fig, group_ax = plt.subplots(int(np.ceil(np.sqrt(n_subjects))),
-                                   int(np.floor(np.sqrt(n_subjects))),
-                                   layout='constrained')
+row, col = int(np.ceil(np.sqrt(n_subjects))), int(np.floor(np.sqrt(n_subjects)))
+group_fig, group_ax = plt.subplots(row, col, layout='constrained')
 with mne.open_report(fname_rep_group % 'h5') as rep_group:
     rep_group.title = f"{task} Group Report"
     for ii, subject in enumerate(subjects_list):
@@ -104,6 +103,7 @@ with mne.open_report(fname_rep_group % 'h5') as rep_group:
                               eog_scores=itc_score, tags=(derivative,))
 
         # TODO: make a grid of the excluded ICAs across all subjects
+        ii = np.unravel_index(ii, (row,col))
         p = ica.plot_components(ica.exclude, axes=group_ax[ii], show=False)
         ica.save(fname_ica, overwrite=redo)
         group_fig.savefig('/Users/teonbrooks/Desktop/test.svg')
