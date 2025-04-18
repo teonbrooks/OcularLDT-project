@@ -106,6 +106,6 @@ with mne.open_report(fname_rep_group % 'h5') as rep_group:
         # TODO: make a grid of the excluded ICAs across all subjects
         p = ica.plot_components(ica.exclude, axes=group_ax[ii], show=False)
         ica.save(fname_ica, overwrite=redo)
-        group_fig.save_fig('/Users/teonbrooks/Desktop/test.svg')
+        group_fig.savefig('/Users/teonbrooks/Desktop/test.svg')
 
     rep_group.save(fname_rep_group % 'html', open_browser=False, overwrite=redo)
