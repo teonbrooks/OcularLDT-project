@@ -34,6 +34,7 @@ bids_path = BIDSPath(root=bids_root, session=None, task=task,
                      datatype=cfg['datatype'], check=False)
 
 fname_rep_group = op.join(root, 'output', 'reports', f'group_{task}-report.%s')
+fname_group_img = op.join(root, 'output', 'reports', f'group_{task}-ica.svg')
 
 ## some versioning change in either mne or h5io cause my h5 object to break
 # pick types -> pick
@@ -106,6 +107,6 @@ with mne.open_report(fname_rep_group % 'h5') as rep_group:
         ii = np.unravel_index(ii, (row,col))
         p = ica.plot_components(ica.exclude, axes=group_ax[ii], show=False)
         ica.save(fname_ica, overwrite=redo)
-        group_fig.savefig('~/Desktop/test.svg')
+        group_fig.savefig(fname_group_img)
 
     rep_group.save(fname_rep_group % 'html', open_browser=False, overwrite=redo)
