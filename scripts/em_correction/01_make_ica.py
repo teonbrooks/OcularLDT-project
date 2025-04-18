@@ -13,10 +13,10 @@ import numpy as np
 import tomllib as toml
 
 import mne
-from mne.report import Report
-
 from mne_bids import read_raw_bids, BIDSPath
 from mne_bids import get_entity_vals
+
+import matplotlib.pyplot as plt
 
 
 parents = list(Path(__file__).resolve().parents)
@@ -31,25 +31,29 @@ evts_labels = ['word/prime/unprimed', 'word/prime/primed', 'nonword/prime']
 bids_root = root / 'data' / task
 subjects_list = get_entity_vals(bids_root, entity_key='subject')
 bids_path = BIDSPath(root=bids_root, session=None, task=task,
-                     datatype=cfg['datatype'])
+                     datatype=cfg['datatype'], check=False)
 
 fname_rep_group = op.join(root, 'output', 'reports', f'group_{task}-report.%s')
 
 ## some versioning change in either mne or h5io cause my h5 object to break
 # pick types -> pick
+n_subjects = len(subjects_list)
+group_fig, group_ax = plt.subplots(int(np.ceil(np.sqrt(n_subjects))),
+                                   int(np.floor(np.sqrt(n_subjects))),
+                                   layout='constrained')
 with mne.open_report(fname_rep_group % 'h5') as rep_group:
     rep_group.title = f"{task} Group Report"
-    for subject in [subjects_list[0]]:
+    for ii, subject in enumerate(subjects_list):
         print(cfg['banner'] % subject)
         bids_path.update(subject=subject)
 
         # define filenames
-        fname_ica = op.join(root, f"sub-{subject}", cfg['datatype'],
-                            f"sub-{subject}_task-{task}_{derivative}.fif")
+        fname_ica = bids_path.update(suffix=derivative).fpath
 
         # ica input is from fixation cross to three hashes
         # no language involved
-        raw = read_raw_bids(bids_path).pick_types(meg=True).load_data()
+        bids_path.update(suffix=None)
+        raw = read_raw_bids(bids_path).pick(['meg']).load_data()
         events, total_event_id = mne.events_from_annotations(raw)
         event_id = {key: value for key, value in total_event_id.items()
                     if key in evts_labels}
@@ -74,10 +78,13 @@ with mne.open_report(fname_rep_group % 'h5') as rep_group:
 
         # compute the inter-trial coherence
         min_cycles = 1 / (epo_tmax - epo_tmin)
+        # zero_mean == False was the setting when this analysis was originally
+        # conducted. The default value changes in MNE 1.8
         itc = mne.time_frequency.tfr_array_morlet(epochs_ica.get_data(),
                                                 epochs_ica.info['sfreq'],
                                                 np.arange(min_cycles, 30),
                                                 n_cycles=.1,
+                                                zero_mean=False,
                                                 output='itc')
         # let's find the most coherent over this time course
         # TODO: find a source for time duration of saccade.
@@ -86,18 +93,19 @@ with mne.open_report(fname_rep_group % 'h5') as rep_group:
         # sum itc across time then sum across frequency
         itc_score = itc[start:stop].sum(axis=(1,2))
         # take the top three for comparison-sake
-        ica_idx = (itc_score).argsort()[::-1][:3]
+        ica_idx = (itc_score).argsort()[::-1][:3].tolist()
 
         # here, we're only remove the top offender
         ica.exclude = [ica_idx[0]]
-        # find out why the add ica to the report is breaking
+        # need to have a labels dict
+        ica.labels_ = {'eog': ica_idx}
         p = rep_group.add_ica(ica, title=f"{subject} {derivative}", inst=epochs,
                               picks=ica_idx, eog_evoked=epochs.average(),
                               eog_scores=itc_score, tags=(derivative,))
 
         # TODO: make a grid of the excluded ICAs across all subjects
-        # p = ica.plot_components(ica.exclude)
-
+        p = ica.plot_components(ica.exclude, axes=group_ax[ii], show=False)
         ica.save(fname_ica, overwrite=redo)
+        group_fig.save_fig('/Users/teonbrooks/Desktop/test.svg')
 
     rep_group.save(fname_rep_group % 'html', open_browser=False, overwrite=redo)
