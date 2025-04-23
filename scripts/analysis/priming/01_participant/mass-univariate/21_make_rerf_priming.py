@@ -23,7 +23,7 @@ bids_root = root / 'data' / 'OcularLDT'
 subjects = get_entity_vals(bids_root, entity_key='subject')
 
 for subject in subjects[:1]:
-    bids_path.update(subject=subject)
+    bids_path.update(subject=subject, check=False)
     print(cfg['banner'] % subject)
     # define filenames
     fname_raw = bids_path.update(suffix='meg').fpath

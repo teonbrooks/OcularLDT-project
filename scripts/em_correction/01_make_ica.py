@@ -23,7 +23,7 @@ parents = list(Path(__file__).resolve().parents)
 root = [path for path in parents if str(path).endswith('OcularLDT-project')][0]
 cfg = toml.load(open(root / 'config.toml', 'rb'))
 
-redo = True
+redo = False
 task = cfg['task']
 derivative = 'ica'
 evts_labels = ['word/prime/unprimed', 'word/prime/primed', 'nonword/prime']
@@ -33,15 +33,24 @@ subjects_list = get_entity_vals(bids_root, entity_key='subject')
 bids_path = BIDSPath(root=bids_root, session=None, task=task,
                      datatype=cfg['datatype'], check=False)
 
-fname_rep_group = op.join(root, 'output', 'reports', f'group_{task}-report.%s')
-fname_group_img = op.join(root, 'output', 'reports', f'group_{task}-ica.svg')
+fname_rep_group = op.join(root, 'output', 'reports',
+                          f'group_{task}-report' + '{}')
+fname_group_img = op.join(root, 'output', 'reports', derivative,
+                          f'group_{task}-ica_' + '{:02d}.svg')
 
 ## some versioning change in either mne or h5io cause my h5 object to break
 # pick types -> pick
 n_subjects = len(subjects_list)
 row, col = int(np.ceil(np.sqrt(n_subjects))), int(np.floor(np.sqrt(n_subjects)))
-group_fig, group_ax = plt.subplots(row, col, layout='constrained')
-with mne.open_report(fname_rep_group % 'h5') as rep_group:
+
+# Make group fig of the top three ICs from this method
+group_fig, group_ax = list(), list()
+for ii in range(3):
+    fig, ax = plt.subplots(row, col, layout='constrained')
+    group_fig.append(fig)
+    group_ax.append(ax)
+
+with mne.open_report(fname_rep_group.format('.h5')) as rep_group:
     rep_group.title = f"{task} Group Report"
     for ii, subject in enumerate(subjects_list):
         print(cfg['banner'] % subject)
@@ -53,7 +62,7 @@ with mne.open_report(fname_rep_group % 'h5') as rep_group:
         # ica input is from fixation cross to three hashes
         # no language involved
         bids_path.update(suffix=None)
-        raw = read_raw_bids(bids_path).pick(['meg']).load_data()
+        raw = read_raw_bids(bids_path).pick(['meg'])
         events, total_event_id = mne.events_from_annotations(raw)
         event_id = {key: value for key, value in total_event_id.items()
                     if key in evts_labels}
@@ -61,8 +70,7 @@ with mne.open_report(fname_rep_group % 'h5') as rep_group:
         epo_tmin, epo_tmax = -.1, .1
         reject = dict(mag=3e-12)
         epochs = mne.Epochs(raw, events, event_id, tmin=epo_tmin, tmax=epo_tmax,
-                            baseline=None, reject=reject, verbose=False,
-                            preload=True)
+                            baseline=None, reject=reject, verbose=False)
 
         if not op.exists(fname_ica) or redo:
             # compute the ICA
@@ -74,24 +82,35 @@ with mne.open_report(fname_rep_group % 'h5') as rep_group:
             ica = mne.preprocessing.read_ica(fname_ica)
 
         # transform epochs to ICs
-        epochs_ica = ica.get_sources(epochs)
+        epochs_ica = ica.get_sources(epochs.load_data())
 
         # compute the inter-trial coherence
         min_cycles = 1 / (epo_tmax - epo_tmin)
         # zero_mean == False was the setting when this analysis was originally
         # conducted. The default value changes in MNE 1.8
+        # wip, maybe migrate to using the method
+        # _, itc = epochs_ica.compute_tfr(method='morlet',
+        #                                 freqs=np.arange(min_cycles, 30),
+        #                                 picks='misc',
+        #                                 output='power',
+        #                                 average=True,
+        #                                 n_cycles=.1,
+        #                                 zero_mean=False,
+        #                                 return_itc=True)
         itc = mne.time_frequency.tfr_array_morlet(epochs_ica.get_data(),
-                                                epochs_ica.info['sfreq'],
-                                                np.arange(min_cycles, 30),
-                                                n_cycles=.1,
-                                                zero_mean=False,
-                                                output='itc')
+                                                  epochs_ica.info['sfreq'],
+                                                  np.arange(min_cycles, 30),
+                                                  n_cycles=.1,
+                                                  zero_mean=False,
+                                                  output='itc')
         # let's find the most coherent over this time course
         # TODO: find a source for time duration of saccade.
         itc_tmin, itc_tmax = -.1, .03
         start, stop = epochs_ica.time_as_index((itc_tmin, itc_tmax))
         # sum itc across time then sum across frequency
         itc_score = itc[start:stop].sum(axis=(1,2))
+        # wip using itc object
+        # itc_score = itc.get_data(tmin=start, tmax=stop).sum(axis=(1,2))
         # take the top three for comparison-sake
         ica_idx = (itc_score).argsort()[::-1][:3].tolist()
 
@@ -103,10 +122,20 @@ with mne.open_report(fname_rep_group % 'h5') as rep_group:
                               picks=ica_idx, eog_evoked=epochs.average(),
                               eog_scores=itc_score, tags=(derivative,))
 
-        # TODO: make a grid of the excluded ICAs across all subjects
-        ii = np.unravel_index(ii, (row,col))
-        p = ica.plot_components(ica.exclude, axes=group_ax[ii], show=False)
-        ica.save(fname_ica, overwrite=redo)
-        group_fig.savefig(fname_group_img)
+        for kk, ica_i in enumerate(ica_idx):
+            # TODO: make a grid of the excluded ICAs across all subjects
+            jj = np.unravel_index(ii, (row,col))
+            p = ica.plot_components(ica_i, axes=group_ax[kk][jj], show=False)
+            # Remove the IC Number from group plot
+            group_ax[kk][jj].set_title(subject)
+        if redo:
+            ica.save(fname_ica, overwrite=redo)
 
-    rep_group.save(fname_rep_group % 'html', open_browser=False, overwrite=redo)
+    rep_group.save(fname_rep_group.format('.html'), open_browser=False, overwrite=True)
+
+for group in group_ax:
+    [ax.set_visible(False) for axes in group for ax in axes if ax.has_data() == False]
+
+for jj, group in enumerate(group_fig):
+    group.suptitle('Group IC Topographies')
+    group.savefig(fname_group_img.format(jj))
